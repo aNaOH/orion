@@ -28,4 +28,7 @@ php composer.phar install
 
 # Third party code
 
-This project uses [PHPRouter](https://github.com/phprouter/main) licensed with a MIT License
+This project uses [PHPRouter](https://github.com/phprouter/main) licensed with a MIT License.
+
+This project uses code by Cloudflare.
+Copyright (c) 2015-2016, Cloudflare. All rights reserved.
