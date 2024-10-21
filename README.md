@@ -11,13 +11,13 @@ Orion is a social network (to write)
 
 # How to install
 
-1. [b]Clone this repository using the terminal[/b]
+1. **Clone this repository using the terminal**
 
 ```
 git clone https://github.com/aNaOH/orion.git
 ```
 
-2. [b]Install Composer packages[/b]
+2. **Install Composer packages**
 
 Depending on the Composer installation, the method can be one of the following:
 
