@@ -6,8 +6,8 @@ Orion is a social network (to write)
 # Requirements
 
 - An Apache and PHP environment
-- Composer ([Get it here](https://getcomposer.org/doc/00-intro.md))
-- Cloudflare account and bucket
+- Composer installed ([Get it here](https://getcomposer.org/doc/00-intro.md))
+- A Cloudflare account and a bucket
 
 # How to install
 
