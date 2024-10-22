@@ -1,6 +1,7 @@
 <?php
 
 use Aws\S3\S3Client;
+use Aws\Exception\AwsException;
 
 class S3Helper {
     public static function getAWSEndpoint() {
@@ -49,7 +50,7 @@ class S3Helper {
 
             return [
                 "body" => $result['Body'],
-                "type" => ""
+                "type" => $result['ContentType']
             ];
         
         } catch (AwsException $e) {

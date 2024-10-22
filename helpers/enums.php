@@ -16,4 +16,14 @@ enum ELEADERBOARD_TYPE : int {
     case BEST = 1;
 }
 
+enum EBUCKET_LOCATION : string {
+    case PROFILE_PIC = 'user/profile_pic/';
+    case GALLERY = 'community/gallery/';
+    case GUIDE_TYPE_ICON = 'community/guide/type/';
+    case GAME_COVER = 'game/cover/';
+    case GAME_THUMB = 'game/thumb/';
+    case GAME_BADGE = 'game/badge/';
+    case GAME_ACHIEVEMENT = 'game/achievement/';
+}
+
 ?>
