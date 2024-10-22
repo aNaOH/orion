@@ -1,5 +1,22 @@
 <?php
-// To call this page, in the browser type a route that doesn't exist like:
-// http://localhost/test/route
 
-echo 'PAGE NOT FOUND';
+$title = "¡Ups!";
+
+function showPage() {
+    ?>
+
+    <!-- Hero Section -->
+    <section id="hero" class="hero section dark-background">
+
+        <div class="carousel-container">
+            <h2 class="animate__animated animate__fadeInDown">¡Ups! Un 404</h2>
+            <p class="animate__animated animate__fadeInUp">Lo que buscas no está aquí... Quizas ya no exista.</p>
+            <a href="/" class="btn-get-started animate__animated animate__fadeInUp scrollto">Llevame de vuelta</a>
+          </div>
+
+    </section><!-- /Hero Section -->
+
+    <?php
+}
+
+include("views/templates/main.php");

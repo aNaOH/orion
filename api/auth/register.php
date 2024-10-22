@@ -1,7 +1,11 @@
 <?php
 
-function APIRegister(){
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $confirmPassword = $_POST['confirmPassword'];
+function APIRegister($post){
+    $username = $post['username'];
+    $password = $post['password'];
+    $confirmPassword = $post['confirmPassword'];
+
+    echo $username;
+    echo $password;
+    echo $confirmPassword;
 }
