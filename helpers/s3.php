@@ -2,10 +2,6 @@
 
 use Aws\S3\S3Client;
 
-// Subir un archivo
-
-
-echo "Archivo subido con éxito. URL: " . $result['ObjectURL'];
 class S3Helper {
     public static function getAWSEndpoint() {
         return "https://".$_ENV["CLOUDFLARE_ACCOUNT_ID"].".r2.cloudflarestorage.com/";
