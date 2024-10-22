@@ -2,7 +2,7 @@
 
 class User {
 
-    private $dbConn;
+    private static $db;
     private static $table = 'users';
 
     //Basic user info
@@ -16,10 +16,15 @@ class User {
     public $motd;
     public $badge;
 
-    public function __construct($username, $password, $role, $profile_pic = null, $motd = null, $badge = null) {
-        global $dbConn;
+    private static function loadDB() {
+        if(!isset($db)){
+            $db = ORION_DB;
+        }
+    }
 
-        $this->dbConn = $dbConn;
+    public function __construct($username, $password, $role, $profile_pic = null, $motd = null, $badge = null) {
+        
+        self::loadDB();
 
         $this->username = $username;
         $this->password = $password;
@@ -42,15 +47,17 @@ class User {
 
         if(!isset($this->id) || !self::getById($this->id)){
             $data['created_at'] = date('Y-m-d H:i:s');
-            return Connection::doInsert($this->db, self::$table, $data);
+            return Connection::doInsert(self::$db, self::$table, $data);
         } else {
-            return Connection::doUpdate($this->db, self::$table, $data, ['id' => $this->id]);
+            return Connection::doUpdate(self::$db, self::$table, $data, ['id' => $this->id]);
         }
     }
 
-    public static function getById($id) : User {
-        $user = Connection::doSelect($dbConn, self::$table, [
-            "id" => $this->$id
+    public static function getById($id) {
+        self::loadDB();
+
+        $user = Connection::doSelect(self::$db, self::$table, [
+            "id" => $id
         ]);
 
         return $user;
@@ -58,6 +65,6 @@ class User {
 
     public function delete() {
         $conditions = ['id' => $id];
-        return Connection::doDelete($this->db, self::$table, $conditions);
+        return Connection::doDelete(self::$db, self::$table, $conditions);
     }
 }

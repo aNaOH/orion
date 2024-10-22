@@ -25,7 +25,3 @@ Depending on the Composer installation method used, the command can be one of th
 composer install
 php composer.phar install
 ```
-
-# Third party code
-
-This project uses [PHPRouter](https://github.com/phprouter/main) licensed with a MIT License.

@@ -2,7 +2,6 @@
 
 require_once __DIR__.'/router.php';
 
-get('/', 'views/index.php');
 
 get('/user/$id', 'views/user');
 
