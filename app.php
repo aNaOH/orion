@@ -14,7 +14,7 @@ define("ORION_DB", Connection::connectToDB($_ENV['DB_HOST'], $_ENV['DB_NAME'], $
 $router = new \Bramus\Router\Router();
 
 $router->get('/', function(){
-    $user = User::getById(0);
+    $userSession = $_SESSION['user'];
     include('views/index.php');
 });
 

@@ -1,165 +1,168 @@
-CREATE TABLE `users` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `username` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` integer NOT NULL,
-  `profile_pic` varchar(255),
-  `motd` varchar(255),
-  `badge` integer,
-  `created_at` timestamp
+-- Table: users
+CREATE TABLE users (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  username VARCHAR(100) NOT NULL,
+  password VARCHAR(255) NOT NULL,
+  role INT NOT NULL,
+  profile_pic VARCHAR(255),
+  motd VARCHAR(255),
+  badge_id INT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE `owns` (
-  `user` integer NOT NULL,
-  `game` integer NOT NULL,
-  `base_price` float NOT NULL,
-  `discount` float NOT NULL
+-- Table: badges
+CREATE TABLE badges (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  icon VARCHAR(255) NOT NULL,
+  game_id INT
 );
 
-CREATE TABLE `developers` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `profile_pic` varchar(255),
-  `motd` varchar(255),
-  `owner` integer NOT NULL
+-- Adding foreign key to `users` referencing `badges`
+ALTER TABLE users ADD CONSTRAINT fk_badge_id FOREIGN KEY (badge_id) REFERENCES badges(id);
+
+-- Table: game
+CREATE TABLE game (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  short_description VARCHAR(255),
+  description TEXT,
+  launch_date TIMESTAMP,
+  base_price FLOAT,
+  discount FLOAT,
+  file VARCHAR(255),
+  version VARCHAR(50),
+  developer_id INT
 );
 
-CREATE TABLE `game` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `title` varchar(255),
-  `short_description` varchar(255),
-  `description` text COMMENT 'Content of the post',
-  `launch_date` timestamp,
-  `base_price` float,
-  `discount` float,
-  `file` varchar(255),
-  `version` varchar(255),
-  `developer` integer NOT NULL
+-- Table: developers
+CREATE TABLE developers (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  name VARCHAR(255) NOT NULL,
+  profile_pic VARCHAR(255),
+  motd VARCHAR(255),
+  owner_id INT NOT NULL,
+  FOREIGN KEY (owner_id) REFERENCES users(id)
 );
 
-CREATE TABLE `posts` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `body` text NOT NULL,
-  `created_at` timestamp,
-  `last_updated_at` timestamp,
-  `is_public` bool DEFAULT false,
-  `type` integer,
-  `game` integer,
-  `author` integer
+-- Adding foreign key to `game` referencing `developers`
+ALTER TABLE game ADD CONSTRAINT fk_developer_id FOREIGN KEY (developer_id) REFERENCES developers(id);
+
+-- Table: owns
+CREATE TABLE owns (
+  user_id INT NOT NULL,
+  game_id INT NOT NULL,
+  base_price FLOAT NOT NULL,
+  discount FLOAT NOT NULL,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (game_id) REFERENCES game(id)
 );
 
-CREATE TABLE `gallery_entries` (
-  `post_id` integer PRIMARY KEY NOT NULL,
-  `media` varchar(255) NOT NULL
+-- Table: posts
+CREATE TABLE posts (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  title VARCHAR(255) NOT NULL,
+  body TEXT NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  last_updated_at TIMESTAMP,
+  is_public BOOLEAN DEFAULT FALSE,
+  type INT,
+  game_id INT,
+  author_id INT,
+  FOREIGN KEY (game_id) REFERENCES game(id),
+  FOREIGN KEY (author_id) REFERENCES users(id)
 );
 
-CREATE TABLE `guides` (
-  `post_id` integer PRIMARY KEY NOT NULL,
-  `type` integer NOT NULL
+-- Table: gallery_entries
+CREATE TABLE gallery_entries (
+  post_id INT PRIMARY KEY NOT NULL,
+  media VARCHAR(255) NOT NULL,
+  FOREIGN KEY (post_id) REFERENCES posts(id)
 );
 
-CREATE TABLE `guide_types` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `icon` varchar(255) NOT NULL,
-  `type` varchar(255) NOT NULL
+-- Table: guide_types
+CREATE TABLE guide_types (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  icon VARCHAR(255) NOT NULL,
+  type VARCHAR(100) NOT NULL
 );
 
-CREATE TABLE `comments` (
-  `author` integer NOT NULL,
-  `post_id` integer NOT NULL
+-- Table: guides
+CREATE TABLE guides (
+  post_id INT PRIMARY KEY NOT NULL,
+  type_id INT NOT NULL,
+  FOREIGN KEY (post_id) REFERENCES posts(id),
+  FOREIGN KEY (type_id) REFERENCES guide_types(id)
 );
 
-CREATE TABLE `votes` (
-  `user` integer NOT NULL,
-  `is_downvote` bool NOT NULL DEFAULT false
+-- Table: comments
+CREATE TABLE comments (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  author_id INT NOT NULL,
+  post_id INT NOT NULL,
+  body TEXT NOT NULL,
+  FOREIGN KEY (author_id) REFERENCES users(id),
+  FOREIGN KEY (post_id) REFERENCES posts(id)
 );
 
-CREATE TABLE `badges` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `icon` varchar(255) NOT NULL,
-  `game` integer NOT NULL
+-- Table: votes
+CREATE TABLE votes (
+  user_id INT NOT NULL,
+  post_id INT NOT NULL,
+  is_downvote BOOLEAN DEFAULT FALSE,
+  FOREIGN KEY (user_id) REFERENCES users(id),
+  FOREIGN KEY (post_id) REFERENCES posts(id)
 );
 
-CREATE TABLE `badge_unlocked` (
-  `badge` integer NOT NULL,
-  `user` integer NOT NULL,
-  `date` timestamp NOT NULL
+-- Adding foreign key to `badges` referencing `game`
+ALTER TABLE badges ADD CONSTRAINT fk_game_id FOREIGN KEY (game_id) REFERENCES game(id);
+
+-- Table: badge_unlocked
+CREATE TABLE badge_unlocked (
+  badge_id INT NOT NULL,
+  user_id INT NOT NULL,
+  date TIMESTAMP NOT NULL,
+  FOREIGN KEY (badge_id) REFERENCES badges(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE `achievements` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `icon` varchar(255) NOT NULL,
-  `locked_icon` varchar(255),
-  `secret` bool NOT NULL DEFAULT false,
-  `game` integer NOT NULL
+-- Table: achievements
+CREATE TABLE achievements (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(255) NOT NULL,
+  icon VARCHAR(255) NOT NULL,
+  locked_icon VARCHAR(255),
+  secret BOOLEAN DEFAULT FALSE,
+  game_id INT,
+  FOREIGN KEY (game_id) REFERENCES game(id)
 );
 
-CREATE TABLE `leaderboards` (
-  `id` integer PRIMARY KEY NOT NULL AUTO_INCREMENT,
-  `concept` integer NOT NULL,
-  `type` integer NOT NULL,
-  `game` integer NOT NULL
+-- Table: leaderboards
+CREATE TABLE leaderboards (
+  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
+  concept INT NOT NULL,
+  type INT NOT NULL,
+  game_id INT,
+  FOREIGN KEY (game_id) REFERENCES game(id)
 );
 
-CREATE TABLE `entries` (
-  `leaderboard` integer NOT NULL,
-  `user` integer NOT NULL,
-  `value` integer NOT NULL
+-- Table: entries
+CREATE TABLE entries (
+  leaderboard_id INT NOT NULL,
+  user_id INT NOT NULL,
+  value INT NOT NULL,
+  FOREIGN KEY (leaderboard_id) REFERENCES leaderboards(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
-CREATE TABLE `unlocks` (
-  `achievement` integer NOT NULL,
-  `user` integer NOT NULL,
-  `date` timestamp NOT NULL
+-- Table: unlocks
+CREATE TABLE unlocks (
+  achievement_id INT NOT NULL,
+  user_id INT NOT NULL,
+  date TIMESTAMP NOT NULL,
+  FOREIGN KEY (achievement_id) REFERENCES achievements(id),
+  FOREIGN KEY (user_id) REFERENCES users(id)
 );
-
-ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `posts` (`author`);
-
-ALTER TABLE `game` ADD FOREIGN KEY (`id`) REFERENCES `posts` (`game`);
-
-ALTER TABLE `posts` ADD FOREIGN KEY (`id`) REFERENCES `gallery_entries` (`post_id`);
-
-ALTER TABLE `posts` ADD FOREIGN KEY (`id`) REFERENCES `guides` (`post_id`);
-
-ALTER TABLE `guides` ADD FOREIGN KEY (`type`) REFERENCES `guide_types` (`id`);
-
-ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `comments` (`author`);
-
-ALTER TABLE `comments` ADD FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`);
-
-ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `votes` (`user`);
-
-ALTER TABLE `votes` ADD FOREIGN KEY (`is_downvote`) REFERENCES `gallery_entries` (`post_id`);
-
-ALTER TABLE `game` ADD FOREIGN KEY (`id`) REFERENCES `leaderboards` (`game`);
-
-ALTER TABLE `leaderboards` ADD FOREIGN KEY (`id`) REFERENCES `entries` (`leaderboard`);
-
-ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `entries` (`user`);
-
-ALTER TABLE `game` ADD FOREIGN KEY (`id`) REFERENCES `achievements` (`game`);
-
-ALTER TABLE `achievements` ADD FOREIGN KEY (`id`) REFERENCES `unlocks` (`achievement`);
-
-ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `unlocks` (`user`);
-
-ALTER TABLE `users` ADD FOREIGN KEY (`badge`) REFERENCES `badges` (`id`);
-
-ALTER TABLE `game` ADD FOREIGN KEY (`id`) REFERENCES `badges` (`game`);
-
-ALTER TABLE `badges` ADD FOREIGN KEY (`id`) REFERENCES `badge_unlocked` (`badge`);
-
-ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `badge_unlocked` (`user`);
-
-ALTER TABLE `users` ADD FOREIGN KEY (`id`) REFERENCES `developers` (`owner`);
-
-ALTER TABLE `developers` ADD FOREIGN KEY (`id`) REFERENCES `game` (`developer`);
-
-ALTER TABLE `owns` ADD FOREIGN KEY (`user`) REFERENCES `users` (`id`);
-
-ALTER TABLE `owns` ADD FOREIGN KEY (`game`) REFERENCES `game` (`id`);

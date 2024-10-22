@@ -2,11 +2,11 @@
 
 class User {
 
-    private static $db;
     private static $table = 'users';
 
     //Basic user info
     public $id;
+    public $email;
     public $username;
     public $password;
     public $role;
@@ -16,15 +16,7 @@ class User {
     public $motd;
     public $badge;
 
-    private static function loadDB() {
-        if(!isset($db)){
-            $db = ORION_DB;
-        }
-    }
-
-    public function __construct($username, $password, $role, $profile_pic = null, $motd = null, $badge = null) {
-        
-        self::loadDB();
+    public function __construct($email, $username, $password, $role, $profile_pic = null, $motd = null, $badge = null, $id = null) {
 
         $this->username = $username;
         $this->password = $password;
@@ -32,6 +24,8 @@ class User {
         $this->profile_pic = $profile_pic;
         $this->motd = $motd;
         $this->badge = $badge;
+
+        $this->id = $id;
     }
 
     public function save() {
@@ -47,24 +41,44 @@ class User {
 
         if(!isset($this->id) || !self::getById($this->id)){
             $data['created_at'] = date('Y-m-d H:i:s');
-            return Connection::doInsert(self::$db, self::$table, $data);
+            return Connection::doInsert(ORION_DB, self::$table, $data);
         } else {
-            return Connection::doUpdate(self::$db, self::$table, $data, ['id' => $this->id]);
+            return Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
         }
     }
 
-    public static function getById($id) {
-        self::loadDB();
+    public static function getById($id) : User|null {
 
-        $user = Connection::doSelect(self::$db, self::$table, [
+        $user = Connection::doSelect(ORION_DB, self::$table, [
             "id" => $id
         ]);
 
-        return $user;
+        if(count($user) == 1){
+            return new User(
+                $user['email'], 
+                $user['username'], 
+                $user['password'], 
+                $user['role'], 
+                $user['profile_pic'], 
+                $user['motd'], 
+                $user['badge'], 
+                $user['id']
+            );
+        }
+
+        return null;
     }
 
     public function delete() {
         $conditions = ['id' => $id];
-        return Connection::doDelete(self::$db, self::$table, $conditions);
+        return Connection::doDelete(ORION_DB, self::$table, $conditions);
+    }
+
+    public function toSessionArray(){
+        return [
+            "id" => $this->id,
+            "username" => $this->username,
+            "profile_pic" => $this->profile_pic
+        ];
     }
 }
