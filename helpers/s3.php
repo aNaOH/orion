@@ -43,7 +43,7 @@ class S3Helper {
 
         try {
             // Obtener el objeto
-            self::getClient()->getObject([
+            $result = self::getClient()->getObject([
                 'Bucket' => self::getBucketName(),
                 'Key'    => $key,
             ]);

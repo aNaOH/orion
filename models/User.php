@@ -18,9 +18,10 @@ class User {
 
     public function __construct($email, $username, $password, $role, $profile_pic = null, $motd = null, $badge = null, $id = null) {
 
+        $this->email = $email;
         $this->username = $username;
         $this->password = $password;
-        $this->role = $role;
+        $this->role = ($role::class == EUSER_TYPE::class) ? $role : EUSER_TYPE::from($role);
         $this->profile_pic = $profile_pic;
         $this->motd = $motd;
         $this->badge = $badge;
@@ -40,7 +41,6 @@ class User {
         ];
 
         if(!isset($this->id) || !self::getById($this->id)){
-            $data['created_at'] = date('Y-m-d H:i:s');
             return Connection::doInsert(ORION_DB, self::$table, $data);
         } else {
             return Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
@@ -69,8 +69,30 @@ class User {
         return null;
     }
 
+    public static function getByEmail($email) : User|null {
+
+        $user = Connection::doSelect(ORION_DB, self::$table, [
+            "email" => $email
+        ]);
+
+        if(count($user) == 1){
+            return new User(
+                $user['email'], 
+                $user['username'], 
+                $user['password'], 
+                $user['role'], 
+                $user['profile_pic'], 
+                $user['motd'], 
+                $user['badge'], 
+                $user['id']
+            );
+        }
+
+        return null;
+    }
+
     public function delete() {
-        $conditions = ['id' => $id];
+        $conditions = ['id' => $this->id];
         return Connection::doDelete(ORION_DB, self::$table, $conditions);
     }
 
