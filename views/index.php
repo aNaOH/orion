@@ -13,7 +13,9 @@ function showPage() {
             <p class="animate__animated animate__fadeInUp">Gamers, ¡unidos!</p>
             <div class="d-flex flex-row justify-content-between">
                 <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Leer más</a>
-                <a href="/register" class="btn-get-started animate__animated animate__fadeInUp">Unirse</a>
+                <?php if(isset($userSession)) { ?>
+                  <a href="/register" class="btn-get-started animate__animated animate__fadeInUp">Unirse</a>
+                <?php } ?>
             </div>
           </div>
 

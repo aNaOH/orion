@@ -12,12 +12,7 @@
           <li><a href="/">Inicio</a></li>
           <li><a href="/communities">Comunidad</a></li>
           <li><a href="/store">Tienda</a></li>
-          <li class="dropdown"><a href="#"><span>Cuenta</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="/login">Iniciar sesión</a></li>
-              <li><a href="/register">Crear una cuenta</a></li>
-            </ul>
-          </li>
+          <?php NavbarHelper::getUserNavbar($userSession) ?>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>

@@ -1,8 +1,7 @@
 {
     "autoload": {
-        "files": [
-            "./helpers/enums.php",
-            "./helpers/s3.php"
+        "classmap": [
+            "./helpers/"
         ]
     },
     "require": {
