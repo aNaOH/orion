@@ -17,6 +17,7 @@ enum ELEADERBOARD_TYPE : int {
 }
 
 enum EBUCKET_LOCATION : string {
+    case MISC = 'misc/';
     case PROFILE_PIC = 'user/profile_pic/';
     case GALLERY = 'community/gallery/';
     case GUIDE_TYPE_ICON = 'community/guide/type/';

@@ -24,22 +24,22 @@ class S3Helper {
         ]);
     }
 
-    public static function upload($location, $name, $body) {
+    public static function upload(EBUCKET_LOCATION $location, $name, $body) {
 
-        //TODO: make this work
-        $key = $location . $name;
+        $key = $location->value . $name;
 
         $result = self::getClient()->putObject([
             'Bucket' => self::getBucketName(),
             'Key'    => $key,
             'Body'   => $body,
         ]);
+
+        return isset($result);
     }
 
-    public static function retrieve($location, $name) {
+    public static function retrieve(EBUCKET_LOCATION $location, $name) {
 
-        //TODO: make this work
-        $key = $location . $name;
+        $key = $location->value . $name;
 
         try {
             // Obtener el objeto

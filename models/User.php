@@ -103,6 +103,10 @@ class User {
         return null;
     }
 
+    public function getProfilePicURL() {
+        return "/media/profile/".($user->profile_pic ?? "default");
+    }
+
     public function delete() {
         $conditions = ['id' => $this->id];
         return Connection::doDelete(ORION_DB, self::$table, $conditions);

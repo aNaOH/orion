@@ -24,27 +24,7 @@ $router->get('/', function(){
     include('views/index.php');
 });
 
-$router->get('/register', function(){
-    if(isset($_SESSION['user'])){
-        header('location: /');
-    }
-    include('views/auth/register.php');
-});
-
-$router->get('/login', function(){
-    if(isset($_SESSION['user'])){
-        header('location: /');
-    }
-    include('views/auth/login.php');
-});
-
-$router->get('/profile', function(){
-    if(!isset($_SESSION['user'])){
-        header('location: /');
-    }
-    $userSession = $_SESSION['user'];
-    include('views/auth/profile.php');
-});
+include('routes/auth.php');
 
 $router->get('/profile/{id}', function($id){
     if(isset($_SESSION['user'])){
@@ -53,72 +33,16 @@ $router->get('/profile/{id}', function($id){
     include('views/auth/profile.php');
 });
 
-$router->get('/logout', function(){
-    if(isset($_SESSION['user'])){
-        session_destroy();
-    }
-    header('location: /');
-});
 
-//Middlewares
+include('routes/media/media.php');
 
-$router->before('GET|POST', '/admin/.*', function() {
-    if (!isset($_SESSION['user'])) { //Complete this
-        header('location: /auth/login');
-        exit();
-    }
-});
+include('routes/api/api.php');
 
-$router->before('GET|POST', '/api/.*', function() {
-    header('Content-Type: application/json'); //Add JSON Header to all API routes
-});
-
-//API
-$router->mount('/media', function() use ($router) {
-
-    $router->get('/profile/{uuid}', function($uuid){
-
-        $img = S3Helper::retrieve(EBUCKET_LOCATION::PROFILE_PIC->value, "default.png");
-
-        header('Content-Type: '.$img['type']); //Add JSON Header to all API routes
-
-        echo $img['body'];
-    });
-});
-
-//API
-$router->mount('/api', function() use ($router) {
-
-    $router->post('/auth/login', function(){
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-
-        UserController::login($email, $password);
-    });
-
-    $router->post('/auth/register', function(){
-        $email = $_POST['email'];
-        $password = $_POST['password'];
-        $confirmPassword = $_POST['confirmPassword'];
-
-        UserController::register($email, $password, $confirmPassword);
-    });
-});
+include('routes/middlewares.php');
 
 $router->set404(function() {
     header('HTTP/1.1 404 Not Found');
     include('views/404.php');
-});
-
-$router->set404('/api(/.*)?', function() {
-    header('HTTP/1.1 404 Not Found');
-    header('Content-Type: application/json');
-
-    $jsonArray = array();
-    $jsonArray['status'] = "404";
-    $jsonArray['status_text'] = "route not defined";
-
-    echo json_encode($jsonArray);
 });
 
 // Run it!
