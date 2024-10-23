@@ -55,6 +55,13 @@ $router->before('GET|POST', '/api/.*', function() {
 //API
 $router->mount('/api', function() use ($router) {
 
+    $router->post('/auth/login', function(){
+        $email = $_POST['email'];
+        $password = $_POST['password'];
+
+        UserController::login($email, $password);
+    });
+
     $router->post('/auth/register', function(){
         $email = $_POST['email'];
         $password = $_POST['password'];

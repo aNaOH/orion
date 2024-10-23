@@ -16,12 +16,20 @@ class User {
     public $motd;
     public $badge;
 
-    public function __construct($email, $username, $password, $role, $profile_pic = null, $motd = null, $badge = null, $id = null) {
+    public function __construct($email, $username, $password, EUSER_TYPE|int $role, $profile_pic = null, $motd = null, $badge = null, $id = null) {
+
+        $parsedRole = 0;
+
+        if(is_numeric($role)){
+            $parsedRole == EUSER_TYPE::from($role);
+        } else{
+            $parsedRole = $role;
+        }
 
         $this->email = $email;
         $this->username = $username;
         $this->password = $password;
-        $this->role = ($role::class == EUSER_TYPE::class) ? $role : EUSER_TYPE::from($role);
+        $this->role = $parsedRole;
         $this->profile_pic = $profile_pic;
         $this->motd = $motd;
         $this->badge = $badge;
@@ -59,14 +67,14 @@ class User {
 
         if(count($user) == 1){
             return new User(
-                $user['email'], 
-                $user['username'], 
-                $user['password'], 
-                $user['role'], 
-                $user['profile_pic'], 
-                $user['motd'], 
-                $user['badge'], 
-                $user['id']
+                $user[0]['email'], 
+                $user[0]['username'], 
+                $user[0]['password'], 
+                $user[0]['role'], 
+                $user[0]['profile_pic'], 
+                $user[0]['motd'], 
+                $user[0]['badge_id'], 
+                $user[0]['id']
             );
         }
 
@@ -81,14 +89,14 @@ class User {
 
         if(count($user) == 1){
             return new User(
-                $user['email'], 
-                $user['username'], 
-                $user['password'], 
-                $user['role'], 
-                $user['profile_pic'], 
-                $user['motd'], 
-                $user['badge'], 
-                $user['id']
+                $user[0]['email'], 
+                $user[0]['username'], 
+                $user[0]['password'], 
+                $user[0]['role'], 
+                $user[0]['profile_pic'], 
+                $user[0]['motd'], 
+                $user[0]['badge_id'], 
+                $user[0]['id']
             );
         }
 
