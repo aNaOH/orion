@@ -32,16 +32,20 @@ class User {
     public function save() {
 
         $data = [
+            'email' => $this->email,
             'username' => $this->username,
             'password' => password_hash($this->password, PASSWORD_BCRYPT),  // Hasheando la contraseña
-            'role' => $this->role,
+            'role' => $this->role->value,
             'profile_pic' => $this->profile_pic,
             'motd' => $this->motd,
-            'badge' => $this->badge,
+            'badge_id' => $this->badge,
         ];
 
         if(!isset($this->id) || !self::getById($this->id)){
-            return Connection::doInsert(ORION_DB, self::$table, $data);
+            $result = Connection::doInsert(ORION_DB, self::$table, $data);
+            $id = count(Connection::doSelect(ORION_DB, self::$table));
+            $this->id = $id;
+            return $result;
         } else {
             return Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
         }

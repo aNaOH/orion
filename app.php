@@ -10,6 +10,10 @@ require 'controllers/UserController.php'; //Import DB model
 
 define("ORION_DB", Connection::connectToDB($_ENV['DB_HOST'], $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS'])); //Connect to DB and entering into constant
 
+session_start([
+    "name" => "ORION_SESSION"
+]);
+
 // Create Router instance
 $router = new \Bramus\Router\Router();
 
@@ -55,7 +59,7 @@ $router->mount('/api', function() use ($router) {
         $email = $_POST['email'];
         $password = $_POST['password'];
         $confirmPassword = $_POST['confirmPassword'];
-        
+
         UserController::register($email, $password, $confirmPassword);
     });
 });

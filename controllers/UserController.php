@@ -31,5 +31,45 @@ class UserController {
 
         $user = new User($email, $username, $password, EUSER_TYPE::USER);
         $user->save();
+
+        header('HTTP/1.1 200 OK');
+        $response['status'] = 200;
+        $response['message'] = "User created ( ID: ".strval($user->id)." )";
+
+        echo json_encode($response);
+        exit();
+    }
+
+    public static function login($email, $password){
+        $response = array();
+        
+        $user = User::getByEmail($email);
+
+        if(!isset($user)){
+            header('HTTP/1.1 400 Bad Request');
+            $response['status'] = 400;
+            $response['message'] = "An user with that email does not exist";
+
+            echo json_encode($response);
+            exit();
+        }
+
+        if(!password_verify($password, $user->password)){
+            header('HTTP/1.1 400 Bad Request');
+            $response['status'] = 400;
+            $response['message'] = "Incorrect password";
+
+            echo json_encode($response);
+            exit();
+        }
+
+        $_SESSION['user'] = $user->toSessionArray();
+
+        header('HTTP/1.1 200 OK');
+        $response['status'] = 200;
+        $response['message'] = "User with ID ".strval($user->id)." logged in";
+
+        echo json_encode($response);
+        exit();
     }
 }
