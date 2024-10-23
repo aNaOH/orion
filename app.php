@@ -38,6 +38,27 @@ $router->get('/login', function(){
     include('views/auth/login.php');
 });
 
+$router->get('/profile', function(){
+    if(!isset($_SESSION['user'])){
+        header('location: /');
+    }
+    $userSession = $_SESSION['user'];
+    include('views/auth/profile.php');
+});
+
+$router->get('/profile/{id}', function($id){
+    if(isset($_SESSION['user'])){
+        header('location: /');
+    }
+    include('views/auth/profile.php');
+});
+
+$router->get('/logout', function(){
+    if(isset($_SESSION['user'])){
+        session_destroy();
+    }
+    header('location: /');
+});
 
 //Middlewares
 
@@ -50,6 +71,19 @@ $router->before('GET|POST', '/admin/.*', function() {
 
 $router->before('GET|POST', '/api/.*', function() {
     header('Content-Type: application/json'); //Add JSON Header to all API routes
+});
+
+//API
+$router->mount('/media', function() use ($router) {
+
+    $router->get('/profile/{uuid}', function($uuid){
+
+        $img = S3Helper::retrieve(EBUCKET_LOCATION::PROFILE_PIC->value, "default.png");
+
+        header('Content-Type: '.$img['type']); //Add JSON Header to all API routes
+
+        echo $img['body'];
+    });
 });
 
 //API
