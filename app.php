@@ -18,9 +18,6 @@ session_start([
 $router = new \Bramus\Router\Router();
 
 $router->get('/', function(){
-    if(isset($_SESSION['user'])){
-        $userSession = $_SESSION['user'];
-    }
     include('views/index.php');
 });
 

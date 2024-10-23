@@ -25,7 +25,6 @@ $router->get('/profile', function(){
     if(!isset($_SESSION['user'])){
         header('location: /');
     }
-    $userSession = $_SESSION['user'];
     include('views/auth/profile.php');
 });
 

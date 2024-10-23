@@ -15,8 +15,7 @@ form.onsubmit = (e) => {
         type: 'POST', // The HTTP method to use for the request (GET, POST, etc.)
         data: { email: fields['emailAddress'].value, password: fields['password'].value, confirmPassword: fields['confirmPassword'].value }, // Data to be sent to the server
         success: function(response) {
-            // Code to execute if the request succeeds
-            console.log('Success:', response);
+            location.href = "/login";
         },
         error: function(xhr, status, error) {
             // Code to execute if the request fails

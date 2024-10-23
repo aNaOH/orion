@@ -12,7 +12,7 @@
           <li><a href="/">Inicio</a></li>
           <li><a href="/communities">Comunidad</a></li>
           <li><a href="/store">Tienda</a></li>
-          <?php NavbarHelper::getUserNavbar($userSession) ?>
+          <?php NavbarHelper::getUserNavbar($userSession ?? null) ?>
         </ul>
         <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
       </nav>
