@@ -37,6 +37,37 @@ class User {
         $this->id = $id;
     }
 
+    public function getHandle(){
+        return str_replace(" ", "_", strtolower($this->username))."#".strval($this->id);
+    }
+
+    public static function getByHandle($handle) : User|null {
+
+        $id = explode("#", $handle)[-1];
+        $user = Connection::doSelect(ORION_DB, self::$table, [
+            "id" => $id
+        ]);
+
+        if(count($user) == 1){
+            $userObj = new User(
+                $user[0]['email'], 
+                $user[0]['username'], 
+                $user[0]['password'], 
+                $user[0]['role'], 
+                $user[0]['profile_pic'], 
+                $user[0]['motd'], 
+                $user[0]['badge_id'], 
+                $user[0]['id']
+            );
+
+            if($userObj->getHandle() == $handle){
+                return $userObj;
+            }
+        }
+
+        return null;
+    }
+
     public function save() {
 
         $data = [
@@ -108,11 +139,17 @@ class User {
     }
 
     public function delete() {
+        if(!isset($this->id)){
+            return null;
+        }
         $conditions = ['id' => $this->id];
         return Connection::doDelete(ORION_DB, self::$table, $conditions);
     }
 
     public function toSessionArray(){
+        if(!isset($this->id)){
+            return [];
+        }
         return [
             "id" => $this->id,
             "username" => $this->username,

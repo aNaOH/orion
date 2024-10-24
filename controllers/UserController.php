@@ -13,6 +13,7 @@ class UserController {
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
             $response['message'] = "An user with that email exists";
+            $response['field'] = "emailAddress";
 
             echo json_encode($response);
             exit();
@@ -22,6 +23,7 @@ class UserController {
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
             $response['message'] = "Passwords must coincide";
+            $response['field'] = "confirmPassword";
 
             echo json_encode($response);
             exit();
@@ -49,6 +51,7 @@ class UserController {
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
             $response['message'] = "An user with that email does not exist";
+            $response['field'] = "emailAddress";
 
             echo json_encode($response);
             exit();
@@ -58,6 +61,7 @@ class UserController {
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
             $response['message'] = "Incorrect password";
+            $response['field'] = "password";
 
             echo json_encode($response);
             exit();
