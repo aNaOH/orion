@@ -1,9 +1,15 @@
 let form = document.getElementById("registerForm");
+let submit = document.getElementById("submitButton");
 
 form.onsubmit = (e) => {
     e.preventDefault();
 
     let fields = e.target.elements;
+
+    resetField('emailAddress');
+    resetField('password');
+
+    submit.classList.add("disabled");
 
     $.ajax({
         url: '/api/auth/login', // The URL to which the request is sent
@@ -13,8 +19,10 @@ form.onsubmit = (e) => {
             location.href = "/";
         },
         error: function(xhr, status, error) {
-            // Code to execute if the request fails
-            console.log('Error:', error);
+            const info = xhr.responseJSON;
+            console.log(info);
+            showError(info);
+            submit.classList.remove("disabled");
         }
     });
 };

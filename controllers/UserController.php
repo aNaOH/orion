@@ -4,8 +4,25 @@ require './models/User.php';
 
 class UserController {
 
-    public static function register($email, $password, $confirmPassword){
+    public static function register($email, $password, $confirmPassword, $terms){
         $response = array();
+
+        FormHelper::ValidateRequiredField($email, "emailAddress");
+        FormHelper::ValidateRequiredField($password, "password");
+        FormHelper::ValidateRequiredField($confirmPassword, "confirmPassword");
+        
+        FormHelper::ValidateMinChars($password, 8, "password");
+        FormHelper::ValidatePasswordRequirements($password, "password");
+
+        if(!isset($terms) || $terms != "yeah"){
+            header('HTTP/1.1 400 Bad Request');
+            $response['status'] = 400;
+            $response['message'] = "Debes aceptar los términos y condiciones y la política de privacidad";
+            $response['field'] = "terms";
+
+            echo json_encode($response);
+            exit();
+        }
         
         $user = User::getByEmail($email);
 
@@ -22,7 +39,7 @@ class UserController {
         if($password != $confirmPassword){
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
-            $response['message'] = "Passwords must coincide";
+            $response['message'] = "Las contraseñas deben coincidir.";
             $response['field'] = "confirmPassword";
 
             echo json_encode($response);
@@ -36,7 +53,7 @@ class UserController {
 
         header('HTTP/1.1 200 OK');
         $response['status'] = 200;
-        $response['message'] = "User created ( ID: ".strval($user->id)." )";
+        $response['message'] = "Usuario creado ( ID: ".strval($user->id)." )";
 
         echo json_encode($response);
         exit();
@@ -44,13 +61,19 @@ class UserController {
 
     public static function login($email, $password){
         $response = array();
+
+        FormHelper::ValidateRequiredField($email, "emailAddress");
+        FormHelper::ValidateRequiredField($password, "password");
+
+        FormHelper::ValidateMinChars($password, 8, "password");
         
         $user = User::getByEmail($email);
 
         if(!isset($user)){
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
-            $response['message'] = "An user with that email does not exist";
+            $response['message'] = "No existe un usuario con ese correo electrónico.";
+            $response['value'] = $email;
             $response['field'] = "emailAddress";
 
             echo json_encode($response);
@@ -60,7 +83,7 @@ class UserController {
         if(!password_verify($password, $user->password)){
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
-            $response['message'] = "Incorrect password";
+            $response['message'] = "Contraseña incorrecta";
             $response['field'] = "password";
 
             echo json_encode($response);
