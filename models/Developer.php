@@ -1,7 +1,9 @@
 <?php
 
+require './models/Game.php';
+
 class Developer {
-    private static string $table = 'developers';
+    public static string $table = 'developers';
 
     public ?int $id;
     public string $name;
@@ -69,8 +71,20 @@ class Developer {
         return null;
     }
 
-    public function getOwner() : User {
+    public function getOwner(): User {
         return User::getById($this->owner_id);
+    }
+
+    public function getGames()  {
+        $games = [];
+
+        $select = Connection::doSelect(ORION_DB, Game::$table, ["developer_id" => $this->id]);
+
+        foreach ($select as $row) {
+            $games[] = Game::getById($row['id']);
+        }
+        
+        return $games;
     }
 
     public function delete(): ?bool {

@@ -1,7 +1,9 @@
 <?php
 
+require './models/Developer.php';
+
 class Game {
-    private static string $table = 'game';
+    public static string $table = 'game';
 
     public ?int $id;
     public string $title;
@@ -77,6 +79,10 @@ class Game {
             );
         }
         return null;
+    }
+
+    public function getDeveloper() : Developer {
+        return Developer::getById($this->developer_id);
     }
 
     public function delete(): ?bool {

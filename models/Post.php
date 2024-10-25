@@ -1,7 +1,7 @@
 <?php
 
 class Post {
-    private static string $table = 'posts';
+    public static string $table = 'posts';
 
     public ?int $id;
     public string $title;
