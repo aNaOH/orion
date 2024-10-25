@@ -1,5 +1,11 @@
 <?php
 
+require './models/User.php';
+require './models/Game.php';
+
+require './models/PostTypes/GalleryEntry.php';
+require './models/PostTypes/Guide.php';
+
 class Post {
     public static string $table = 'posts';
 
@@ -9,7 +15,7 @@ class Post {
     public string $created_at;
     public ?string $last_updated_at;
     public bool $is_public;
-    public ?int $type;
+    public EPOST_TYPE $type;
     public ?int $game_id;
     public int $author_id;
 
@@ -19,7 +25,7 @@ class Post {
         string $created_at,
         ?string $last_updated_at,
         bool $is_public,
-        ?int $type,
+        EPOST_TYPE|int $type,
         ?int $game_id,
         int $author_id,
         ?int $id = null
@@ -29,7 +35,7 @@ class Post {
         $this->created_at = $created_at;
         $this->last_updated_at = $last_updated_at;
         $this->is_public = $is_public;
-        $this->type = $type;
+        $this->type = is_numeric($type) ? EPOST_TYPE::from($type) : $type;
         $this->game_id = $game_id;
         $this->author_id = $author_id;
         $this->id = $id;
@@ -42,7 +48,7 @@ class Post {
             'created_at' => $this->created_at,
             'last_updated_at' => $this->last_updated_at,
             'is_public' => $this->is_public,
-            'type' => $this->type,
+            'type' => $this->type->value,
             'game_id' => $this->game_id,
             'author_id' => $this->author_id
         ];
@@ -72,6 +78,27 @@ class Post {
             );
         }
         return null;
+    }
+
+    public function getAuthor(): User {
+        return User::getById($this->author_id);
+    }
+
+    public function getPostInfo() : null|GalleryEntry|Guide {
+        if(is_null($this->id)) return null;
+        switch ($this->type) {
+            case EPOST_TYPE::GALLERY:
+                return GalleryEntry::getByPostId($this->id);
+                break;
+
+            case EPOST_TYPE::GUIDE:
+                return Guide::getByPostId($this->id);
+                break;
+            
+            default:
+                return null;
+                break;
+        }
     }
 
     public function delete(): ?bool {
