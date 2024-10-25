@@ -54,6 +54,25 @@ class Developer {
         return null;
     }
 
+    public static function getByUser(User|int $user): ?Developer {
+        $userId = $user instanceof User ? $user->id : $user;
+        $developer = Connection::doSelect(ORION_DB, self::$table, ['owner_id' => $userId]);
+        if (count($developer) === 1) {
+            return new Developer(
+                $developer[0]['name'],
+                $developer[0]['profile_pic'],
+                $developer[0]['motd'],
+                $developer[0]['owner_id'],
+                $developer[0]['id']
+            );
+        }
+        return null;
+    }
+
+    public function getOwner() : User {
+        return User::getById($this->owner_id);
+    }
+
     public function delete(): ?bool {
         if (!isset($this->id)) return null;
         return (bool)Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);

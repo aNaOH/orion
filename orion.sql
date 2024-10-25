@@ -1,168 +1,180 @@
--- Table: users
-CREATE TABLE users (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  email VARCHAR(255) NOT NULL UNIQUE,
-  username VARCHAR(100) NOT NULL,
-  password VARCHAR(255) NOT NULL,
-  role INT NOT NULL,
-  profile_pic VARCHAR(255),
-  motd VARCHAR(255),
-  badge_id INT,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
+CREATE TABLE IF NOT EXISTS `users` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `email` varchar(255) NOT NULL,
+  `username` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `role` int NOT NULL,
+  `profile_pic` varchar(255) DEFAULT NULL,
+  `motd` varchar(255) DEFAULT NULL,
+  `badge_id` int DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email` (`email`),
+  KEY `fk_badge_id` (`badge_id`),
+  CONSTRAINT `fk_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: badges
-CREATE TABLE badges (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  description VARCHAR(255) NOT NULL,
-  icon VARCHAR(255) NOT NULL,
-  game_id INT
-);
+CREATE TABLE IF NOT EXISTS `developers` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) NOT NULL,
+  `profile_pic` varchar(255) DEFAULT NULL,
+  `motd` varchar(255) DEFAULT NULL,
+  `owner_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `owner_id` (`owner_id`),
+  CONSTRAINT `developers_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Adding foreign key to `users` referencing `badges`
-ALTER TABLE users ADD CONSTRAINT fk_badge_id FOREIGN KEY (badge_id) REFERENCES badges(id);
+CREATE TABLE IF NOT EXISTS `game` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `short_description` varchar(255) DEFAULT NULL,
+  `description` text,
+  `launch_date` timestamp NULL DEFAULT NULL,
+  `base_price` float DEFAULT NULL,
+  `discount` float DEFAULT NULL,
+  `file` varchar(255) DEFAULT NULL,
+  `version` varchar(50) DEFAULT NULL,
+  `developer_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_developer_id` (`developer_id`),
+  CONSTRAINT `fk_developer_id` FOREIGN KEY (`developer_id`) REFERENCES `developers` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: game
-CREATE TABLE game (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  short_description VARCHAR(255),
-  description TEXT,
-  launch_date TIMESTAMP,
-  base_price FLOAT,
-  discount FLOAT,
-  file VARCHAR(255),
-  version VARCHAR(50),
-  developer_id INT
-);
+CREATE TABLE IF NOT EXISTS `posts` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `body` text NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_updated_at` timestamp NULL DEFAULT NULL,
+  `is_public` tinyint(1) DEFAULT '0',
+  `type` int DEFAULT NULL,
+  `game_id` int DEFAULT NULL,
+  `author_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `game_id` (`game_id`),
+  KEY `author_id` (`author_id`),
+  CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`),
+  CONSTRAINT `posts_ibfk_2` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: developers
-CREATE TABLE developers (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  name VARCHAR(255) NOT NULL,
-  profile_pic VARCHAR(255),
-  motd VARCHAR(255),
-  owner_id INT NOT NULL,
-  FOREIGN KEY (owner_id) REFERENCES users(id)
-);
+CREATE TABLE IF NOT EXISTS `achievements` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `icon` varchar(255) NOT NULL,
+  `locked_icon` varchar(255) DEFAULT NULL,
+  `secret` tinyint(1) DEFAULT '0',
+  `game_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `game_id` (`game_id`),
+  CONSTRAINT `achievements_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Adding foreign key to `game` referencing `developers`
-ALTER TABLE game ADD CONSTRAINT fk_developer_id FOREIGN KEY (developer_id) REFERENCES developers(id);
+CREATE TABLE IF NOT EXISTS `badges` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL,
+  `description` varchar(255) NOT NULL,
+  `icon` varchar(255) NOT NULL,
+  `game_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_game_id` (`game_id`),
+  CONSTRAINT `fk_game_id` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: owns
-CREATE TABLE owns (
-  user_id INT NOT NULL,
-  game_id INT NOT NULL,
-  base_price FLOAT NOT NULL,
-  discount FLOAT NOT NULL,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (game_id) REFERENCES game(id)
-);
+CREATE TABLE IF NOT EXISTS `badge_unlocked` (
+  `badge_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `badge_id` (`badge_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `badge_unlocked_ibfk_1` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`),
+  CONSTRAINT `badge_unlocked_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: posts
-CREATE TABLE posts (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  title VARCHAR(255) NOT NULL,
-  body TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  last_updated_at TIMESTAMP,
-  is_public BOOLEAN DEFAULT FALSE,
-  type INT,
-  game_id INT,
-  author_id INT,
-  FOREIGN KEY (game_id) REFERENCES game(id),
-  FOREIGN KEY (author_id) REFERENCES users(id)
-);
+CREATE TABLE IF NOT EXISTS `comments` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `author_id` int NOT NULL,
+  `post_id` int NOT NULL,
+  `body` text NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `author_id` (`author_id`),
+  KEY `post_id` (`post_id`),
+  CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: gallery_entries
-CREATE TABLE gallery_entries (
-  post_id INT PRIMARY KEY NOT NULL,
-  media VARCHAR(255) NOT NULL,
-  FOREIGN KEY (post_id) REFERENCES posts(id)
-);
+CREATE TABLE IF NOT EXISTS `leaderboards` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `concept` int NOT NULL,
+  `type` int NOT NULL,
+  `game_id` int DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `game_id` (`game_id`),
+  CONSTRAINT `leaderboards_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: guide_types
-CREATE TABLE guide_types (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  icon VARCHAR(255) NOT NULL,
-  type VARCHAR(100) NOT NULL
-);
+CREATE TABLE IF NOT EXISTS `entries` (
+  `leaderboard_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `value` int NOT NULL,
+  KEY `leaderboard_id` (`leaderboard_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `entries_ibfk_1` FOREIGN KEY (`leaderboard_id`) REFERENCES `leaderboards` (`id`),
+  CONSTRAINT `entries_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: guides
-CREATE TABLE guides (
-  post_id INT PRIMARY KEY NOT NULL,
-  type_id INT NOT NULL,
-  FOREIGN KEY (post_id) REFERENCES posts(id),
-  FOREIGN KEY (type_id) REFERENCES guide_types(id)
-);
+CREATE TABLE IF NOT EXISTS `gallery_entries` (
+  `post_id` int NOT NULL,
+  `media` varchar(255) NOT NULL,
+  PRIMARY KEY (`post_id`),
+  CONSTRAINT `gallery_entries_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: comments
-CREATE TABLE comments (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  author_id INT NOT NULL,
-  post_id INT NOT NULL,
-  body TEXT NOT NULL,
-  FOREIGN KEY (author_id) REFERENCES users(id),
-  FOREIGN KEY (post_id) REFERENCES posts(id)
-);
+CREATE TABLE IF NOT EXISTS `guides` (
+  `post_id` int NOT NULL,
+  `type_id` int NOT NULL,
+  PRIMARY KEY (`post_id`),
+  KEY `type_id` (`type_id`),
+  CONSTRAINT `guides_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`),
+  CONSTRAINT `guides_ibfk_2` FOREIGN KEY (`type_id`) REFERENCES `guide_types` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: votes
-CREATE TABLE votes (
-  user_id INT NOT NULL,
-  post_id INT NOT NULL,
-  is_downvote BOOLEAN DEFAULT FALSE,
-  FOREIGN KEY (user_id) REFERENCES users(id),
-  FOREIGN KEY (post_id) REFERENCES posts(id)
-);
+CREATE TABLE IF NOT EXISTS `guide_types` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `icon` varchar(255) NOT NULL,
+  `type` varchar(100) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Adding foreign key to `badges` referencing `game`
-ALTER TABLE badges ADD CONSTRAINT fk_game_id FOREIGN KEY (game_id) REFERENCES game(id);
+CREATE TABLE IF NOT EXISTS `owns` (
+  `user_id` int NOT NULL,
+  `game_id` int NOT NULL,
+  `base_price` float NOT NULL,
+  `discount` float NOT NULL,
+  KEY `user_id` (`user_id`),
+  KEY `game_id` (`game_id`),
+  CONSTRAINT `owns_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `owns_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: badge_unlocked
-CREATE TABLE badge_unlocked (
-  badge_id INT NOT NULL,
-  user_id INT NOT NULL,
-  date TIMESTAMP NOT NULL,
-  FOREIGN KEY (badge_id) REFERENCES badges(id),
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
+CREATE TABLE IF NOT EXISTS `unlocks` (
+  `achievement_id` int NOT NULL,
+  `user_id` int NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `achievement_id` (`achievement_id`),
+  KEY `user_id` (`user_id`),
+  CONSTRAINT `unlocks_ibfk_1` FOREIGN KEY (`achievement_id`) REFERENCES `achievements` (`id`),
+  CONSTRAINT `unlocks_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
--- Table: achievements
-CREATE TABLE achievements (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  description VARCHAR(255) NOT NULL,
-  icon VARCHAR(255) NOT NULL,
-  locked_icon VARCHAR(255),
-  secret BOOLEAN DEFAULT FALSE,
-  game_id INT,
-  FOREIGN KEY (game_id) REFERENCES game(id)
-);
-
--- Table: leaderboards
-CREATE TABLE leaderboards (
-  id INT PRIMARY KEY AUTO_INCREMENT NOT NULL,
-  concept INT NOT NULL,
-  type INT NOT NULL,
-  game_id INT,
-  FOREIGN KEY (game_id) REFERENCES game(id)
-);
-
--- Table: entries
-CREATE TABLE entries (
-  leaderboard_id INT NOT NULL,
-  user_id INT NOT NULL,
-  value INT NOT NULL,
-  FOREIGN KEY (leaderboard_id) REFERENCES leaderboards(id),
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
-
--- Table: unlocks
-CREATE TABLE unlocks (
-  achievement_id INT NOT NULL,
-  user_id INT NOT NULL,
-  date TIMESTAMP NOT NULL,
-  FOREIGN KEY (achievement_id) REFERENCES achievements(id),
-  FOREIGN KEY (user_id) REFERENCES users(id)
-);
+CREATE TABLE IF NOT EXISTS `votes` (
+  `user_id` int NOT NULL,
+  `post_id` int NOT NULL,
+  `is_downvote` tinyint(1) DEFAULT '0',
+  KEY `user_id` (`user_id`),
+  KEY `post_id` (`post_id`),
+  CONSTRAINT `votes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
+  CONSTRAINT `votes_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

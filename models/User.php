@@ -1,6 +1,7 @@
 <?php
 
 require './models/Badge.php';
+require './models/Developer.php';
 
 class User {
     public static string $table = 'users';
@@ -129,6 +130,20 @@ class User {
         return "/media/profile/" . ($this->profile_pic ?? "default");
     }
 
+    // Relationship with Developer
+    public function getDeveloperInfo() : ?Developer {
+        return Developer::getByUser($this);
+    }
+
+    public function addDeveloperInfo($name) : bool {
+        if(is_null($this->getDeveloperInfo())){
+            $dev = new Developer($name, null, null, $this->id);
+            return $dev->save();
+        }
+
+        return false;
+    }
+
     // Relationship with Badge
     public function getBadge(): ?Badge {
         return isset($this->badge) && is_numeric($this->badge) ? Badge::getById($this->badge) : null;
@@ -160,6 +175,18 @@ class User {
         $select = Connection::doSelect(ORION_DB, Badge::$table, ["badge_id" => $badgeId, "user_id" => $this->id]);
 
         return count($select) === 1 ? $select[0]['date'] : null;
+    }
+
+    public function unlockBadge(Badge|int $badge) : bool {
+        if(!$this->hasUnlockedBadge($badge)){
+            $badgeId = $badge instanceof Badge ? $badge->id : $badge;
+            return Connection::doInsert(ORION_DB, 'badge_unlocked', [
+                "badge_id" => $badgeId,
+                "user_id" => $this->id
+            ]);
+        }
+
+        return false;
     }
 
     // Auth related
