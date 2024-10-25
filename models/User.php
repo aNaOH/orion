@@ -5,19 +5,16 @@ require './models/Badge.php';
 class User {
     public static string $table = 'users';
 
-    // Basic user info
     public int $id;
     public string $email;
     public string $username;
     public string $password;
     public EUSER_TYPE $role;
-
-    // Community profile
     public ?string $profile_pic;
     public ?string $motd;
     public ?int $badge;
 
-    //Constructor
+    // Constructor
     public function __construct(
         string $email, 
         string $username, 
@@ -38,7 +35,7 @@ class User {
         $this->id = $id;
     }
 
-    //Get by
+    // Get by ID
     public static function getById(int $id): ?User {
         $user = Connection::doSelect(ORION_DB, self::$table, ["id" => $id]);
 
@@ -54,7 +51,6 @@ class User {
                 $user[0]['id']
             );
         }
-
         return null;
     }
 
@@ -73,11 +69,10 @@ class User {
                 $user[0]['id']
             );
         }
-
         return null;
     }
 
-    //Dynamic field (Handle)
+    // Handle methods
     public function getHandle(): string {
         return strtolower(str_replace(" ", "_", $this->username)) . "#" . strval($this->id);
     }
@@ -100,11 +95,10 @@ class User {
             );
             return $userObj->getHandle() === $handle ? $userObj : null;
         }
-
         return null;
     }
 
-    //DB functions
+    // DB functions
     public function save(): bool {
         $data = [
             'email' => $this->email,
@@ -119,24 +113,23 @@ class User {
         if (!isset($this->id) || !self::getById($this->id)) {
             $result = Connection::doInsert(ORION_DB, self::$table, $data);
             $this->id = ORION_DB->lastInsertId();
-            return $result;
+            return (bool)$result;
         } else {
-            return Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
+            return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
         }
     }
 
     public function delete(): ?bool {
         if (!isset($this->id)) return null;
-
-        return Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);
+        return (bool)Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);
     }
 
-    //Getters
+    // Profile picture URL getter
     public function getProfilePicURL(): string {
         return "/media/profile/" . ($this->profile_pic ?? "default");
     }
 
-    //Relationship with Badge
+    // Relationship with Badge
     public function getBadge(): ?Badge {
         return isset($this->badge) && is_numeric($this->badge) ? Badge::getById($this->badge) : null;
     }
@@ -149,7 +142,6 @@ class User {
             $dateUnlocked = $select[0]['date'];
             return true;
         }
-
         return false;
     }
 
@@ -160,7 +152,6 @@ class User {
         foreach ($select as $badgeRow) {
             $badges[] = Badge::getById($badgeRow['id']);
         }
-
         return $badges;
     }
 
@@ -171,7 +162,7 @@ class User {
         return count($select) === 1 ? $select[0]['date'] : null;
     }
 
-    //Auth stuff
+    // Auth related
     public function toSessionArray(): array {
         return isset($this->id) ? [
             "id" => $this->id,

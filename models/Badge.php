@@ -1,16 +1,22 @@
 <?php
 
 class Badge {
-    public static $table = 'badges';
+    public static string $table = 'badges';
 
-    public $id;
-    public $name;
-    public $description;
-    public $icon;
-    public $game_id;
+    public ?int $id;
+    public string $name;
+    public string $description;
+    public string $icon;
+    public int $game_id;
 
-    //Constructor
-    public function __construct($name, $description, $icon, $game_id, $id = null) {
+    // Constructor
+    public function __construct(
+        string $name,
+        string $description,
+        string $icon,
+        int $game_id,
+        ?int $id = null
+    ) {
         $this->name = $name;
         $this->description = $description;
         $this->icon = $icon;
@@ -18,8 +24,8 @@ class Badge {
         $this->id = $id;
     }
 
-    //Get by
-    public static function getById($id) {
+    // Get by ID
+    public static function getById(int $id): ?Badge {
         $badge = Connection::doSelect(ORION_DB, self::$table, ['id' => $id]);
         if (count($badge) === 1) {
             return new Badge(
@@ -33,8 +39,8 @@ class Badge {
         return null;
     }
 
-    //DB functions
-    public function save() {
+    // Save badge
+    public function save(): bool {
         $data = [
             'name' => $this->name,
             'description' => $this->description,
@@ -45,18 +51,19 @@ class Badge {
         if (!isset($this->id) || !self::getById($this->id)) {
             $result = Connection::doInsert(ORION_DB, self::$table, $data);
             $this->id = ORION_DB->lastInsertId();
-            return $result;
+            return (bool)$result;
         } else {
-            return Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
+            return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
         }
     }
 
-    public function delete() {
+    // Delete badge
+    public function delete(): ?bool {
         if (!isset($this->id)) return null;
-        return Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);
+        return (bool)Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);
     }
 
-    //Relationship with User
+    // Relationship with User
     public function hasUserUnlocked(User|int $user, ?string &$dateUnlocked = null): bool {
         $userId = $user instanceof User ? $user->id : $user;
         $select = Connection::doSelect(ORION_DB, User::$table, [
@@ -68,7 +75,6 @@ class Badge {
             $dateUnlocked = $select[0]['date'];
             return true;
         }
-
         return false;
     }
 
