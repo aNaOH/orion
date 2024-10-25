@@ -1,54 +1,93 @@
 <?php
 
+require './models/Badge.php';
+
 class User {
+    public static string $table = 'users';
 
-    private static $table = 'users';
+    // Basic user info
+    public int $id;
+    public string $email;
+    public string $username;
+    public string $password;
+    public EUSER_TYPE $role;
 
-    //Basic user info
-    public $id;
-    public $email;
-    public $username;
-    public $password;
-    public $role;
+    // Community profile
+    public ?string $profile_pic;
+    public ?string $motd;
+    public ?int $badge;
 
-    //Community profile
-    public $profile_pic;
-    public $motd;
-    public $badge;
-
-    public function __construct($email, $username, $password, EUSER_TYPE|int $role, $profile_pic = null, $motd = null, $badge = null, $id = null) {
-
-        $parsedRole = 0;
-
-        if(is_numeric($role)){
-            $parsedRole == EUSER_TYPE::from($role);
-        } else{
-            $parsedRole = $role;
-        }
-
+    //Constructor
+    public function __construct(
+        string $email, 
+        string $username, 
+        string $password, 
+        EUSER_TYPE|int $role, 
+        ?string $profile_pic = null, 
+        ?string $motd = null, 
+        ?int $badge = null, 
+        ?int $id = null
+    ) {
+        $this->role = is_numeric($role) ? EUSER_TYPE::from($role) : $role;
         $this->email = $email;
         $this->username = $username;
         $this->password = $password;
-        $this->role = $parsedRole;
         $this->profile_pic = $profile_pic;
         $this->motd = $motd;
         $this->badge = $badge;
-
         $this->id = $id;
     }
 
-    public function getHandle(){
-        return str_replace(" ", "_", strtolower($this->username))."#".strval($this->id);
+    //Get by
+    public static function getById(int $id): ?User {
+        $user = Connection::doSelect(ORION_DB, self::$table, ["id" => $id]);
+
+        if (count($user) === 1) {
+            return new User(
+                $user[0]['email'], 
+                $user[0]['username'], 
+                $user[0]['password'], 
+                $user[0]['role'], 
+                $user[0]['profile_pic'], 
+                $user[0]['motd'], 
+                $user[0]['badge_id'], 
+                $user[0]['id']
+            );
+        }
+
+        return null;
     }
 
-    public static function getByHandle($handle) : User|null {
+    public static function getByEmail(string $email): ?User {
+        $user = Connection::doSelect(ORION_DB, self::$table, ["email" => $email]);
 
-        $id = explode("#", $handle)[-1];
-        $user = Connection::doSelect(ORION_DB, self::$table, [
-            "id" => $id
-        ]);
+        if (count($user) === 1) {
+            return new User(
+                $user[0]['email'], 
+                $user[0]['username'], 
+                $user[0]['password'], 
+                $user[0]['role'], 
+                $user[0]['profile_pic'], 
+                $user[0]['motd'], 
+                $user[0]['badge_id'], 
+                $user[0]['id']
+            );
+        }
 
-        if(count($user) == 1){
+        return null;
+    }
+
+    //Dynamic field (Handle)
+    public function getHandle(): string {
+        return strtolower(str_replace(" ", "_", $this->username)) . "#" . strval($this->id);
+    }
+
+    public static function getByHandle(string $handle): ?User {
+        $id = explode("#", $handle)[1] ?? null;
+        if (!$id) return null;
+
+        $user = Connection::doSelect(ORION_DB, self::$table, ["id" => $id]);
+        if (count($user) === 1) {
             $userObj = new User(
                 $user[0]['email'], 
                 $user[0]['username'], 
@@ -59,101 +98,85 @@ class User {
                 $user[0]['badge_id'], 
                 $user[0]['id']
             );
-
-            if($userObj->getHandle() == $handle){
-                return $userObj;
-            }
+            return $userObj->getHandle() === $handle ? $userObj : null;
         }
 
         return null;
     }
 
-    public function save() {
-
+    //DB functions
+    public function save(): bool {
         $data = [
             'email' => $this->email,
             'username' => $this->username,
-            'password' => password_hash($this->password, PASSWORD_BCRYPT),  // Hasheando la contraseña
+            'password' => password_hash($this->password, PASSWORD_BCRYPT),
             'role' => $this->role->value,
             'profile_pic' => $this->profile_pic,
             'motd' => $this->motd,
             'badge_id' => $this->badge,
         ];
 
-        if(!isset($this->id) || !self::getById($this->id)){
+        if (!isset($this->id) || !self::getById($this->id)) {
             $result = Connection::doInsert(ORION_DB, self::$table, $data);
-            $id = count(Connection::doSelect(ORION_DB, self::$table));
-            $this->id = $id;
+            $this->id = ORION_DB->lastInsertId();
             return $result;
         } else {
             return Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
         }
     }
 
-    public static function getById($id) : User|null {
+    public function delete(): ?bool {
+        if (!isset($this->id)) return null;
 
-        $user = Connection::doSelect(ORION_DB, self::$table, [
-            "id" => $id
-        ]);
-
-        if(count($user) == 1){
-            return new User(
-                $user[0]['email'], 
-                $user[0]['username'], 
-                $user[0]['password'], 
-                $user[0]['role'], 
-                $user[0]['profile_pic'], 
-                $user[0]['motd'], 
-                $user[0]['badge_id'], 
-                $user[0]['id']
-            );
-        }
-
-        return null;
+        return Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);
     }
 
-    public static function getByEmail($email) : User|null {
-
-        $user = Connection::doSelect(ORION_DB, self::$table, [
-            "email" => $email
-        ]);
-
-        if(count($user) == 1){
-            return new User(
-                $user[0]['email'], 
-                $user[0]['username'], 
-                $user[0]['password'], 
-                $user[0]['role'], 
-                $user[0]['profile_pic'], 
-                $user[0]['motd'], 
-                $user[0]['badge_id'], 
-                $user[0]['id']
-            );
-        }
-
-        return null;
+    //Getters
+    public function getProfilePicURL(): string {
+        return "/media/profile/" . ($this->profile_pic ?? "default");
     }
 
-    public function getProfilePicURL() {
-        return "/media/profile/".($user->profile_pic ?? "default");
+    //Relationship with Badge
+    public function getBadge(): ?Badge {
+        return isset($this->badge) && is_numeric($this->badge) ? Badge::getById($this->badge) : null;
     }
 
-    public function delete() {
-        if(!isset($this->id)){
-            return null;
+    public function hasUnlockedBadge(Badge|int $badge, ?string &$dateUnlocked = null): bool {
+        $badgeId = $badge instanceof Badge ? $badge->id : $badge;
+        $select = Connection::doSelect(ORION_DB, Badge::$table, ["badge_id" => $badgeId, "user_id" => $this->id]);
+        
+        if (count($select) === 1) {
+            $dateUnlocked = $select[0]['date'];
+            return true;
         }
-        $conditions = ['id' => $this->id];
-        return Connection::doDelete(ORION_DB, self::$table, $conditions);
+
+        return false;
     }
 
-    public function toSessionArray(){
-        if(!isset($this->id)){
-            return [];
+    public function getUnlockedBadges(): array {
+        $badges = [];
+        $select = Connection::doSelect(ORION_DB, Badge::$table, ["user_id" => $this->id]);
+        
+        foreach ($select as $badgeRow) {
+            $badges[] = Badge::getById($badgeRow['id']);
         }
-        return [
+
+        return $badges;
+    }
+
+    public function getUnlockedBadgeDate(Badge|int $badge): ?string {
+        $badgeId = $badge instanceof Badge ? $badge->id : $badge;
+        $select = Connection::doSelect(ORION_DB, Badge::$table, ["badge_id" => $badgeId, "user_id" => $this->id]);
+
+        return count($select) === 1 ? $select[0]['date'] : null;
+    }
+
+    //Auth stuff
+    public function toSessionArray(): array {
+        return isset($this->id) ? [
             "id" => $this->id,
             "username" => $this->username,
             "profile_pic" => $this->profile_pic
-        ];
+        ] : [];
     }
 }
