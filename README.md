@@ -6,6 +6,7 @@ Orion is a social network (to write)
 # Requirements
 
 - An Apache and PHP 8 environment
+- PDO enabled on PHP
 - A MySQL database
 - Composer installed ([Get it here](https://getcomposer.org/doc/00-intro.md))
 - A Cloudflare account and a bucket
@@ -49,3 +50,27 @@ Orion uses 2 static files hosted on the bucket:
  
  - **user/profile_pic/default.png**: A default user profile picture, when no one is uploaded
  - **misc/404.png**: A 404 image used when a media file is not found
+
+# Install using Docker
+
+1. **Install Docker**
+
+Install Docker (Engine or Desktop) on your system, you can know how [here for Engine](https://docs.docker.com/engine/install/) or [here for Desktop](https://docs.docker.com/desktop/).
+
+2. **Follow the 'How to install steps'**
+
+Go [here](#how-to-install) and follow these steps.
+
+3. **Build the Docker Image**
+
+Open your terminal and use the next command, if needed, run it with privileges (admin or sudo):
+
+```
+docker build -t composer-quick .
+```
+
+4. **Create the Container**
+
+Open your terminal and use the next command, if needed, run it with privileges (admin or sudo):
+
+sudo docker run -d -p 8080:80 -v <Your proyect location>:/var/www/html --name orion-server composer-quick
