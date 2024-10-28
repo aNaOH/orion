@@ -1,6 +1,6 @@
 <?php
 
-require './models/Game.php';
+require_once './models/Game.php';
 
 class Developer {
     public static string $table = 'developers';

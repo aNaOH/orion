@@ -1,7 +1,7 @@
 <?php
 
-require './models/Badge.php';
-require './models/Developer.php';
+require_once './models/Badge.php';
+require_once './models/Developer.php';
 
 class User {
     public static string $table = 'users';

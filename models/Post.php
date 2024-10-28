@@ -1,10 +1,10 @@
 <?php
 
-require './models/User.php';
-require './models/Game.php';
+require_once './models/User.php';
+require_once './models/Game.php';
 
-require './models/PostTypes/GalleryEntry.php';
-require './models/PostTypes/Guide.php';
+require_once './models/PostTypes/GalleryEntry.php';
+require_once './models/PostTypes/Guide.php';
 
 class Post {
     public static string $table = 'posts';
