@@ -73,4 +73,4 @@ docker build -t composer-quick .
 
 Open your terminal and use the next command, if needed, run it with privileges (admin or sudo):
 
-sudo docker run -d -p 8080:80 -v <Your proyect location>:/var/www/html --name orion-server composer-quick
+sudo docker run -d -p 8080:80 -v <Your project location>:/var/www/html --name orion-server composer-quick
