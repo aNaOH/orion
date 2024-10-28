@@ -76,3 +76,14 @@ Open your terminal and use the next command, if needed, run it with privileges (
 ```
 docker run -d -p 8080:80 -v <Your project location>:/var/www/html --name orion-server composer-quick
 ```
+
+5. **Check it out!**
+
+In your browser, go to localhost:8080 to see the project running.
+
+To stop and/or remove the Container, open your terminal and use the next command, if needed, run it with privileges (admin or sudo):
+
+```
+docker stop orion-server
+docker remove orion-server
+```
