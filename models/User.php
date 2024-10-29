@@ -151,7 +151,7 @@ class User {
 
     public function hasUnlockedBadge(Badge|int $badge, ?string &$dateUnlocked = null): bool {
         $badgeId = $badge instanceof Badge ? $badge->id : $badge;
-        $select = Connection::doSelect(ORION_DB, Badge::$table, ["badge_id" => $badgeId, "user_id" => $this->id]);
+        $select = Connection::doSelect(ORION_DB, "badge_unlocked", ["badge_id" => $badgeId, "user_id" => $this->id]);
         
         if (count($select) === 1) {
             $dateUnlocked = $select[0]['date'];
@@ -162,7 +162,7 @@ class User {
 
     public function getUnlockedBadges(): array {
         $badges = [];
-        $select = Connection::doSelect(ORION_DB, Badge::$table, ["user_id" => $this->id]);
+        $select = Connection::doSelect(ORION_DB, "badge_unlocked", ["user_id" => $this->id]);
         
         foreach ($select as $badgeRow) {
             $badges[] = Badge::getById($badgeRow['id']);
@@ -172,7 +172,7 @@ class User {
 
     public function getUnlockedBadgeDate(Badge|int $badge): ?string {
         $badgeId = $badge instanceof Badge ? $badge->id : $badge;
-        $select = Connection::doSelect(ORION_DB, Badge::$table, ["badge_id" => $badgeId, "user_id" => $this->id]);
+        $select = Connection::doSelect(ORION_DB, "badge_unlocked", ["badge_id" => $badgeId, "user_id" => $this->id]);
 
         return count($select) === 1 ? $select[0]['date'] : null;
     }

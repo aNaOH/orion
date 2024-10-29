@@ -30,6 +30,8 @@ $router->get('/profile/{id}', function($id){
     include('views/auth/profile.php');
 });
 
+include('routes/admin/admin.php');
+
 include('routes/media/media.php');
 
 include('routes/api/api.php');
