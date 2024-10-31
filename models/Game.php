@@ -62,6 +62,26 @@ class Game {
         }
     }
 
+    public static function all() {
+        $select = Connection::doSelect(ORION_DB, self::$table);
+        $games = [];
+        foreach ($select as $game) {
+            $games[] = new Game(
+                $game[0]['title'],
+                $game[0]['short_description'],
+                $game[0]['description'],
+                $game[0]['launch_date'],
+                (float)$game[0]['base_price'],
+                (float)$game[0]['discount'],
+                $game[0]['file'],
+                $game[0]['version'],
+                $game[0]['developer_id'],
+                $game[0]['id']
+            );
+        }
+        return $games;
+    }
+
     public static function getById(int $id): ?Game {
         $game = Connection::doSelect(ORION_DB, self::$table, ['id' => $id]);
         if (count($game) === 1) {

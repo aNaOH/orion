@@ -1,6 +1,5 @@
 <?php
 
-//API
 $router->mount('/admin', function() use ($router) {
 
     $router->get('/', function(){

@@ -6,7 +6,7 @@ require_once './models/Developer.php';
 class User {
     public static string $table = 'users';
 
-    public int $id;
+    public ?int $id;
     public string $email;
     public string $username;
     public string $password;

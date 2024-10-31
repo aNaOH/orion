@@ -5,8 +5,8 @@ require 'vendor/autoload.php';
 $dotenv = Dotenv\Dotenv::createImmutable('./');
 $dotenv->load();
 
-require 'models/conn.php'; //Import DB model
-require 'controllers/UserController.php'; //Import DB model
+require_once 'models/conn.php'; //Import DB model
+require_once 'controllers/UserController.php'; //Import DB model
 
 define("ORION_DB", Connection::connectToDB($_ENV['DB_HOST'], $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS'])); //Connect to DB and entering into constant
 
@@ -29,6 +29,8 @@ $router->get('/profile/{id}', function($id){
     }
     include('views/auth/profile.php');
 });
+
+include('routes/game/community.php');
 
 include('routes/admin/admin.php');
 

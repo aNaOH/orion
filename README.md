@@ -51,6 +51,11 @@ Orion uses 2 static files hosted on the bucket:
  - **user/profile_pic/default.png**: A default user profile picture, when no one is uploaded
  - **misc/404.png**: A 404 image used when a media file is not found
 
+The admin credentials:
+
+Email: admin@togetheronorion.com
+Password: 0R1ON_together
+
 # Install using Docker
 
 1. **Install Docker**

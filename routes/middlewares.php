@@ -1,25 +1,27 @@
 <?php
 
-$router->before('GET|POST', '/admin/.*', function() {
-    if (isset($_SESSION['user'])) { //Complete this
+$router->before('GET|POST', '/admin(/.*)?', function() {
+
+    if (isset($_SESSION['user'])) {
+
         $user = User::getById($_SESSION['user']['id']);
         if($user){
             if($user->role != EUSER_TYPE::ADMIN){
-                header('location: /auth/login');
+                header('location: /');
                 exit();
             }
         }
         else{
-            header('location: /auth/login');
+            header('location: /');
             exit();
         }
     }
     else {
-        header('location: /auth/login');
+        header('location: /');
         exit();
     }
 });
 
-$router->before('GET|POST', '/api/.*', function() {
+$router->before('GET|POST', '/api(/.*)?', function() {
     header('Content-Type: application/json'); //Add JSON Header to all API routes
 });

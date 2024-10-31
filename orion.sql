@@ -178,3 +178,9 @@ CREATE TABLE IF NOT EXISTS `votes` (
   CONSTRAINT `votes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `votes_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `users` (`id`, `email`, `username`, `password`, `role`, `profile_pic`, `motd`, `badge_id`, `created_at`) VALUES
+	(1, 'admin@togetheronorion.com', 'Orion', '$2y$10$jzNZPi0NpZoyB/VaJZkar.FVvw0YfUVT9CTgyuhJZt6lrxR.6wCZa', 1, "Orion's official account", NULL, NULL, '2024-10-30 15:24:12');
+
+INSERT INTO `developers` (`id`, `name`, `profile_pic`, `motd`, `owner_id`) VALUES
+	(1, 'Orion', NULL, 'Experience it united', 1);
