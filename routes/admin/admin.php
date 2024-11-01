@@ -6,6 +6,10 @@ $router->mount('/admin', function() use ($router) {
         include('views/admin/home.php');
     });
 
+    $router->get('/quickgame', function(){
+        include('views/admin/quickgame.php');
+    });
+
 });
 
 

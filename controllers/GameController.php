@@ -9,10 +9,16 @@ class GameController {
     public static function addGameQuick(string $title){
         $game = new Game($title, null, null, null, null, null, null, null, 1);
         $game->save();
+
+        header('HTTP/1.1 200 OK');
+        $response['status'] = 200;
+        $response['message'] = "Juego creado ( ID: ".strval($game->id)." )";
+
+        echo json_encode($response);
+        exit();
     }
 
     public static function showCommunities(){
-        $games = Game::all();
         include('views/community/hub.php');
     }
 

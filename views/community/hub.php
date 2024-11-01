@@ -2,11 +2,11 @@
 
 $title = "Comunidades en Orion";
 
+$GLOBALS['games'] = Game::all();
+
 function showPage() {
     global $games;
     ?>
-
-    <script src="/assets/js/components/game-community.js"></script>
 
     <!-- Hero Section -->
     <section id="hero" class="hero section dark-background">
@@ -27,14 +27,16 @@ function showPage() {
             </div>
 
         <?php } else { ?>
-        <div class="container md-3">
+        <div class="container lg-5 md-3 sm-2">
+            <div class="row">
 
-            <?php foreach ($games as $game) { ?>
-               
-                <game-community game-title="<?= $game->title ?>" game-id="<?= $game->id ?>"/>
+                <?php foreach ($games as $game) {
+                
+                    OrionComponents::GameCommunity($game);
 
-            <?php } ?>
+                } ?>
 
+            </div>
         </div>
 
         <?php } ?>
@@ -45,3 +47,5 @@ function showPage() {
 }
 
 include("views/templates/main.php");
+
+unset($GLOBALS['games']);
