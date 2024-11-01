@@ -27,7 +27,7 @@ function showPage() {
             </div>
 
         <?php } else { ?>
-        <div class="container lg-5 md-3 sm-2">
+        <div class="container">
             <div class="row">
 
                 <?php foreach ($games as $game) {

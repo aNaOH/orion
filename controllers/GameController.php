@@ -27,7 +27,9 @@ class GameController {
 
         if(is_null($game)) return false;
 
-        include('/views/community/index.php');
+        $GLOBALS['game'] = $game;
+
+        include('views/community/index.php');
     }
 
 }
