@@ -1,6 +1,6 @@
 <?php
 
-require './models/Post.php';
+require_once './models/Post.php';
 
 class Guide {
     public static string $table = 'guides';

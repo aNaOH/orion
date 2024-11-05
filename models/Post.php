@@ -22,8 +22,6 @@ class Post {
     public function __construct(
         string $title,
         string $body,
-        string $created_at,
-        ?string $last_updated_at,
         bool $is_public,
         EPOST_TYPE|int $type,
         ?int $game_id,
@@ -32,8 +30,6 @@ class Post {
     ) {
         $this->title = $title;
         $this->body = $body;
-        $this->created_at = $created_at;
-        $this->last_updated_at = $last_updated_at;
         $this->is_public = $is_public;
         $this->type = is_numeric($type) ? EPOST_TYPE::from($type) : $type;
         $this->game_id = $game_id;
@@ -68,8 +64,6 @@ class Post {
             return new Post(
                 $post[0]['title'],
                 $post[0]['body'],
-                $post[0]['created_at'],
-                $post[0]['last_updated_at'],
                 (bool)$post[0]['is_public'],
                 $post[0]['type'],
                 $post[0]['game_id'],
@@ -78,6 +72,26 @@ class Post {
             );
         }
         return null;
+    }
+
+    public static function getAllByType(EPOST_TYPE $type) {
+        $postSelect = Connection::doSelect(ORION_DB, self::$table, ['type' => $type->value]);
+        
+        $posts = [];
+
+        foreach ($postSelect as $post) {
+            $posts[] = new Post(
+                $post['title'],
+                $post['body'],
+                (bool)$post['is_public'],
+                $post['type'],
+                $post['game_id'],
+                $post['author_id'],
+                $post['id']
+            );
+        }
+
+        return $posts;
     }
 
     public function getAuthor(): User {

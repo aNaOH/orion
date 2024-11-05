@@ -28,3 +28,4 @@ function showPage() {
 include("views/templates/main.php");
 
 unset($GLOBALS['game']);
+unset($GLOBALS['posts']);

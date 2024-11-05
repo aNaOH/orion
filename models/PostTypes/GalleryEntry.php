@@ -1,6 +1,6 @@
 <?php
 
-require './models/Post.php';
+require_once './models/Post.php';
 
 class GalleryEntry {
     public static string $table = 'gallery_entries';
