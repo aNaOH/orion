@@ -1,0 +1,1 @@
+<input type="hidden" name="tript_token" value="<?= $token ?>">

@@ -11,6 +11,11 @@ function showPage() {
 
         <div class="carousel-container">
             <h2 class="animate__animated animate__fadeInDown">Posts de <?= $game->title ?></h2>
+            <?php if (isset($_SESSION['user']['id'])) { ?>
+                <div class="d-flex flex-row justify-content-between">
+                    <a href="/communities/<?= $game->id ?>/posts/create" class="btn-get-started animate__animated animate__fadeInUp scrollto">Nuevo post</a>
+                </div>
+            <?php } ?>
           </div>
 
     </section><!-- /Hero Section -->

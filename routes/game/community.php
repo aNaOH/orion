@@ -42,4 +42,35 @@ $router->mount('/communities', function() use ($router) {
         if($result === false) $router->trigger404();
     });
 
+    $router->get("/(\d+)/(\w+)/create", function($gameId, $type) use ($router){
+
+        if(isset($_SESSION['user'])){
+            if(is_null(User::getById($_SESSION['user']['id']))){
+                $router->trigger404();
+                exit();
+            }
+        } else {
+            $router->trigger404();
+            exit();
+        }
+
+        $result = false;
+
+        switch ($type) {
+            case 'posts':
+                $result = PostController::createPost($gameId, EPOST_TYPE::POST);
+                break;
+            
+            case 'gallery':
+                $result = PostController::createPost($gameId, EPOST_TYPE::GALLERY);
+                break;
+
+            case 'guides':
+                $result = PostController::createPost($gameId, EPOST_TYPE::GUIDE);
+                break;
+        }
+
+        if($result === false) $router->trigger404();
+    });
+
 });

@@ -60,7 +60,33 @@ class PostController {
                 break;
         }
 
-        include('views/community/posts/index.php');
+        include('views/community/'.$typeString.'/index.php');
+    }
+
+    public static function createPost(int $gameId, EPOST_TYPE $type){
+        $game = Game::getById($gameId);
+
+        if(is_null($game)) return false;
+
+        $GLOBALS['game'] = $game;
+
+        $typeString = '';
+
+        switch ($type) {
+            case EPOST_TYPE::POST:
+                $typeString = "posts";
+                break;
+            
+            case EPOST_TYPE::GALLERY:
+                $typeString = "gallery";
+                break;
+
+            case EPOST_TYPE::GUIDE:
+                $typeString = "guides";
+                break;
+        }
+
+        include('views/community/'.$typeString.'/create.php');
     }
 
 }

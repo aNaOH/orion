@@ -1,5 +1,11 @@
 <?php
 
+enum ETOKEN_TYPE : int {
+    case COMMON = 0;
+    case AUTHFORM = 1;
+    case USERACTION = 2;
+}
+
 enum EPOST_TYPE : int {
     case POST = 0;
     case GALLERY = 1;
