@@ -19,6 +19,8 @@ $router->mount('/api', function() use ($router) {
         UserController::register($email, $password, $confirmPassword, $terms);
     });
 
+    include('routes/api/community.php');
+
     include('routes/api/admin.php');
 });
 

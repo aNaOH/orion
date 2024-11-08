@@ -4,6 +4,7 @@ $title = "Posts de $game->title en Orion";
 
 function showPage() {
     global $game;
+    global $posts;
     ?>
 
     <!-- Hero Section -->
@@ -25,7 +26,36 @@ function showPage() {
 
     
 
+        <div class="container">
+
+            <div class="list-group">
+                <?php foreach ($posts as $post) { 
+                    
+                    if(!$post->is_public) continue;
+
+                    ?>
+
+                        <a href="/communities/<?=$game->id?>/posts/<?=$post->id?>" class="list-group-item list-group-item-action d-flex gap-3 py-3" aria-current="true">
+                            <div class="d-flex gap-2 w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-0"><?=$post->title?></h6>
+                                    <p class="mb-0 opacity-75">de <?=$post->getAuthor()->username?></p>
+                                </div>
+                                <small class="opacity-50 text-nowrap" data-createdat="<?= $post->created_at->format('Y-m-d H:i:s') ?>"></small>
+
+                            </div>
+                        </a>
+                    
+                <?php } ?>
+                
+            </div>
+
+        </div>
+
     </section><!-- /Features Section -->
+
+
+    <script src="/assets/js/addDatesCommunity.js"></script>
 
     <?php
 }

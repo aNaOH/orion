@@ -29,13 +29,9 @@
   <link href="/assets/css/main.css" rel="stylesheet">
   <link href="/assets/css/custom.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: Selecao
-  * Template URL: https://bootstrapmade.com/selecao-bootstrap-template/
-  * Updated: Aug 07 2024 with Bootstrap v5.3.3
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+
+  <script src="/assets/vendor/jquery/jquery-3.7.1.min.js"></script>
+
 </head>
 
 <body class="starter-page-page">

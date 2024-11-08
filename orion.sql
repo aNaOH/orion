@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `game` (
 CREATE TABLE IF NOT EXISTS `posts` (
   `id` int NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
-  `body` text NOT NULL,
+  `body` longtext NOT NULL,
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `last_updated_at` timestamp NULL DEFAULT NULL,
   `is_public` tinyint(1) DEFAULT '0',

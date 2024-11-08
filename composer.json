@@ -8,6 +8,7 @@
         "vlucas/phpdotenv": "^5.6",
         "aws/aws-sdk-php": "^3.324",
         "bramus/router": "~1.6",
-        "intervention/image": "^3.9"
+        "intervention/image": "^3.9",
+        "erusev/parsedown": "^1.7"
     }
 }

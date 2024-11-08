@@ -33,7 +33,7 @@
   <script src="/assets/vendor/imagesloaded/imagesloaded.pkgd.min.js"></script>
   <script src="/assets/vendor/isotope-layout/isotope.pkgd.min.js"></script>
   <script src="/assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="/assets/vendor/jquery/jquery-3.7.1.min.js"></script>
+  <script src="/assets/vendor/moment/moment.min.js"></script>
 
   <!-- Main JS File -->
   <script src="/assets/js/main.js"></script>

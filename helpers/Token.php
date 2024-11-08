@@ -11,7 +11,7 @@ class Token {
         return Tript::encryptString(self::$magicWord.'_'.self::getDate());
     }
 
-    public static function validateToken($token){
+    public static function validateToken($token, &$tokenParts = []){
         $parsedToken = Tript::decryptString($token);
 
         $tokenParts = explode('_', $parsedToken);
@@ -24,8 +24,12 @@ class Token {
     }
 }
 
-class AuthFormToken extends Token {
+class AuthFormToken {
     private static $magicWord = 'orionauth';
+
+    public static function createToken(){
+        return Tript::encryptString(self::$magicWord.'_'.self::getDate());
+    }
 
     public static function getDate() {
         $endDate = new DateTime();
@@ -33,6 +37,14 @@ class AuthFormToken extends Token {
         $endDate->add(new DateInterval('PT30M'));
 
         return $endDate->format('Y-m-d H:i:s');
+    }
+
+    public static function validateToken($token, &$tokenParts = []){
+        $parsedToken = Tript::decryptString($token);
+
+        $tokenParts = explode('_', $parsedToken);
+
+        return self::validationRules($tokenParts);
     }
 
     private static function validationRules($tokenParts){
@@ -46,8 +58,12 @@ class AuthFormToken extends Token {
 
 }
 
-class UserActionToken extends Token {
+class UserActionToken {
     private static $magicWord = 'orionuserdoes';
+
+    public static function createToken(){
+        return Tript::encryptString(self::$magicWord.'_'.self::getDate());
+    }
 
     public static function getDate() {
 
@@ -64,6 +80,14 @@ class UserActionToken extends Token {
         $endDate->add(new DateInterval('PT30M'));
 
         return $endDate->format('Y-m-d H:i:s').'_'.strval($user->id);
+    }
+
+    public static function validateToken($token, &$tokenParts = []){
+        $parsedToken = Tript::decryptString($token);
+
+        $tokenParts = explode('_', $parsedToken);
+
+        return self::validationRules($tokenParts);
     }
 
     private static function validationRules($tokenParts){
@@ -83,7 +107,7 @@ class UserActionToken extends Token {
         return (
                 $tokenParts[0] == self::$magicWord && 
                 $currentDate < $dateExpiration && 
-                $tokenParts[3] == $user->id
+                $tokenParts[2] == $user->id
             );
     }
 }

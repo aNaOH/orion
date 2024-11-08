@@ -12,8 +12,8 @@ class Post {
     public ?int $id;
     public string $title;
     public string $body;
-    public string $created_at;
-    public ?string $last_updated_at;
+    public DateTime $created_at;
+    public ?DateTime $last_updated_at;
     public bool $is_public;
     public EPOST_TYPE $type;
     public ?int $game_id;
@@ -41,8 +41,8 @@ class Post {
         $data = [
             'title' => $this->title,
             'body' => $this->body,
-            'created_at' => $this->created_at,
-            'last_updated_at' => $this->last_updated_at,
+            'created_at' => $this->created_at ?? (new DateTime())->format('Y-m-d H:i:s'),
+            'last_updated_at' => $this->last_updated_at ?? (new DateTime())->format('Y-m-d H:i:s'),
             'is_public' => $this->is_public,
             'type' => $this->type->value,
             'game_id' => $this->game_id,
@@ -80,7 +80,7 @@ class Post {
         $posts = [];
 
         foreach ($postSelect as $post) {
-            $posts[] = new Post(
+            $postObj = new Post(
                 $post['title'],
                 $post['body'],
                 (bool)$post['is_public'],
@@ -89,6 +89,11 @@ class Post {
                 $post['author_id'],
                 $post['id']
             );
+
+            $postObj->created_at = new DateTime($post['created_at']);
+            $postObj->last_updated_at = new DateTime($post['last_updated_at']);
+
+            $posts[] = $postObj;
         }
 
         return $posts;

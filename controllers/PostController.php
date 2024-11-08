@@ -63,6 +63,37 @@ class PostController {
         include('views/community/'.$typeString.'/index.php');
     }
 
+    public static function getPost(int $gameId, EPOST_TYPE $type, int $postId){
+        $game = Game::getById($gameId);
+
+        if(is_null($game)) return false;
+
+        $post = Post::getById($postId);
+
+        if(is_null($post) || $post->game_id !== $game->id) return false;
+
+        $GLOBALS['game'] = $game;
+        $GLOBALS['post'] = $post;
+
+        $typeString = '';
+
+        switch ($type) {
+            case EPOST_TYPE::POST:
+                $typeString = "posts";
+                break;
+            
+            case EPOST_TYPE::GALLERY:
+                $typeString = "gallery";
+                break;
+
+            case EPOST_TYPE::GUIDE:
+                $typeString = "guides";
+                break;
+        }
+
+        include('views/community/'.$typeString.'/post.php');
+    }
+
     public static function createPost(int $gameId, EPOST_TYPE $type){
         $game = Game::getById($gameId);
 
@@ -88,5 +119,23 @@ class PostController {
 
         include('views/community/'.$typeString.'/create.php');
     }
+
+    public static function create(int $gameId, EPOST_TYPE $type, string $title, string $body){
+        $game = Game::getById($gameId);
+
+        if(is_null($game)) return false;
+
+        $post = new Post($title, $body, true, $type, $game->id, $_SESSION['user']['id']);
+
+        $post->save();
+
+        header('HTTP/1.1 200 OK');
+        $response['status'] = 200;
+        $response['message'] = "Post creado ( ID: ".strval($post->id)." )";
+
+        echo json_encode($response);
+        exit();
+    }
+
 
 }
