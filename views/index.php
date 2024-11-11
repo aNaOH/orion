@@ -1,99 +1,121 @@
-<?php
-
-$title = "Bienvenido a Orion";
-
-function showPage() {
-    ?>
-
-    <!-- Hero Section -->
-    <section id="hero" class="hero section dark-background">
-
-        <div class="carousel-container">
-            <h2 class="animate__animated animate__fadeInDown">Bienvenido a <span>Orion</span></h2>
-            <p class="animate__animated animate__fadeInUp">Gamers, ¡unidos!</p>
-            <div class="d-flex flex-row justify-content-between">
-                <a href="#about" class="btn-get-started animate__animated animate__fadeInUp scrollto">Leer más</a>
-                <?php if(isset($userSession)) { ?>
-                  <a href="/register" class="btn-get-started animate__animated animate__fadeInUp">Unirse</a>
-                <?php } ?>
-            </div>
-          </div>
-
-    </section><!-- /Hero Section -->
-
-    <!-- About Section -->
-    <section id="about" class="about section">
-
-      <!-- Section Title -->
-      <div class="container section-title" data-aos="fade-up">
-        <h2>Sobre Orion</h2>
-        <p>¿Qué es?</p>
-      </div><!-- End Section Title -->
-
-      <div class="container">
-
-        <div class="row gy-4">
-
-          <div class="col-lg-6 content" data-aos="fade-up" data-aos-delay="100">
-            <p>
-              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore
-              magna aliqua.
-            </p>
-            <ul>
-              <li><i class="bi bi-check2-circle"></i> <span>Ullamco laboris nisi ut aliquip ex ea commodo consequat.</span></li>
-              <li><i class="bi bi-check2-circle"></i> <span>Duis aute irure dolor in reprehenderit in voluptate velit.</span></li>
-              <li><i class="bi bi-check2-circle"></i> <span>Ullamco laboris nisi ut aliquip ex ea commodo</span></li>
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Orion - Plataforma de Juegos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: '#1B2A49',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        .animate-fadeIn {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .hover-pulse:hover {
+            animation: pulse 0.3s ease-in-out;
+        }
+        .link-underline {
+            position: relative;
+        }
+        .link-underline::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: -2px;
+            left: 0;
+            background-color: white;
+            transition: width 0.3s ease;
+        }
+        .link-underline:hover::after {
+            width: 100%;
+        }
+        .account-dropdown:hover .dropdown-icon,
+        .account-dropdown[aria-expanded="true"] .dropdown-icon {
+            transform: rotate(90deg);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white">
+    <header class="bg-brand p-4">
+        <nav class="container mx-auto flex justify-between items-center">
+            <a href="/" class="text-2xl font-bold text-white flex items-center hover-pulse">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
+                </svg>
+                <span>Orion</span>
+            </a>
+            <ul class="flex space-x-4 items-center">
+                <li>
+                    <a href="/" class="text-white hover:text-gray-300 link-underline">Inicio</a>
+                </li>
+                <li>
+                    <a href="/juegos" class="text-white hover:text-gray-300 link-underline">Juegos</a>
+                </li>
+                <li>
+                    <a href="/comunidad" class="text-white hover:text-gray-300 link-underline">Comunidad</a>
+                </li>
+                <li class="relative">
+                    <button id="accountDropdown" class="account-dropdown text-white hover:text-gray-300 flex items-center focus:outline-none" aria-haspopup="true" aria-expanded="false">
+                        Cuenta
+                        <svg xmlns="http://www.w3.org/2000/svg" class="dropdown-icon h-4 w-4 ml-1 transition-transform duration-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </button>
+                    <ul id="accountMenu" class="absolute right-0 mt-2 py-2 w-48 bg-gray-800 rounded-md shadow-xl z-20 hidden animate-fadeIn" role="menu" aria-orientation="vertical" aria-labelledby="accountDropdown">
+                        <li>
+                            <a href="/iniciar-sesion" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200" role="menuitem">Iniciar sesión</a>
+                        </li>
+                        <li>
+                            <a href="/unirse" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200" role="menuitem">Unirse</a>
+                        </li>
+                    </ul>
+                </li>
             </ul>
-          </div>
+        </nav>
+    </header>
 
-          <div class="col-lg-6" data-aos="fade-up" data-aos-delay="200">
-            <p>Ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. </p>
-            <a href="/register" class="read-more"><span>Unirse a Orion</span></a>
-          </div>
+    <main class="container mx-auto mt-8 px-4">
+        <h1 class="text-3xl font-bold mb-4">Bienvenido a Orion</h1>
+        <p class="text-gray-300">Tu plataforma social de videojuegos.</p>
+    </main>
 
-        </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const accountDropdown = document.getElementById('accountDropdown');
+            const accountMenu = document.getElementById('accountMenu');
 
-      </div>
+            accountDropdown.addEventListener('click', function() {
+                const expanded = this.getAttribute('aria-expanded') === 'true' || false;
+                this.setAttribute('aria-expanded', !expanded);
+                accountMenu.classList.toggle('hidden');
+            });
 
-    </section><!-- /About Section -->
-
-    <!-- Features Section -->
-    <section id="features" class="features section">
-
-        <div class="container">
-
-            <ul class="nav nav-tabs row  d-flex" data-aos="fade-up" data-aos-delay="100">
-            <li class="nav-item col-3">
-                <a class="nav-link active show" data-bs-toggle="tab" data-bs-target="#features-tab-1">
-                <i class="bi bi-binoculars"></i>
-                <h4 class="d-none d-lg-block">Modi sit est dela pireda nest</h4>
-                </a>
-            </li>
-            <li class="nav-item col-3">
-                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#features-tab-2">
-                <i class="bi bi-box-seam"></i>
-                <h4 class="d-none d-lg-block">Unde praesenti mara setra le</h4>
-                </a>
-            </li>
-            <li class="nav-item col-3">
-                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#features-tab-3">
-                <i class="bi bi-brightness-high"></i>
-                <h4 class="d-none d-lg-block">Pariatur explica nitro dela</h4>
-                </a>
-            </li>
-            <li class="nav-item col-3">
-                <a class="nav-link" data-bs-toggle="tab" data-bs-target="#features-tab-4">
-                <i class="bi bi-command"></i>
-                <h4 class="d-none d-lg-block">Nostrum qui dile node</h4>
-                </a>
-            </li>
-            </ul><!-- End Tab Nav -->
-
-        </div>
-
-    </section><!-- /Features Section -->
-
-    <?php
-}
-
-include("views/templates/main.php");
+            document.addEventListener('click', function(event) {
+                if (!accountDropdown.contains(event.target) && !accountMenu.contains(event.target)) {
+                    accountDropdown.setAttribute('aria-expanded', 'false');
+                    accountMenu.classList.add('hidden');
+                }
+            });
+        });
+    </script>
+</body>
+</html>
