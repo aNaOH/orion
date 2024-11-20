@@ -5,11 +5,7 @@ if(isset($_SESSION['user'])){
 }
 
 include('header.php');
-?>
-  <main class="container mx-auto mt-8 px-4">
-<?php
+
 showPage();
-?>
-  </main>
-<?php
+
 include('footer.php');

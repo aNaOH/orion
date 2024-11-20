@@ -1,5 +1,3 @@
-</main>
-
   <!-- Footer -->
 
   <!-- Vendor JS Files -->

@@ -62,7 +62,7 @@ class UserController {
     public static function login($email, $password){
         $response = array();
 
-        FormHelper::ValidateRequiredField($email, "emailAddress");
+        FormHelper::ValidateRequiredField($email, "email");
         FormHelper::ValidateRequiredField($password, "password");
 
         FormHelper::ValidateMinChars($password, 8, "password");
@@ -74,7 +74,7 @@ class UserController {
             $response['status'] = 400;
             $response['message'] = "No existe un usuario con ese correo electrónico.";
             $response['value'] = $email;
-            $response['field'] = "emailAddress";
+            $response['field'] = "email";
 
             echo json_encode($response);
             exit();

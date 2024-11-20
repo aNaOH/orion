@@ -5,46 +5,43 @@ $title = "Entrar a Orion";
 function showPage() {
     ?>
 
-    <!-- Page Title -->
-    <div class="page-title dark-background">
-      <div class="container position-relative">
-        <h1>Entrar a Orion</h1>
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <img class="mx-auto h-10 w-auto" src="/assets/img/orion-logo.svg" alt="Orion logo">
+        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white-900">Inicia sesión con tu cuenta</h2>
       </div>
-    </div><!-- End Page Title -->
 
-    <!-- Starter Section Section -->
-    <section id="starter-section" class="starter-section section">
-
-    <div class="container px-5 my-5">
-      <?php
-
-      if(isset($_GET['from']) && $_GET['from'] == "register"){
-        ?>
-          <div class="alert alert-success" role="alert">
-            ¡Cuenta creada! Ya puedes entrar.
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form class="space-y-6" novalidate id="loginForm">
+          <div>
+            <label for="email" class="block text-sm/6 font-medium text-white-900">Correo electrónico</label>
+            <div class="mt-2">
+              <input id="email" name="email" type="email" autocomplete="email" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+            </div>
+            <span id="emailError" class="mt-2 block text-sm/6 font-medium text-red-500"></span>
           </div>
-        <?php
-      }
 
-      ?>
-        <form id="registerForm" novalidate>
-            <div class="form-floating mb-3">
-                <input class="form-control" id="emailAddress" name="emailAddress" type="email" placeholder="Email Address" required />
-                <label for="emailAddress">Correo electrónico</label>
-                <div id="emailAddressError" class="invalid-feedback"></div>
+          <div>
+            <div class="flex items-center justify-between">
+              <label for="password" class="block text-sm/6 font-medium text-white-900">Contraseña</label>
             </div>
-            <div class="form-floating mb-3">
-                <input class="form-control" id="password" name="password" type="password" placeholder="Password" required />
-                <label for="password">Contraseña</label>
-                <div id="passwordError" class="invalid-feedback"></div>
+            <div class="mt-2">
+              <input id="password" name="password" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
             </div>
-            <div class="d-grid">
-                <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Iniciar sesión</button>
-            </div>
+            <span id="passwordError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+          </div>
+
+          <div>
+            <button id="submitButton" type="submit" class="flex w-full justify-center rounded-md bg-alt-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-alt-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Iniciar sesión</button>
+          </div>
         </form>
-    </div>
 
-    </section><!-- /Starter Section Section -->
+        <p class="mt-10 text-center text-sm/6 text-gray-500">
+          ¿No tienes cuenta?
+          <a href="/register" class="font-semibold text-alt-600 hover:text-alt-500">Creala aquí</a>
+        </p>
+      </div>
+    </div>
 
     <script src="/assets/js/forms/validator.js"></script>
     <script src="/assets/js/forms/login.js"></script>
@@ -52,4 +49,4 @@ function showPage() {
     <?php
 }
 
-include("views/templates/main.php");
+include("views/templates/nomain.php");

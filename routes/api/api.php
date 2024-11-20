@@ -15,6 +15,7 @@ $router->mount('/api', function() use ($router) {
         $password = $_POST['password'];
         $confirmPassword = $_POST['confirmPassword'];
         $terms = $_POST['terms'];
+        $birthdate = $_POST['birthdate'];
 
         UserController::register($email, $password, $confirmPassword, $terms);
     });
