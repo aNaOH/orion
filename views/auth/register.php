@@ -5,53 +5,86 @@ $title = "Unirse a Orion";
 function showPage() {
     ?>
 
-    <!-- Page Title -->
-    <div class="page-title dark-background">
-      <div class="container position-relative">
-        <h1>Unirse a Orion</h1>
+    <div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+      <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+        <img class="mx-auto h-10 w-auto" src="/assets/img/orion-logo.svg" alt="Orion logo">
+        <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white-900">Crea tu cuenta</h2>
       </div>
-    </div><!-- End Page Title -->
 
-    <!-- Starter Section Section -->
-    <section id="starter-section" class="starter-section section">
+      <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form class="space-y-6" novalidate id="loginForm">
+          <div>
+            <label for="email" class="block text-sm/6 font-medium text-white-900">Correo electrónico</label>
+            <div class="mt-2">
+              <input id="email" name="email" type="email" autocomplete="email" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+            </div>
+            <span id="emailError" class="mt-2 block text-sm/6 font-medium text-red-500"></span>
+          </div>
 
-    <div class="container px-5 my-5">
-        <form id="registerForm" novalidate>
-            <div class="form-floating mb-3">
-                <input class="form-control" id="emailAddress" name="emailAddress" type="email" placeholder="Email Address" required />
-                <label for="emailAddress">Correo electrónico</label>
-                <div id="emailAddressError" class="invalid-feedback"></div>
+          <div>
+            <div class="flex items-center justify-between">
+              <label for="password" class="block text-sm/6 font-medium text-white-900">Contraseña</label>
             </div>
-            <div class="form-floating mb-3">
-                <input class="form-control" id="password" name="password" type="password" placeholder="Password" required />
-                <label for="password">Contraseña</label>
-                <div id="passwordError" class="invalid-feedback"></div>
+            <div class="mt-2">
+              <input id="password" name="password" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
             </div>
-            <div class="form-floating mb-3">
-                <input class="form-control" id="confirmPassword" name="confirmPassword" type="password" placeholder="Confirm password" required />
-                <label for="confirmPassword">Repetir contraseña</label>
-                <div id="confirmPasswordError" class="invalid-feedback"></div>
+            <span id="passwordError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between">
+              <label for="confirmPassword" class="block text-sm/6 font-medium text-white-900">Confirmar contraseña</label>
             </div>
-            <div class="mb-3">
-                <input class="form-check-input" id="terms" name="terms" type="checkbox" value="yeah" required />
-                <label class="form-check-label" for="terms">
-                    Acepto los Términos y Condiciones y la Política de Privacidad.
-                </label>
-                <div id="termsError" class="invalid-feedback"></div>
+            <div class="mt-2">
+              <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
             </div>
-            <div class="d-grid">
-                <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Unirse</button>
+            <span id="confirmPasswordError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+          </div>
+
+          <div>
+            <div class="flex items-center justify-between">
+              <label for="birthdate" class="block text-sm/6 font-medium text-white-900">Fecha de nacimiento</label>
+              <span class="relative group text-alt-600 hover:text-alt-500">
+                    ¿Por qué necesitamos esto?
+                    <span class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-black text-white text-xs rounded px-4 py-2 max-w-none w-auto">
+                        En la mayoría de países, se requiere de 14 años para poder registrarse en una red social.
+                    </span>
+                </span>
             </div>
+            <div class="mt-2">
+              <input id="birthdate" name="birthdate" type="date" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+            </div>
+            <span id="birthdateError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+          </div>
+
+          <div>
+            <div class="flex items-start">
+                <div class="flex items-center h-5">
+                    <input id="terms" aria-describedby="terms" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="">
+                </div>
+                <div class="ml-3 text-sm">
+                    <label for="terms" class="block text-sm/6 font-medium text-white-900">He leído y acepto los <a href="/legal/terms" class="text-alt-600 hover:text-alt-500">términos y condiciones</a> y la <a href="/legal/privacy" class="text-alt-600 hover:text-alt-500">política de privacidad</a></label>
+                </div>
+            </div>
+            <span id="termsError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+          </div>
+
+          <div>
+            <button id="submitButton" type="submit" class="flex w-full justify-center rounded-md bg-alt-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-alt-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Iniciar sesión</button>
+          </div>
         </form>
+
+        <p class="mt-10 text-center text-sm/6 text-gray-500">
+          ¿No tienes cuenta?
+          <a href="/register" class="font-semibold text-alt-600 hover:text-alt-500">Creala aquí</a>
+        </p>
+      </div>
     </div>
 
-
-    </section><!-- /Starter Section Section -->
-
     <script src="/assets/js/forms/validator.js"></script>
-    <script src="/assets/js/forms/register.js"></script>
+    <script src="/assets/js/forms/login.js"></script>
 
     <?php
 }
 
-include("views/templates/main.php");
+include("views/templates/nomain.php");
