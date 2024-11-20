@@ -70,7 +70,7 @@ function showPage() {
           </div>
 
           <div>
-            <button id="submitButton" type="submit" class="flex w-full justify-center rounded-md bg-alt-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-alt-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Iniciar sesión</button>
+            <button id="submitButton" type="submit" class="flex w-full justify-center rounded-md bg-alt-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-alt-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Unirse</button>
           </div>
         </form>
 
