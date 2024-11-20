@@ -75,8 +75,8 @@ function showPage() {
         </form>
 
         <p class="mt-10 text-center text-sm/6 text-gray-500">
-          ¿No tienes cuenta?
-          <a href="/register" class="font-semibold text-alt-600 hover:text-alt-500">Creala aquí</a>
+          ¿Ya tienes una cuenta?
+          <a href="/login" class="font-semibold text-alt-600 hover:text-alt-500">Entra aquí</a>
         </p>
       </div>
     </div>
