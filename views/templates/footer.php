@@ -22,10 +22,10 @@
         <div>
           <h2 class="text-2xl font-bold mb-4">Síguenos</h2>
           <div class="flex justify-center space-x-6">
-            <a href="https://x.com/togetheronorion" class="text-white hover:text-alt-500 transition">X (Anteriormente Twitter)</a>
-            <a href="https://bsky.app/profile/togetheronorion.com" class="text-white hover:text-alt-500 transition">Bluesky</a>
-            <a href="https://www.instagram.com/togetheronorion" class="text-white hover:text-alt-500 transition">Instagram</a>
-            <a href="https://www.youtube.com/@togetheronorion" class="text-white hover:text-alt-500 transition">YouTube</a>
+            <a href="https://x.com/togetheronorion"><img class="h-6" src="/assets/img/third/x.svg" alt="X (anteriormente Twitter)"></a>
+            <a href="https://bsky.app/profile/togetheronorion.com" class="text-white hover:text-alt-500 transition"><img class="h-6" src="/assets/img/third/bluesky.svg" alt="Bluesky"></a>
+            <a href="https://www.instagram.com/togetheronorion" class="text-white hover:text-alt-500 transition"><img class="h-6" src="/assets/img/third/instagram.svg" alt="Instagram"></a>
+            <a href="https://www.youtube.com/@togetheronorion" class="text-white hover:text-alt-500 transition"><img class="h-6" src="/assets/img/third/youtube.svg" alt="Youtube"></a>
           </div>
         </div>
       </div>

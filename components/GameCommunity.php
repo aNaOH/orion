@@ -1,12 +1,15 @@
 <div class="<?= $class ?>">
-    <!-- Image with violet mask -->
-    <div class="bg-image rounded-6">
-      <a href="/communities/<?= $game->id ?>">
-        <img
-            src="/media/games/cover/<?= $game->id ?>"
-            class="w-75"
-            alt="<?= $game->title ?> cover"
-        />
-      </a>
-    </div>
+  <div class="relative rounded-lg overflow-hidden group w-60 h-90 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"> <!-- Ajustamos el tamaño del contenedor -->
+    <a href="/communities/<?= $game->id ?>">
+      <img
+        src="/media/games/cover/<?= $game->id ?>"
+        class="w-full h-full object-cover"
+        alt="<?= $game->title ?> cover"
+      />
+      <!-- Degradado y título -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+        <h3 class="text-white text-base font-semibold"><?= $game->title ?></h3>
+      </div>
+    </a>
   </div>
+</div>

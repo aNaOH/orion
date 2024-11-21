@@ -21,7 +21,7 @@ function showPage() {
 
         <div class="container">
         <?php
-            $Parsedown = new Parsedown();
+            $Parsedown = new TailwindParsedown();
             echo $Parsedown->text($post->body);
         ?>
         </div>
