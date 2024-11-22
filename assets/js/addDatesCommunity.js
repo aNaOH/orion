@@ -15,8 +15,8 @@ function fromNowShort(date) {
     return `${Math.floor(years)}y`;
   }
 
-$(document).ready(function() {
-    const allDates = $('[data-createdat]');
+document.onload(function() {
+    const allDates = $('[data-createdate]');
     for (const dateAt of allDates) {
         const d = dateAt.dataset.createdat;
         dateAt.innerHTML = fromNowShort(moment(d));

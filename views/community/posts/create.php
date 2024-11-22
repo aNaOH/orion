@@ -9,33 +9,42 @@ function showPage() {
     <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
 
     <!-- Hero Section -->
-    <section id="hero" class="hero section dark-background">
-
-        <div class="carousel-container">
-            <h2 class="animate__animated animate__fadeInDown">Crear post para <?= $game->title ?></h2>
-          </div>
-
+    <section id="hero" class="bg-brand-500 text-white pt-20">
+    <div class="container mx-auto text-center">
+        <h2 class="text-2xl md:text-4xl font-bold animate__animated animate__fadeInDown">Crear post para <?= $game->title ?></h2>
+    </div>
     </section><!-- /Hero Section -->
 
     <!-- Features Section -->
-    <section id="features" class="features section">
+    <section id="features" class="py-20">
+    <div class="container mx-auto max-w-2xl">
+        <form id="communityCreateForm" novalidate class="bg-branddark shadow-lg rounded-lg p-8 space-y-6">
+        <?php OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION) ?>
 
-        <div class="container">
-            <form id="communityCreateForm" novalidate>
-                <?php OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION) ?>
-
-                <div class="form-floating mb-3">
-                    <input class="form-control" id="title" name="title" type="text" placeholder="Título" required />
-                    <label for="title">Título</label>
-                    <div id="titleError" class="invalid-feedback"></div>
-                </div>
-
-                <textarea name="body" id="body" class="m-2"></textarea>
-
-                <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Publicar post</button>
-            </form>
+        <!-- Título -->
+        <div>
+            <label for="title" class="block text-sm font-medium text-gray-200">Título</label>
+            <input class="form-control block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200"
+                id="title" name="title" type="text" placeholder="Título" required />
+            <div id="titleError" class="text-sm text-red-500 mt-2 hidden"></div>
         </div>
 
+        <!-- Cuerpo -->
+        <div>
+            <label for="body" class="block text-sm font-medium text-gray-200">Contenido del post</label>
+            <div class="p-2 bg-white rounded-lg shadow-lg">
+                <textarea name="body" id="body" class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200" rows="8" placeholder="Escribe el contenido aquí..." required></textarea>
+            </div>
+        </div>
+
+        <!-- Botón Publicar -->
+        <div class="text-right">
+            <button class="px-6 py-3 bg-alt-500 text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition" id="submitButton" type="submit">
+            Publicar post
+            </button>
+        </div>
+        </form>
+    </div>
     </section><!-- /Features Section -->
 
     <script>

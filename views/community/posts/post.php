@@ -8,24 +8,25 @@ function showPage() {
     ?>
 
     <!-- Hero Section -->
-    <section id="hero" class="hero section dark-background">
-
-        <div class="carousel-container">
-            <h2 class="animate__animated animate__fadeInDown"><?= $post->title ?> de <?= $post->getAuthor()->username ?></h2>
-          </div>
-
+    <section id="hero" class="bg-brand-500 text-white py-20">
+    <div class="container mx-auto text-center">
+        <h2 class="text-4xl md:text-5xl font-bold animate__animated animate__fadeInDown">
+        <?= $post->title ?> 
+        </h2>
+        <p class="text-lg mt-4">
+        Escrito por <span class="font-semibold"><?= $post->getAuthor()->username ?></span>
+        </p>
+    </div>
     </section><!-- /Hero Section -->
 
     <!-- Features Section -->
-    <section id="features" class="features section">
-
-        <div class="container">
+    <section id="features" class="py-20">
+    <div class="container mx-auto p-6">
         <?php
-            $Parsedown = new TailwindParsedown();
-            echo $Parsedown->text($post->body);
+        $Parsedown = new TailwindParsedown();
+        echo $Parsedown->text($post->body);
         ?>
-        </div>
-
+    </div>
     </section><!-- /Features Section -->
 
     <?php
