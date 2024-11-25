@@ -17,7 +17,7 @@ form.onsubmit = (e) => {
         type: 'POST', // The HTTP method to use for the request (GET, POST, etc.)
         data: { title: fields['title'].value, body: fields['body'].value, token: fields['tript_token'].value }, // Data to be sent to the server
         success: function(response) {
-            location.href = "/";
+            location.href = "/communities/" + game.toString() + "/" + type;
         },
         error: function(xhr, status, error) {
             const info = xhr.responseJSON;

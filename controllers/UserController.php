@@ -14,15 +14,15 @@ class UserController {
         FormHelper::ValidateMinChars($password, 8, "password");
         FormHelper::ValidatePasswordRequirements($password, "password");
 
-        if(!isset($terms) || $terms != "yeah"){
-            header('HTTP/1.1 400 Bad Request');
-            $response['status'] = 400;
-            $response['message'] = "Debes aceptar los términos y condiciones y la política de privacidad";
-            $response['field'] = "terms";
+        //if(!isset($terms) || $terms != "yeah"){
+        //    header('HTTP/1.1 400 Bad Request');
+        //    $response['status'] = 400;
+        //    $response['message'] = "Debes aceptar los términos y condiciones y la política de privacidad";
+        //    $response['field'] = "terms";
 
-            echo json_encode($response);
-            exit();
-        }
+        //    echo json_encode($response);
+        //    exit();
+        //}
         
         $user = User::getByEmail($email);
 

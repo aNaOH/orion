@@ -12,7 +12,7 @@ function showPage() {
       </div>
 
       <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form class="space-y-6" novalidate id="loginForm">
+        <form class="space-y-6" novalidate id="registerForm">
           <div>
             <label for="email" class="block text-sm/6 font-medium text-white-900">Correo electrónico</label>
             <div class="mt-2">
@@ -82,7 +82,7 @@ function showPage() {
     </div>
 
     <script src="/assets/js/forms/validator.js"></script>
-    <script src="/assets/js/forms/login.js"></script>
+    <script src="/assets/js/forms/register.js"></script>
 
     <?php
 }
