@@ -1,11 +1,9 @@
-version: '3.8'
-
 services:
   web:
     build: .
     container_name: php-apache
     ports:
-      - "80:80"  # Acceso a la aplicación PHP
+      - "8686:80"  # Acceso a la aplicación PHP
     volumes:
       - /home/abel/proyecto/orion:/var/www/html
     depends_on:
