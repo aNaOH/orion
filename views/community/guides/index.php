@@ -1,6 +1,6 @@
 <?php
 
-$title = "Posts de $game->title en Orion";
+$title = "Guías pata $game->title en Orion";
 
 function showPage() {
     global $game;
@@ -10,10 +10,10 @@ function showPage() {
     <!-- Hero Section -->
     <section id="hero" class="bg-brand-500 text-white py-20">
     <div class="container mx-auto text-center">
-        <h2 class="text-4xl md:text-5xl font-bold animate__animated animate__fadeInDown">Posts de <?= $game->title ?></h2>
+        <h2 class="text-4xl md:text-5xl font-bold animate__animated animate__fadeInDown">Guías para <?= $game->title ?></h2>
         <?php if (isset($_SESSION['user']['id'])) { ?>
         <div class="mt-6">
-            <a href="/communities/<?= $game->id ?>/posts/create" class="px-6 py-3 bg-alt text-white font-semibold rounded-lg shadow-md hover:bg-alt-400 transition animate__animated animate__fadeInUp">
+            <a href="/communities/<?= $game->id ?>/guides/create" class="px-6 py-3 bg-alt text-white font-semibold rounded-lg shadow-md hover:bg-alt-400 transition animate__animated animate__fadeInUp">
             Nuevo post
             </a>
         </div>
@@ -29,7 +29,7 @@ function showPage() {
             if (!$post->is_public) continue;
         ?>
             <!-- Post Item -->
-            <a href="/communities/<?= $game->id ?>/posts/<?= $post->id ?>" class="block bg-branddark shadow-lg rounded-lg p-6 hover:bg-branddark-600 transition-colors duration-300">
+            <a href="/communities/<?= $game->id ?>/guides/<?= $post->id ?>" class="block bg-branddark shadow-lg rounded-lg p-6 hover:bg-branddark-600 transition-colors duration-300">
             <div class="flex justify-between items-center">
                 <div>
                 <h6 class="text-lg font-semibold text-gray-200 mb-1"><?= $post->title ?></h6>

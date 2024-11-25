@@ -99,6 +99,31 @@ class Post {
         return $posts;
     }
 
+    public static function getAllByTypeAndGame(EPOST_TYPE $type, int $game_id) {
+        $postSelect = Connection::doSelect(ORION_DB, self::$table, ['type' => $type->value, 'game_id' => $game_id]);
+        
+        $posts = [];
+
+        foreach ($postSelect as $post) {
+            $postObj = new Post(
+                $post['title'],
+                $post['body'],
+                (bool)$post['is_public'],
+                $post['type'],
+                $post['game_id'],
+                $post['author_id'],
+                $post['id']
+            );
+
+            $postObj->created_at = new DateTime($post['created_at']);
+            $postObj->last_updated_at = new DateTime($post['last_updated_at']);
+
+            $posts[] = $postObj;
+        }
+
+        return $posts;
+    }
+
     public function getAuthor(): User {
         return User::getById($this->author_id);
     }

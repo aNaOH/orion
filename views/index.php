@@ -10,14 +10,11 @@ function showPage() {
     <div class="container mx-auto text-center">
         <img src="/assets/img/orion-logo.svg" alt="Orion logo" class="mx-auto mb-5 w-1/4">
         <p class="text-lg md:text-xl mb-6">Descubre, comparte y gestiona videojuegos en una plataforma creada para jugadores y desarrolladores.</p>
-        <a href="/explore" class="px-8 py-4 bg-alt text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-alt-300 transition">
-        Explorar ahora
-        </a>
     </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-20">
+    <section id="features" class="py-10">
     <div class="container mx-auto text-center">
         <h2 class="text-3xl md:text-4xl font-bold text-gray-200 mb-12">Lo que ofrecemos</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">

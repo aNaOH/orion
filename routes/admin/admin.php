@@ -10,6 +10,10 @@ $router->mount('/admin', function() use ($router) {
         include('views/admin/quickgame.php');
     });
 
+    $router->get('/guidetype', function(){
+        include('views/admin/guidetype.php');
+    });
+
 });
 
 

@@ -42,7 +42,7 @@ class PostController {
         if(is_null($game)) return false;
 
         $GLOBALS['game'] = $game;
-        $GLOBALS['posts'] = Post::getAllByType($type);
+        $GLOBALS['posts'] = Post::getAllByTypeAndGame($type, $gameId);
 
         $typeString = '';
 

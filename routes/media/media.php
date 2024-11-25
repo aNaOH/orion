@@ -25,27 +25,28 @@ $router->mount('/media', function() use ($router) {
 $router->set404('/media(/.*)?', function() {
     header('HTTP/1.1 404 Not Found');
 
-    $manager = new ImageManager(
-        new Intervention\Image\Drivers\Gd\Driver()
-    );
+    //$manager = new ImageManager(
+    //    new Intervention\Image\Drivers\Gd\Driver()
+    //);
 
     $requestedRoute = $_SERVER['REQUEST_URI'];
 
     $img = S3Helper::retrieve(EBUCKET_LOCATION::MISC, "404.png");
     $bodyData = $img['body']->getContents();
 
-    $image = $manager->read($bodyData);
+    //$image = $manager->read($bodyData);
 
     // Modificar el regex para capturar el segmento después de /media/games/
-    if (preg_match('#^/media/games/([^/]+)#', $requestedRoute, $matches)) {
-        $subroute = $matches[1]; 
-        switch ($subroute) {
-            case 'cover':
-                $image->resize(600, 900);
-                break;
-        }
-    }
+    //if (preg_match('#^/media/games/([^/]+)#', $requestedRoute, $matches)) {
+    //    $subroute = $matches[1]; 
+    //    switch ($subroute) {
+    //        case 'cover':
+    //            $image->resize(600, 900);
+    //            break;
+    //    }
+    //}
 
     header('Content-Type: image/jpeg');
-    echo $image->toJpeg();
+    //echo $image->toJpeg();
+    echo $bodyData;
 });

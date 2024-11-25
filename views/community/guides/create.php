@@ -11,7 +11,7 @@ function showPage() {
     <!-- Hero Section -->
     <section id="hero" class="bg-brand-500 text-white pt-20">
     <div class="container mx-auto text-center">
-        <h2 class="text-2xl md:text-4xl font-bold animate__animated animate__fadeInDown">Crear post para <?= $game->title ?></h2>
+        <h2 class="text-2xl md:text-4xl font-bold animate__animated animate__fadeInDown">Crear guía para <?= $game->title ?></h2>
     </div>
     </section><!-- /Hero Section -->
 
@@ -31,7 +31,7 @@ function showPage() {
 
         <!-- Cuerpo -->
         <div>
-            <label for="body" class="block text-sm font-medium text-gray-200">Contenido del post</label>
+            <label for="body" class="block text-sm font-medium text-gray-200">Contenido de la guía</label>
             <div class="p-2 bg-white rounded-lg shadow-lg">
                 <textarea name="body" id="body" class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200" rows="8" placeholder="Escribe el contenido aquí..." required></textarea>
             </div>
@@ -40,7 +40,7 @@ function showPage() {
         <!-- Botón Publicar -->
         <div class="text-right">
             <button class="px-6 py-3 bg-alt-500 text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition" id="submitButton" type="submit">
-            Publicar post
+            Publicar guía
             </button>
         </div>
         </form>

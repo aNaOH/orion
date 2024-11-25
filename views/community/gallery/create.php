@@ -11,7 +11,7 @@ function showPage() {
     <!-- Hero Section -->
     <section id="hero" class="bg-brand-500 text-white pt-20">
     <div class="container mx-auto text-center">
-        <h2 class="text-2xl md:text-4xl font-bold animate__animated animate__fadeInDown">Crear post para <?= $game->title ?></h2>
+        <h2 class="text-2xl md:text-4xl font-bold animate__animated animate__fadeInDown">Subir imagen para <?= $game->title ?></h2>
     </div>
     </section><!-- /Hero Section -->
 

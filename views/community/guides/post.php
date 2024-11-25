@@ -1,6 +1,6 @@
 <?php
 
-$title = "Post '$post->title' para $game->title en Orion";
+$title = "Guía '$post->title' para $game->title en Orion";
 
 function showPage() {
     global $game;
