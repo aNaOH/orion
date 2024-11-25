@@ -5,6 +5,8 @@ $title = "Bienvenido a Orion";
 function showPage() {
     ?>
 
+<script src="/assets/js/components/gradientSquare.js"></script>
+
 <div class="app-content-header"> <!--begin::Container-->
     <div class="container-fluid"> <!--begin::Row-->
         <div class="row">
@@ -30,8 +32,14 @@ function showPage() {
                     <div class="row mb-3"> <label for="type" class="col-sm-2 col-form-label">Nombre</label>
                         <div class="col-sm-10"> <input type="text" class="form-control" id="type" name="type"> </div>
                     </div>
-                    <div class="row mb-3"> <label for="icon" class="col-sm-2 col-form-label">Icono</label>
-                        <div class="col-sm-10"> <input type="file" class="form-control" id="icon" name="icon" accept="image/*"> </div>
+                    <div class="row mb-3"> <label for="icon" class="col-sm-2 col-form-label">Icono (en formato svg)</label>
+                        <div class="col-sm-10"> <input type="file" class="form-control" id="icon" name="icon" accept="image/svg+xml"> </div>
+                    </div>
+                    <div class="row mb-3"> <label for="tintColor" class="col-sm-2 col-form-label">Color</label>
+                        <div class="col-sm-10"> <input type="color" class="form-control" id="tintColor" name="tintColor" value="#DEAB18"> </div>
+                    </div>
+                    <div class="row mb-3"> <label for="preview" id="previewLabel" style="display: none;" class="col-sm-2 col-form-label">Previsualización</label>
+                        <div class="col-sm-10"> <gradient-square id="preview" base-color="#DEAB18" size="50" style="display: none;"></gradient-square> </div>
                     </div>
                 </div> <!--end::Body--> <!--begin::Footer-->
                 <div class="card-footer"> <button type="submit" id="submitButton" class="btn btn-primary">Crear tipo de guía</button> </div> <!--end::Footer-->
@@ -41,7 +49,7 @@ function showPage() {
 </div> <!--end::App Content-->
 
 <script src="/assets/js/forms/validator.js"></script>
-<script src="/assets/js/forms/admin/quickgame.js"></script>
+<script src="/assets/js/forms/admin/guidetype.js"></script>
             <?php
 }
 

@@ -24,18 +24,27 @@ class S3Helper {
         ]);
     }
 
-    public static function upload(EBUCKET_LOCATION $location, $name, $body) {
-
+    public static function upload(EBUCKET_LOCATION $location, $name, $body, $contentType = null, $sourceFile = null) {
         $key = $location->value . $name;
-
-        $result = self::getClient()->putObject([
+        $params = [
             'Bucket' => self::getBucketName(),
             'Key'    => $key,
-            'Body'   => $body,
-        ]);
-
+        ];
+    
+        if ($sourceFile) {
+            $params['SourceFile'] = $sourceFile;
+        } else {
+            $params['Body'] = $body;
+        }
+    
+        if ($contentType) {
+            $params['ContentType'] = $contentType;
+        }
+    
+        $result = self::getClient()->putObject($params);
+    
         return isset($result);
-    }
+    }    
 
     public static function retrieve(EBUCKET_LOCATION $location, $name) {
 

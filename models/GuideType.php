@@ -6,10 +6,13 @@ class GuideType {
     public ?int $id;
     public string $icon;
     public string $type;
+    public string $tint;
 
-    public function __construct(string $icon, string $type, ?int $id = null) {
+
+    public function __construct(string $icon, string $type, string $tint, ?int $id = null) {
         $this->icon = $icon;
         $this->type = $type;
+        $this->tint = $tint;
 
         $this->id = $id;
     }
@@ -21,6 +24,7 @@ class GuideType {
             return new GuideType(
                 $gType[0]['icon'], 
                 $gType[0]['type'],
+                $gType[0]['tint'],
                 $gType[0]['id']
             );
         }
@@ -30,7 +34,8 @@ class GuideType {
     public function save(): bool {
         $data = [
             'icon' => $this->icon,
-            'type' => $this->type
+            'type' => $this->type,
+            'tint' => $this->tint
         ];
 
         if (!isset($this->id)) {

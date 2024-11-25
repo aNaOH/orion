@@ -40,6 +40,9 @@
                         <li class="nav-item"> <a href="/admin/quickgame" class="nav-link"> <i class="nav-icon bi bi-download"></i>
                                 <p>Crear juego (Pre-tienda)</p>
                             </a> </li>
+                        <li class="nav-item"> <a href="/admin/guidetype" class="nav-link"> <i class="nav-icon bi bi-tag"></i>
+                                <p>Crear tipo de guía</p>
+                            </a> </li>
                     </ul> <!--end::Sidebar Menu-->
                 </nav>
             </div> <!--end::Sidebar Wrapper-->

@@ -13,19 +13,26 @@ $router->mount('/admin', function() use ($router) {
 
     $router->post('/guidetype', function(){
         $type = $_POST['type'];
+        $tint = $_POST['tintColor'];
 
         $uploadedIcon = $_FILES['icon'];
 
-        //$guideType = new GuideType();
-        //$guideType->save();
+        $name = str_replace('.svg', '', $uploadedIcon['name']);
+        $name = str_replace('_', '', $name);
+        $name = str_replace('-', '', $name);
 
-        var_dump($uploadedIcon);
+        $uuid = Tript::encryptString('guidetypeicon'.$name);
+
+        S3Helper::upload(EBUCKET_LOCATION::GUIDE_TYPE_ICON, $uuid, null, "image/svg+xml", $uploadedIcon['tmp_name']);
+
+        $guideType = new GuideType($uuid, $type, $tint);
+        $guideType->save();
 
         header('HTTP/1.1 200 OK');
-        //$response['status'] = 200;
-        //$response['message'] = "Tipo de guía creado ( ID: ".strval($guideType->id)." )";
+        $response['status'] = 200;
+        $response['message'] = "Tipo de guía creado ( ID: ".strval($guideType->id)." )";
 
-        //echo json_encode($response);
+        echo json_encode($response);
         exit();
     });
 
