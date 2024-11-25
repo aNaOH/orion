@@ -30,8 +30,11 @@ function showPage() {
                     <div class="row mb-3"> <label for="type" class="col-sm-2 col-form-label">Nombre</label>
                         <div class="col-sm-10"> <input type="text" class="form-control" id="type" name="type"> </div>
                     </div>
+                    <div class="row mb-3"> <label for="icon" class="col-sm-2 col-form-label">Icono</label>
+                        <div class="col-sm-10"> <input type="file" class="form-control" id="icon" name="icon" accept="image/*"> </div>
+                    </div>
                 </div> <!--end::Body--> <!--begin::Footer-->
-                <div class="card-footer"> <button type="submit" id="submitButton" class="btn btn-primary">Crear juego</button> </div> <!--end::Footer-->
+                <div class="card-footer"> <button type="submit" id="submitButton" class="btn btn-primary">Crear tipo de guía</button> </div> <!--end::Footer-->
             </form> <!--end::Form-->
         </div> <!--end::Horizontal Form-->
     </div> <!--end::Container-->
