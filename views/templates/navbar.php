@@ -24,7 +24,7 @@
                 <a href="/communities" class="hover:text-gray-300 link-underline">Comunidad</a>
             </li>
             <li class="relative">
-                <?php NavbarHelper::getUserNavbar($_SESSION['user']); ?>
+                <?php NavbarHelper::getUserNavbar($_SESSION['user'] ?? []); ?>
             </li>
         </ul>
     </nav>

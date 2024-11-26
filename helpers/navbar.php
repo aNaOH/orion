@@ -2,7 +2,7 @@
 
 class NavbarHelper {
     public static function getUserNavbar($userSession){
-        $user = isset($userSession) ? User::getById($userSession['id']) : null;
+        $user = key_exists("id", $userSession) ? User::getById($userSession['id']) : null;
         if(isset($user)){
             ?>
 
