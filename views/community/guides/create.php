@@ -4,9 +4,13 @@ $title = "Posts de $game->title en Orion";
 
 function showPage() {
     global $game;
+    global $guideTypes;
+
     ?>
     <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.min.css">
     <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
+
+    <script src="/assets/js/components/gradientSquare.js"></script>
 
     <!-- Hero Section -->
     <section id="hero" class="bg-brand-500 text-white pt-20">
@@ -24,9 +28,24 @@ function showPage() {
         <!-- Título -->
         <div>
             <label for="title" class="block text-sm font-medium text-gray-200">Título</label>
-            <input class="form-control block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200"
+            <input class="form-control block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200 text-brand"
                 id="title" name="title" type="text" placeholder="Título" required />
             <div id="titleError" class="text-sm text-red-500 mt-2 hidden"></div>
+        </div>
+
+        <!-- Tipo -->
+        <div>
+            <label for="guideType" class="block text-sm font-medium text-gray-200">Seleccionar tipo</label>
+            <div class="p-2 bg-white rounded-lg shadow-lg flex flex-row gap-x-2 content-center transition-colors duration-200" style="background-color: <?= $guideTypes[0]->tint ?>;" id="guideContainer">
+                <div class="shadow-2xl">
+                    <gradient-square id="guideIcon" size="55" base-color="<?= $guideTypes[0]->tint ?>" icon-path="/media/guidetype/<?=$guideTypes[0]->icon?>" ></gradient-square>
+                </div>
+                <select name="guideType" id="guideType" class="text-brand form-control block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200">
+                    <?php if(isset($guideTypes) && count($guideTypes) > 0) foreach ($guideTypes as $gType) { ?>
+                        <option <?php if ($guideTypes[0] == $gType) echo 'selected'; ?> value="<?= $gType->id ?>" data-color="<?= $gType->tint ?>" data-icon="/media/guidetype/<?=$gType->icon?>"><?= $gType->type ?></option>
+                    <?php } ?>
+                </select>
+            </div>
         </div>
 
         <!-- Cuerpo -->
@@ -52,7 +71,7 @@ function showPage() {
             element: document.getElementById("body"),
             autosave: {
                 enabled: true,
-                uniqueId: "Orion_NewPost_Body",
+                uniqueId: "Orion_NewGuide_Body",
                 delay: 1000,
             },
             insertTexts: {
@@ -66,7 +85,10 @@ function showPage() {
          });
     </script>
 
+    <script src="/assets/js/helpers/colorHelper.js"></script>
+
     <script src="/assets/js/forms/community-create.js"></script>
+    <script src="/assets/js/forms/guide-create.js"></script>
 
     <?php
 }
@@ -74,3 +96,4 @@ function showPage() {
 include("views/templates/main.php");
 
 unset($GLOBALS['game']);
+if(isset($GLOBALS['guideTypes'])) unset($GLOBALS['guideTypes']);

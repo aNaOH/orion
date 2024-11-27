@@ -31,6 +31,23 @@ class GuideType {
         return null;
     }
 
+    public static function getAll(): array {
+        $gTypesDB = Connection::doSelect(ORION_DB, self::$table);
+
+        $gTypes = [];
+
+        foreach ($gTypesDB as $gType) {
+            $gTypes[] = new GuideType(
+                $gType['icon'], 
+                $gType['type'],
+                $gType['tint'],
+                $gType['id']
+            );
+        }
+
+        return $gTypes;
+    }
+
     public function save(): bool {
         $data = [
             'icon' => $this->icon,

@@ -114,13 +114,15 @@ class PostController {
 
             case EPOST_TYPE::GUIDE:
                 $typeString = "guides";
+                $gTypes = GuideType::getAll();
+                $GLOBALS['guideTypes'] = $gTypes;
                 break;
         }
 
         include('views/community/'.$typeString.'/create.php');
     }
 
-    public static function create(int $gameId, EPOST_TYPE $type, string $title, string $body){
+    public static function create(int $gameId, EPOST_TYPE $type, string $title, string $body, int $guideType = null){
         $game = Game::getById($gameId);
 
         if(is_null($game)) return false;
@@ -128,6 +130,23 @@ class PostController {
         $post = new Post($title, $body, true, $type, $game->id, $_SESSION['user']['id']);
 
         $post->save();
+
+        if ($type == EPOST_TYPE::GUIDE) {
+
+            if(!isset($guideType)) {
+
+                $post->delete();
+
+                header('HTTP/1.1 400 Bad Request');
+                $response['status'] = 400;
+                $response['message'] = "Guide type is not set";
+
+                echo json_encode($response);
+                exit();
+            }
+            $guide = new Guide($post->id, $guideType);
+            $guide->save();
+        }
 
         header('HTTP/1.1 200 OK');
         $response['status'] = 200;

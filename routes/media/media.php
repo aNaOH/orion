@@ -20,6 +20,23 @@ $router->mount('/media', function() use ($router) {
 
         echo $img['body'];
     });
+
+    $router->get('/guidetype/{uuid}', function($uuid) use ($router) {
+
+        if($uuid == "default"){
+            $uuid .= ".png";
+        }
+
+        $img = S3Helper::retrieve(EBUCKET_LOCATION::GUIDE_TYPE_ICON, $uuid);
+
+        if(!isset($img)){
+            $router->trigger404();
+        }
+
+        header('Content-Type: '.$img['type']); //Add JSON Header to all API routes
+
+        echo $img['body'];
+    });
 });
 
 $router->set404('/media(/.*)?', function() {

@@ -25,7 +25,7 @@ $router->mount('/communities', function() use ($router) {
                 break;
         }
 
-        $result = PostController::create(intval($gameId), $postType, $_POST['title'], $_POST['body']);
+        $result = PostController::create(intval($gameId), $postType, $_POST['title'], $_POST['body'], isset($_POST['guideType']) ? $_POST['guideType'] : null);
 
         if($result === false) $router->trigger404();
     });

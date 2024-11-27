@@ -1,6 +1,7 @@
 <?php
 
 require_once './models/Post.php';
+require_once './models/GuideType.php';
 
 class Guide {
     public static string $table = 'guides';
@@ -32,6 +33,10 @@ class Guide {
             return new Guide($guide[0]['post_id'], $guide[0]['type_id']);
         }
         return null;
+    }
+
+    public function getType() {
+        return GuideType::getById($this->type_id);
     }
 
     public function getParentPost(): Post {
