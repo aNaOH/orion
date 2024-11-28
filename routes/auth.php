@@ -50,6 +50,7 @@ $router->get('/profile/(\d+)', function($userId) use ($router) {
     
     if(!isset($user)){
         $router->trigger404();
+        exit();
     }
 
     $GLOBALS['user'] = $user;

@@ -5,16 +5,28 @@ $title = "¡Ups!";
 function showPage() {
     ?>
 
-    <!-- Hero Section -->
-    <section id="hero" class="hero section dark-background">
-
-        <div class="carousel-container">
-            <h2 class="animate__animated animate__fadeInDown">¡Ups! Un 404</h2>
-            <p class="animate__animated animate__fadeInUp">Lo que buscas no está aquí... Quizas ya no exista.</p>
-            <a href="/" class="btn-get-started animate__animated animate__fadeInUp scrollto">Llevame de vuelta</a>
-          </div>
-
-    </section><!-- /Hero Section -->
+    <!-- 404 Page -->
+    <section class="min-h-screen flex flex-col md:flex-row items-center justify-center text-center md:text-left p-8">
+    <!-- Content -->
+    <div data-aos="fade-right" class="md:w-1/2">
+        <!-- Error Title -->
+        <h1 class="text-6xl font-bold text-gray-200 mb-4">Vaya, un 404</h1>
+        <h2 class="text-2xl font-semibold text-gray-400 mb-4">Página no encontrada</h2>
+        <p class="text-lg text-gray-400 mb-8">
+        Lo sentimos, no pudimos encontrar la página que buscas. Es posible que haya sido movida o ya no exista.
+        </p>
+        <!-- Buttons -->
+        <div class="flex justify-center md:justify-start space-x-4">
+        <a href="/" class="px-6 py-3 bg-alt text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition">
+            Volver al inicio
+        </a>
+        </div>
+    </div>
+    <!-- Decorative Image -->
+    <div data-aos="fade-left" class="md:w-1/2 flex justify-center mt-12 md:mt-0">
+        <img src="https://placehold.co/400x300?text=Error+404" alt="Error 404" class="rounded-lg shadow-md">
+    </div>
+    </section>
 
     <?php
 }
