@@ -37,7 +37,6 @@ class GradientChipElement extends HTMLElement {
           overflow: hidden;
           position: relative;
           transition: background 0.3s ease, color 0.3s ease;
-          cursor: pointer;
         }
         .icon-container {
           display: flex;
@@ -51,7 +50,6 @@ class GradientChipElement extends HTMLElement {
           font-weight: 500;
           line-height: 1;
           white-space: nowrap;
-          overflow: hidden;
           text-overflow: ellipsis;
           flex-grow: 1;
         }

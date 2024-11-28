@@ -10,30 +10,36 @@ class User {
     public string $email;
     public string $username;
     public string $password;
+    public string $birthdate;
     public EUSER_TYPE $role;
     public ?string $profile_pic;
     public ?string $motd;
     public ?int $badge;
+    public ?string $created_at;
 
     // Constructor
     public function __construct(
         string $email, 
         string $username, 
-        string $password, 
+        string $password,
+        string $birthdate, 
         EUSER_TYPE|int $role, 
         ?string $profile_pic = null, 
         ?string $motd = null, 
         ?int $badge = null, 
-        ?int $id = null
+        ?int $id = null,
+        ?string $created_at = null
     ) {
         $this->role = is_numeric($role) ? EUSER_TYPE::from($role) : $role;
         $this->email = $email;
         $this->username = $username;
         $this->password = $password;
+        $this->birthdate = $birthdate;
         $this->profile_pic = $profile_pic;
         $this->motd = $motd;
         $this->badge = $badge;
         $this->id = $id;
+        $this->created_at = $created_at;
     }
 
     // Get by ID
@@ -45,11 +51,13 @@ class User {
                 $user[0]['email'], 
                 $user[0]['username'], 
                 $user[0]['password'], 
+                $user[0]['birthdate'], 
                 $user[0]['role'], 
                 $user[0]['profile_pic'], 
                 $user[0]['motd'], 
                 $user[0]['badge_id'], 
-                $user[0]['id']
+                $user[0]['id'],
+                $user[0]['created_at']
             );
         }
         return null;
@@ -62,12 +70,14 @@ class User {
             return new User(
                 $user[0]['email'], 
                 $user[0]['username'], 
-                $user[0]['password'], 
+                $user[0]['password'],
+                $user[0]['birthdate'], 
                 $user[0]['role'], 
                 $user[0]['profile_pic'], 
                 $user[0]['motd'], 
                 $user[0]['badge_id'], 
-                $user[0]['id']
+                $user[0]['id'],
+                $user[0]['created_at']
             );
         }
         return null;
@@ -87,12 +97,14 @@ class User {
             $userObj = new User(
                 $user[0]['email'], 
                 $user[0]['username'], 
-                $user[0]['password'], 
+                $user[0]['password'],
+                $user[0]['birthdate'], 
                 $user[0]['role'], 
                 $user[0]['profile_pic'], 
                 $user[0]['motd'], 
                 $user[0]['badge_id'], 
-                $user[0]['id']
+                $user[0]['id'],
+                $user[0]['created_at']
             );
             return $userObj->getHandle() === $handle ? $userObj : null;
         }
@@ -105,6 +117,7 @@ class User {
             'email' => $this->email,
             'username' => $this->username,
             'password' => password_hash($this->password, PASSWORD_BCRYPT),
+            'birthdate' => $this->birthdate,
             'role' => $this->role->value,
             'profile_pic' => $this->profile_pic,
             'motd' => $this->motd,
