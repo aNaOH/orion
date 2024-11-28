@@ -24,11 +24,11 @@ function showPage() {
     </div>
     <!-- Decorative Image -->
     <div data-aos="fade-left" class="md:w-1/2 flex justify-center mt-12 md:mt-0">
-        <img src="https://placehold.co/400x300?text=Error+404" alt="Error 404" class="rounded-lg shadow-md">
+        <img src="/assets/img/404.png" alt="Error 404">
     </div>
     </section>
 
     <?php
 }
 
-include("views/templates/main.php");
+include("views/templates/nomain.php");
