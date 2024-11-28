@@ -7,13 +7,14 @@ function showPage() {
 
     <!-- Hero Section -->
     <section id="hero" class="relative bg-brand-500 text-white min-h-screen flex items-center justify-center overflow-hidden">
-        <!-- Imagen de fondo con gradiente -->
-        <div class="absolute inset-0 bg-cover bg-center bg-no-repeat" style="background-image: url('/assets/img/hero-bg.jpg');">
-            <div class="absolute inset-0 bg-gradient-to-b from-[rgba(0,0,0,0.8)] to-[rgba(0,0,0,0)]"></div>
+        <div  class="absolute inset-0">
+            <div class="h-full w-full bg-cover bg-center" 
+                style="background-image: url('/assets/img/hero-bg-transparent.png'); mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0.25%, rgba(0,0,0,0)); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0.25%, rgba(0,0,0,0));">
+            </div>
         </div>
 
         <!-- Contenido principal -->
-        <div data-aos="fade-down" class="relative z-10 container mx-auto text-center">
+        <div data-aos="fade-up" class="relative z-10 container mx-auto text-center">
             <img src="/assets/img/orion-logo.svg" alt="Orion logo" class="mx-auto mb-5 w-1/4 animate-fade-in">
             <p class="text-lg md:text-xl mb-6">Descubre, comparte y gestiona videojuegos en una plataforma creada para jugadores y desarrolladores.</p>
         </div>
