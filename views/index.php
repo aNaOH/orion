@@ -10,7 +10,7 @@ function showPage() {
         <!-- Fondo con imagen y degradado -->
         <div class="absolute inset-0">
             <div class="h-full w-full bg-cover bg-center" 
-                style="background-image: url('/assets/img/hero-bg-transparent.png'); mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0.25%, rgba(0,0,0,0)); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0.25%, rgba(0,0,0,0));">
+                style="background-image: url('/assets/img/hero-bg-transparent.png'); mask-image: linear-gradient(to bottom, rgba(0,0,0,0.05) 0.25%, rgba(0,0,0,0)); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.05) 0.25%, rgba(0,0,0,0));">
             </div>
         </div>
 
@@ -61,10 +61,16 @@ function showPage() {
                 </div>
             </form>
         </div>
+
+        <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 mb-4 animate__animated animate__fadeInUp">
+            <a href="#why" id="moveToWhy" class="text-white text-4xl">
+                <i class="bi bi-chevron-down"></i>
+            </a>
+        </div>
     </section>
 
     <!-- Features Section -->
-    <section id="features" class="py-10">
+    <section id="why" class="py-10">
         <div class="container mx-auto px-4">
             <h2 class="text-3xl sm:text-4xl font-bold text-gray-200 mb-12 text-center">Por qué es el punto de encuentro para <span id="userCount">N</span> usuarios</h2>
             <div class="flex flex-col gap-10">
