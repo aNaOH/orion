@@ -4,15 +4,21 @@ require './models/User.php';
 
 class UserController {
 
-    public static function register($email, $password, $confirmPassword, $terms){
+    public static function register($email, $password, $confirmPassword, $birthdate, $terms){
         $response = array();
 
         FormHelper::ValidateRequiredField($email, "emailAddress");
         FormHelper::ValidateRequiredField($password, "password");
         FormHelper::ValidateRequiredField($confirmPassword, "confirmPassword");
+        FormHelper::ValidateRequiredField($birthdate, "birthdate");
+
+        FormHelper::ValidateMinAge($birthdate, 14, "birthdate");
         
         FormHelper::ValidateMinChars($password, 8, "password");
         FormHelper::ValidatePasswordRequirements($password, "password");
+
+        var_dump($birthdate);
+        var_dump($terms);
 
         //if(!isset($terms) || $terms != "yeah"){
         //    header('HTTP/1.1 400 Bad Request');
@@ -48,7 +54,7 @@ class UserController {
 
         $username = explode("@", $email)[0];
 
-        $user = new User($email, $username, $password, EUSER_TYPE::USER);
+        $user = new User($email, $username, $password, $birthdate, EUSER_TYPE::USER);
         $user->save();
 
         header('HTTP/1.1 200 OK');

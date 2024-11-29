@@ -45,6 +45,24 @@ class FormHelper {
         }
     }
 
+    public static function ValidateMinAge($field, $age, $fieldId){
+        $response = [];
+
+        $userBirthdate = new DateTime($field);
+
+        $userAge = $userBirthdate->diff(new DateTime());
+
+        if($userAge->y < $age){
+            header('HTTP/1.1 400 Bad Request');
+            $response['status'] = 400;
+            $response['message'] = "No cumples con la edad requerida para crear una cuenta ($age, actualmente $userAge).";
+            $response['field'] = $fieldId;
+
+            echo json_encode($response);
+            exit();
+        }
+    }
+
     public static function ValidateToken($field, $fieldId, ETOKEN_TYPE $type){
         $validated = false;
         $response = [];
