@@ -210,4 +210,10 @@ class User {
             "profile_pic" => $this->profile_pic
         ] : [];
     }
+
+    public static function getCount(){
+        $count = Connection::customQuery(ORION_DB, "SELECT COUNT(id) FROM ".self::$table)->fetch(PDO::FETCH_BOTH);
+
+        return $count[0];
+    }
 }

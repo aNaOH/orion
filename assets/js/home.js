@@ -5,6 +5,9 @@ $(document).ready(function () {
         method: "GET",
         success: function (response) {
             const showcaseGames = response.showcaseGames;
+            const users = response.users;
+
+            document.getElementById("userCount").innerHTML = users;
 
             if (!showcaseGames || showcaseGames.length === 0) {
                 console.error("No se encontraron juegos en la respuesta.");
@@ -28,4 +31,22 @@ $(document).ready(function () {
             console.error("Error al obtener los juegos:", error);
         }
     });
+
 });
+
+let form = document.getElementById("searchForm");
+
+form.onsubmit = (e) => {
+    e.preventDefault();
+
+    let fields = e.target.elements;
+
+    // Obtener el valor del campo de búsqueda
+    const searchQuery = fields['search'].value.trim();
+
+    // Obtener la opción seleccionada del selector
+    const where = fields['where'].value;
+
+    // Redirigir a la página con el parámetro de búsqueda
+    window.location.href = `${where}?search=${encodeURIComponent(searchQuery)}`;
+};

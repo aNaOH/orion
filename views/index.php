@@ -37,8 +37,8 @@ function showPage() {
                 <!-- Selector -->
                 <div class="relative">
                     <select name="where" id="where" class="bg-transparent text-gray-200 px-4 py-2 rounded-full border-none outline-none appearance-none cursor-pointer">
-                        <option value="/games" class="text-gray-200 bg-branddark">Juego</option>
-                        <option value="/communities" class="text-gray-200 bg-branddark">Comunidad</option>
+                        <option value="/store" class="text-gray-200 bg-branddark">Tienda</option>
+                        <option value="/communities" class="text-gray-200 bg-branddark" selected>Comunidad</option>
                     </select>
                     <div class="absolute inset-y-0 right-0 flex items-center pointer-events-none">
                         <i class="bi bi-caret-down-fill text-gray-200"></i>
@@ -66,7 +66,7 @@ function showPage() {
     <!-- Features Section -->
     <section id="features" class="py-10">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-200 mb-12 text-center">Lo que ofrecemos</h2>
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-200 mb-12 text-center">Por qué es el punto de encuentro para <span id="userCount">N</span> usuarios</h2>
             <div class="flex flex-col gap-10">
                 <!-- Comunidad Activa -->
                 <div data-aos="fade-left" 
