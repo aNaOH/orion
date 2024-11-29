@@ -249,5 +249,29 @@ class Connection {
         $stmt->execute();
         return $stmt;
     }
+
+    /**
+     * Ejecuta una consulta SQL personalizada.
+     * @param PDO $dbConn Conexión a la base de datos.
+     * @param string $sql Consulta SQL con marcadores "?".
+     * @param array $params Valores para enlazar a los marcadores.
+     * @return PDOStatement Resultado de la consulta.
+     */
+    public static function customQuery(PDO $dbConn, string $sql, array $params = []): PDOStatement {
+        try {
+            $stmt = $dbConn->prepare($sql);
+            
+            // Enlazar valores a los marcadores de posición "?"
+            foreach ($params as $index => $value) {
+                $stmt->bindValue($index + 1, $value); // El índice es 1-based para bindValue
+            }
+            
+            $stmt->execute();
+            return $stmt;
+        } catch (PDOException $e) {
+            die("Error en consulta personalizada: " . $e->getMessage());
+        }
+    }
+
 }
 ?>

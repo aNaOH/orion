@@ -43,7 +43,6 @@
   <script src="/assets/vendor/aos/aos.js"></script>
   <script>AOS.init();</script>
 
-  <script src="/assets/vendor/jquery/jquery-3.7.1.min.js"></script>
   <script src="/assets/vendor/moment/moment.min.js"></script>
 
 </body>

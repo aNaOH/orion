@@ -7,10 +7,25 @@ function showPage() {
 
     <!-- Hero Section -->
     <section id="hero" class="relative bg-brand-500 text-white min-h-screen flex items-center justify-center overflow-hidden">
-        <div  class="absolute inset-0">
+        <!-- Fondo con imagen y degradado -->
+        <div class="absolute inset-0">
             <div class="h-full w-full bg-cover bg-center" 
                 style="background-image: url('/assets/img/hero-bg-transparent.png'); mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0.25%, rgba(0,0,0,0)); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.3) 0.25%, rgba(0,0,0,0));">
             </div>
+        </div>
+
+        <!-- Contenedores prefijados para juegos flotantes -->
+        <div class="absolute inset-0 pointer-events-none">
+            <div class="absolute w-[200px] h-[100px] showcase-item top-10 left-10"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item top-20 right-10"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item top-1/2 left-1/4"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item top-[30%] right-[20%]"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item bottom-[20%] left-[15%]"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item bottom-10 right-1/4"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item top-[40%] left-[60%]"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item bottom-[30%] right-[10%]"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item bottom-10 left-[30%]"></div>
+            <div class="absolute w-[200px] h-[100px] showcase-item top-[5%] right-[40%]"></div>
         </div>
 
         <!-- Contenido principal -->
@@ -19,6 +34,7 @@ function showPage() {
             <p class="text-lg md:text-xl mb-6">Descubre, comparte y gestiona videojuegos en una plataforma creada para jugadores y desarrolladores.</p>
         </div>
     </section>
+
 
 
     <!-- Features Section -->
@@ -68,6 +84,8 @@ function showPage() {
         </a>
     </div>
     </section>
+
+    <script src="/assets/js/home.js"></script>
 
     <?php
 }

@@ -1,7 +1,46 @@
 <?php
 
+require_once 'controllers/UserController.php'; //Import user Controller
+require_once 'controllers/HomeController.php'; //Import user Controller
+
 //API
 $router->mount('/api', function() use ($router) {
+
+    $router->get('/', function(){
+        $response = [];
+
+        header('HTTP/1.1 200 OK');
+
+        $response['name'] = "Orion API";
+        $response['author'] = "Abel";
+        $response['lastModifiedDate'] = "2024-11-29";
+        $response['currentSystemDate'] = (new DateTime())->format('Y-m-d');
+        $response['message'] = "hello!";
+        $response['surprise'] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAIAAACkr0LiAAAACXBIWXMAAA9hAAAPYQGoP6dpAAAAdUlEQVQImV2OQQ3DQADDvKoEQuEoDOUgtBQOwkqhFELBFPZoNU3LK4/YymPb3gDIX2S5SpLOV+cOqBBh/e4yBuRmNMnqZRPyjLW9POICBGzbszCPfR7zwleU5DimOkZCasWQ5eeXwHMEohVW7wMC1bOFJAP9AD4XPtggqnyXAAAAAElFTkSuQmCC";
+
+        echo json_encode($response);
+        exit();
+    });
+
+    $router->post('/', function(){
+        $response = [];
+
+        header('HTTP/1.1 200 OK');
+
+        $response['name'] = "Orion API";
+        $response['author'] = "Abel";
+        $response['lastModifiedDate'] = "2024-11-29";
+        $response['currentSystemDate'] = (new DateTime())->format('Y-m-d');
+        $response['message'] = "hello!";
+        $response['surprise'] = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAkAAAAICAIAAACkr0LiAAAACXBIWXMAAA9hAAAPYQGoP6dpAAAAdUlEQVQImV2OQQ3DQADDvKoEQuEoDOUgtBQOwkqhFELBFPZoNU3LK4/YymPb3gDIX2S5SpLOV+cOqBBh/e4yBuRmNMnqZRPyjLW9POICBGzbszCPfR7zwleU5DimOkZCasWQ5eeXwHMEohVW7wMC1bOFJAP9AD4XPtggqnyXAAAAAElFTkSuQmCC";
+
+        echo json_encode($response);
+        exit();
+    });
+
+    $router->get('/home', function(){
+        $games = HomeController::do();
+    });
 
     $router->post('/auth/login', function(){
         $email = $_POST['email'];
@@ -17,7 +56,7 @@ $router->mount('/api', function() use ($router) {
         $terms = $_POST['terms'];
         $birthdate = $_POST['birthdate'];
 
-        UserController::register($email, $password, $confirmPassword, $terms);
+        UserController::register($email, $password, $confirmPassword, $birthdate, $terms);
     });
 
     include('routes/api/community.php');

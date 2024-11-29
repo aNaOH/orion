@@ -6,6 +6,9 @@
     <title><?=$title?></title>
     <script src="/assets/vendor/tailwind-3.4.15.js"></script>
     <script src="/assets/js/tailwindConfig.js"></script>
+
+    <script src="/assets/vendor/jquery/jquery-3.7.1.min.js"></script>
+
     <link rel="stylesheet" href="/assets/css/main.css">
 </head>
 <body class="bg-brand text-white h-full">

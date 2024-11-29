@@ -109,4 +109,27 @@ class Game {
         if (!isset($this->id)) return null;
         return (bool)Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);
     }
+
+    public static function pickRandom($quantity) {
+
+        $sql = "SELECT * FROM ".self::$table." ORDER BY RAND() LIMIT ".strval($quantity);
+
+        $select = Connection::customQuery(ORION_DB, $sql)->fetchAll(PDO::FETCH_ASSOC);
+        $games = [];
+        foreach ($select as $game) {
+            $games[] = new Game(
+                $game['title'],
+                $game['short_description'],
+                $game['description'],
+                $game['launch_date'],
+                (float)$game['base_price'],
+                (float)$game['discount'],
+                $game['file'],
+                $game['version'],
+                $game['developer_id'],
+                $game['id']
+            );
+        }
+        return $games;
+    }
 }
