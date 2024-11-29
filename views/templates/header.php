@@ -10,6 +10,8 @@
     <script src="/assets/vendor/jquery/jquery-3.7.1.min.js"></script>
 
     <link rel="stylesheet" href="/assets/css/main.css">
+    <link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+
 </head>
 <body class="bg-brand text-white h-full">
   <?php include('navbar.php') ?>

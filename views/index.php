@@ -32,47 +32,72 @@ function showPage() {
         <div data-aos="fade-up" class="relative z-10 container mx-auto text-center">
             <img src="/assets/img/orion-logo.svg" alt="Orion logo" class="mx-auto mb-5 w-1/4 animate-fade-in">
             <p class="text-lg md:text-xl mb-6">Descubre, comparte y gestiona videojuegos en una plataforma creada para jugadores y desarrolladores.</p>
+            <!-- Formulario de Búsqueda -->
+            <form id="searchForm" class="flex items-center space-x-2 p-2 rounded-full bg-branddark bg-opacity-75 shadow-md w-[50%] mx-auto">
+                <!-- Selector -->
+                <div class="relative">
+                    <select name="where" id="where" class="bg-transparent text-gray-200 px-4 py-2 rounded-full border-none outline-none appearance-none cursor-pointer">
+                        <option value="/games" class="text-gray-200 bg-branddark">Juego</option>
+                        <option value="/communities" class="text-gray-200 bg-branddark">Comunidad</option>
+                    </select>
+                    <div class="absolute inset-y-0 right-0 flex items-center pointer-events-none">
+                        <i class="bi bi-caret-down-fill text-gray-200"></i>
+                    </div>
+                </div>
+
+                <!-- Campo de Búsqueda -->
+                <div class="relative flex-grow">
+                    <input 
+                    type="text" 
+                    name="search" 
+                    id="search" 
+                    placeholder="¡Mira si lo tenemos aquí!" 
+                    class="w-full bg-transparent text-text-gray-200 placeholder-text-gray-200/75 px-4 py-2 rounded-full border-none focus:outline-none"
+                    >
+                    <!-- Icono de Búsqueda -->
+                    <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                    <i class="bi bi-search text-white"></i>
+                    </div>
+                </div>
+            </form>
         </div>
     </section>
 
-
-
     <!-- Features Section -->
     <section id="features" class="py-10">
-    <div>
-        <h2 class="text-3xl md:text-4xl font-bold text-gray-200 mb-12 text-center">Lo que ofrecemos</h2>
-        <div class="overflow-hidden flex flex-col m-5 gap-5">
-            <!-- Comunidad Activa -->
-            <div data-aos="fade-left" 
-                class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 text-right flex flex-row-reverse gap-4">
-                <img src="https://placehold.co/300x200" alt="Comunidad Activa" class="rounded-lg mb-4">
-                <div>
-                    <h3 class="text-xl font-semibold text-gray-200 mb-2">Comunidad Activa</h3>
-                    <p class="text-gray-400">Participa en foros, comparte contenido y compite en tablas de clasificaciones.</p>
+        <div class="container mx-auto px-4">
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-200 mb-12 text-center">Lo que ofrecemos</h2>
+            <div class="flex flex-col gap-10">
+                <!-- Comunidad Activa -->
+                <div data-aos="fade-left" 
+                    class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6">
+                    <img src="https://placehold.co/300x200" alt="Comunidad Activa" class="rounded-lg w-full max-w-md lg:max-w-xs">
+                    <div class="text-center lg:text-right">
+                        <h3 class="text-xl font-semibold text-gray-200 mb-2">Comunidad Activa</h3>
+                        <p class="text-gray-400">Participa en foros, comparte contenido y compite en tablas de clasificaciones.</p>
+                    </div>
                 </div>
-            </div>
-            <!-- Herramientas para Creadores -->
-            <div data-aos="fade-right" 
-                class="bg-gradient-to-r from-branddark to-transparent rounded-xl p-6 text-left flex flex-row gap-4">
-                <img src="https://placehold.co/300x200" alt="Herramientas para Creadores" class="rounded-lg mb-4">
-                <div>
-                    <h3 class="text-xl font-semibold text-gray-200 mb-2">Herramientas para Creadores</h3>
-                    <p class="text-gray-400">Gestión de juegos, moderación eficiente y páginas de tienda personalizadas.</p>
+                <!-- Herramientas para Creadores -->
+                <div data-aos="fade-right" 
+                    class="bg-gradient-to-r from-branddark to-transparent rounded-xl p-6 flex flex-col lg:flex-row items-center gap-6">
+                    <img src="https://placehold.co/300x200" alt="Herramientas para Creadores" class="rounded-lg w-full max-w-md lg:max-w-xs">
+                    <div class="text-center lg:text-left">
+                        <h3 class="text-xl font-semibold text-gray-200 mb-2">Herramientas para Creadores</h3>
+                        <p class="text-gray-400">Gestión de juegos, moderación eficiente y páginas de tienda personalizadas.</p>
+                    </div>
                 </div>
-            </div>
-            <!-- Logros y Más -->
-            <div data-aos="fade-left" 
-                class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 text-right flex flex-row-reverse gap-4">
-                <img src="https://placehold.co/300x200" alt="Logros y Más" class="rounded-lg mb-4">
-                <div>
-                    <h3 class="text-xl font-semibold text-gray-200 mb-2">Logros y Más</h3>
-                    <p class="text-gray-400">Obtén logros únicos y comparte tus momentos destacados con la comunidad.</p>
+                <!-- Logros y Más -->
+                <div data-aos="fade-left" 
+                    class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6">
+                    <img src="https://placehold.co/300x200" alt="Logros y Más" class="rounded-lg w-full max-w-md lg:max-w-xs">
+                    <div class="text-center lg:text-right">
+                        <h3 class="text-xl font-semibold text-gray-200 mb-2">Logros y Más</h3>
+                        <p class="text-gray-400">Obtén logros únicos y comparte tus momentos destacados con la comunidad.</p>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-
+    </section>
 
     <!-- Call to Action Section -->
     <section data-aos="fade-up" class="text-white py-20">
