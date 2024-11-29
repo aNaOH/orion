@@ -30,4 +30,39 @@ $router->mount('/communities', function() use ($router) {
         if($result === false) $router->trigger404();
     });
 
+    $router->post("/comment/(\d+)", function($postId) use ($router){
+
+        $result = false;
+
+        FormHelper::ValidateToken($_POST['tript_token'], 'tript_token', ETOKEN_TYPE::USERACTION);
+
+        $body = trim($_POST['comment'] ?? "");
+
+        if(count_chars($body) == 0) $body = "El usuario no ha escrito nada...";
+
+        $result = PostController::addComment(intval($postId), $body);
+
+        if($result === false) {
+            $router->trigger404();
+            exit();
+        }
+
+        $post = Post::getById($postId);
+
+        $type = "posts";
+
+        switch ($post->type) {
+            case EPOST_TYPE::GUIDE:
+                $type = 'guides';
+                break;
+            
+            case EPOST_TYPE::GALLERY:
+                $type = 'gallery';
+                break;
+        }
+
+        header('location: /communities/'.strval($post->game_id).'/'.$type.'/'.strval($post->id));
+    
+    });
+
 });

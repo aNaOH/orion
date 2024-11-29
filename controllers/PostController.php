@@ -156,5 +156,20 @@ class PostController {
         exit();
     }
 
+    public static function addComment($postId, string $body) {
 
+        $author = null;
+
+        if(isset($_SESSION['user'])){
+            $author = User::getById($_SESSION['user']['id'] ?? -1);
+        }
+        
+        if(is_null($author)) header('location: /login');
+        
+        $post = Post::getById($postId);
+
+        if(is_null($post)) header('location: /communities');
+
+        return $post->addComment($author->id, $body);
+    }
 }

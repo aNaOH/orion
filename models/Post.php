@@ -2,6 +2,7 @@
 
 require_once './models/User.php';
 require_once './models/Game.php';
+require_once './models/Comment.php';
 
 require_once './models/PostTypes/GalleryEntry.php';
 require_once './models/PostTypes/Guide.php';
@@ -143,6 +144,20 @@ class Post {
                 return null;
                 break;
         }
+    }
+
+    public function addComment(int $authorId, string $body) : bool {
+        if(is_null($this->id)) return null;
+        $comment = new Comment($authorId, $this->id, $body);
+
+        return $comment->save();
+    }
+
+    public function getComments() : array {
+        if(is_null($this->id)) return null;
+        $comments = Comment::getFromPost($this);
+
+        return $comments;
     }
 
     public function delete(): ?bool {
