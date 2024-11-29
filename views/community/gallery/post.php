@@ -22,10 +22,7 @@ function showPage() {
     <!-- Features Section -->
     <section id="features" class="py-20">
     <div class="container mx-auto p-6">
-        <?php
-        $Parsedown = new TailwindParsedown();
-        echo $Parsedown->text($post->body);
-        ?>
+        
     </div>
     </section><!-- /Features Section -->
 
@@ -51,17 +48,9 @@ function showPage() {
                     </div>
                 </form>
 
-            <?php } foreach ($post->getComments() as $comment) { ?>
-                <div class="bg-branddark-600 flex flex-row p-2 gap-5 rounded-xl">
-                        <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-alt-500">
-                            <img src="/media/profile/<?= $comment->getAuthor()->profile_pic ?? 'default' ?>" alt="Foto de perfil de <?= $comment->getAuthor()->username ?>" class="w-full h-full object-cover">
-                        </div>
-                        <div class="flex flex-col gap-2 w-full mr-4">
-                            <p class="font-semibold text-gray-200"><?= $comment->getAuthor()->username ?></p>
-                            <p class="text-gray-200 w-full"><?= $comment->body ?></p>   
-                    </div>
-                </div>
-            <?php } ?>
+            <?php } foreach ($post->getComments() as $comment) {
+                OrionComponents::Comment($comment);
+             } ?>
         </div>
     </section><!-- /Features Section -->
 

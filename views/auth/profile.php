@@ -49,4 +49,4 @@ function showPage() {
 include("views/templates/main.php");
 
 unset($GLOBALS['user']);
-if(isset($GLOBALS['is_set'])) unset($GLOBALS['is_set']);
+if(isset($GLOBALS['is_self'])) unset($GLOBALS['is_self']);

@@ -38,6 +38,22 @@ $router->get('/profile', function(){
     include('views/auth/profile.php');
 });
 
+$router->get('/profile/edit', function(){
+    if(!isset($_SESSION['user'])){
+        header('location: /');
+    }
+
+    $user = User::getById($_SESSION['user']['id']);
+
+    if(!isset($user)){
+        header('location: /logout');
+    }
+
+    $GLOBALS['user'] = $user;
+
+    include('views/auth/profileEdit.php');
+});
+
 $router->get('/profile/(\d+)', function($userId) use ($router) {
     
     if(isset($_SESSION['user'])){

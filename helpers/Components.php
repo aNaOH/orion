@@ -8,6 +8,10 @@ class OrionComponents {
         include 'components/GameCommunity.php';
     }
 
+    public static function Comment(Comment $comment){
+        include 'components/Comment.php';
+    }
+
     public static function TokenInput(ETOKEN_TYPE $type){
 
         $token = '';
