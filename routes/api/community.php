@@ -38,7 +38,7 @@ $router->mount('/communities', function() use ($router) {
 
         $body = trim($_POST['comment'] ?? "");
 
-        if(count_chars($body) == 0) $body = "El usuario no ha escrito nada...";
+        if(strlen($body) == 0) $body = "El usuario no ha escrito nada...";
 
         $result = PostController::addComment(intval($postId), $body);
 

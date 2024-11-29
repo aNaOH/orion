@@ -12,7 +12,7 @@ form.onsubmit = (e) => {
     let formData = new FormData();
     formData.append("type", fields["type"].value); // Agregar el título
     formData.append("icon", fields["icon"].files[0]); // Agregar la imagen
-    formData.append("tintColor", fields["tintColor"].value); // Agregar la imagen
+    formData.append("tintColor", fields["tintColor"].value); // Agregar el color
 
     // Realizar la solicitud AJAX con FormData
     $.ajax({

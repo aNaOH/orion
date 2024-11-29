@@ -16,6 +16,21 @@ class FormHelper {
         }
     }
 
+    public static function ValidateEmailField($email, $fieldId){
+        $response = [];
+    
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            header('HTTP/1.1 400 Bad Request');
+            $response['status'] = 400;
+            $response['message'] = "Este campo debe contener un correo electrónico válido.";
+            $response['field'] = $fieldId;
+    
+            echo json_encode($response);
+            exit();
+        }
+    }
+    
+
     public static function ValidateMinChars($field, $minChars, $fieldId){
         $response = [];
 
@@ -55,7 +70,7 @@ class FormHelper {
         if($userAge->y < $age){
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
-            $response['message'] = "No cumples con la edad requerida para crear una cuenta ($age, actualmente $userAge).";
+            $response['message'] = "No cumples con la edad requerida para crear una cuenta (".strval($age).", actualmente ".strval($userAge->y).").";
             $response['field'] = $fieldId;
 
             echo json_encode($response);

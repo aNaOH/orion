@@ -12,6 +12,8 @@ class UserController {
         FormHelper::ValidateRequiredField($confirmPassword, "confirmPassword");
         FormHelper::ValidateRequiredField($birthdate, "birthdate");
 
+        FormHelper::ValidateEmailField($email, "emailAddress");
+
         FormHelper::ValidateMinAge($birthdate, 14, "birthdate");
         
         FormHelper::ValidateMinChars($password, 8, "password");
@@ -65,6 +67,74 @@ class UserController {
         exit();
     }
 
+    public static function edit(User $user, $username, $motd, $profilePic, $email, $currentPassword, $password, $confirmPassword, $token){
+        $response = array();
+
+        FormHelper::ValidateToken($token, "tript_token", ETOKEN_TYPE::USERACTION);
+
+        FormHelper::ValidateRequiredField($username, "username");
+        FormHelper::ValidateRequiredField($email, "email");
+
+        if(!is_null($password) && strlen($password) 
+            && !is_null($currentPassword) && strlen($currentPassword)
+            && !is_null($confirmPassword) && strlen($confirmPassword)
+        ){
+            var_dump($password);
+            var_dump($currentPassword);
+            var_dump($confirmPassword);
+
+            FormHelper::ValidateMinChars($currentPassword, 8, "currentPassword");
+            FormHelper::ValidatePasswordRequirements($currentPassword, "currentPassword");
+
+            if(!password_verify($password, $user->getPassword())){
+                header('HTTP/1.1 400 Bad Request');
+                $response['status'] = 400;
+                $response['message'] = "Contraseña incorrecta";
+                $response['field'] = "password";
+    
+                echo json_encode($response);
+                exit();
+            }
+    
+            if($password != $confirmPassword){
+                header('HTTP/1.1 400 Bad Request');
+                $response['status'] = 400;
+                $response['message'] = "Las contraseñas deben coincidir.";
+                $response['field'] = "confirmPassword";
+    
+                echo json_encode($response);
+                exit();
+            }
+
+            $user->setPassword($password);
+        }
+
+        if(isset($profilePic)){
+            $uuid = Tript::encryptString('userprofilepic'.strval($user->id));
+            S3Helper::upload(EBUCKET_LOCATION::PROFILE_PIC, $uuid, null, $profilePic['type'], $profilePic['tmp_name']);
+            $user->profile_pic = $uuid;
+        }
+
+        if($email != $user->email){
+            FormHelper::ValidateEmailField($email, "emailAddress");
+            $user->email = $email;
+        }
+
+        $user->username = $username;
+        $user->motd = $motd;
+
+        $user->save();
+
+        $_SESSION['user'] = $user->toSessionArray();
+
+        header('HTTP/1.1 200 OK');
+        $response['status'] = 200;
+        $response['message'] = "Usuario editado ( ID: ".strval($user->id)." )";
+
+        echo json_encode($response);
+        exit();
+    }
+
     public static function login($email, $password){
         $response = array();
 
@@ -86,7 +156,7 @@ class UserController {
             exit();
         }
 
-        if(!password_verify($password, $user->password)){
+        if(!password_verify($password, $user->getPassword())){
             header('HTTP/1.1 400 Bad Request');
             $response['status'] = 400;
             $response['message'] = "Contraseña incorrecta";

@@ -9,7 +9,7 @@ class User {
     public ?int $id;
     public string $email;
     public string $username;
-    public string $password;
+    private string $password;
     public string $birthdate;
     public EUSER_TYPE $role;
     public ?string $profile_pic;
@@ -81,6 +81,14 @@ class User {
             );
         }
         return null;
+    }
+
+    public function getPassword() {
+        return $this->password;
+    }
+
+    public function setPassword($password) {
+        $this->password = password_hash($password, PASSWORD_BCRYPT);
     }
 
     // Handle methods

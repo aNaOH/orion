@@ -1,6 +1,6 @@
 <?php
 
-$title = "Entrar a Orion";
+$title = "Tu perfil en Orion";
 
 function showPage() {
 

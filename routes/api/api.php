@@ -59,6 +59,38 @@ $router->mount('/api', function() use ($router) {
         UserController::register($email, $password, $confirmPassword, $birthdate, $terms);
     });
 
+    $router->post('/auth/edit', function(){
+
+        $user = null;
+
+        if(isset($_SESSION['user'])){
+            $user = User::getById($_SESSION['user']['id']);
+        }
+
+        if(is_null($user)){
+            header('HTTP/1.1 401 Unauthorized');
+        
+            $jsonArray = array();
+            $jsonArray['status'] = "401";
+            $jsonArray['status_text'] = "User not logged";
+        
+            echo json_encode($jsonArray);
+            exit();
+        }
+
+        $email = $_POST['email'] ?? null;
+        $password = $_POST['password'] ?? null;
+        $confirmPassword = $_POST['confirmPassword'] ?? null;
+        $currentPassword = $_POST['currentPassword'] ?? null;
+        $username = $_POST['username'];
+        $motd = $_POST['motd'] ?? null;
+        $token = $_POST['tript_token'];
+
+        $profilePic = $_FILES['profilePic'] ?? null;
+
+        UserController::edit($user, $username, $motd, $profilePic, $email, $currentPassword, $password, $confirmPassword, $token);
+    });
+
     include('routes/api/community.php');
 
     include('routes/api/admin.php');
