@@ -127,26 +127,52 @@ class PostController {
 
         if(is_null($game)) return false;
 
-        $post = new Post($title, $body, true, $type, $game->id, $_SESSION['user']['id']);
+        if($type != EPOST_TYPE::GALLERY){
+            $post = new Post($title, $body, true, $type, $game->id, $_SESSION['user']['id']);
 
-        $post->save();
+            $post->save();
 
-        if ($type == EPOST_TYPE::GUIDE) {
+            if ($type == EPOST_TYPE::GUIDE) {
 
-            if(!isset($guideType)) {
-
-                $post->delete();
+                if(!isset($guideType)) {
+    
+                    $post->delete();
+    
+                    header('HTTP/1.1 400 Bad Request');
+                    $response['status'] = 400;
+                    $response['message'] = "Guide type is not set";
+    
+                    echo json_encode($response);
+                    exit();
+                }
+                $guide = new Guide($post->id, $guideType);
+                $guide->save();
+            }
+        } else {
+            if(!isset($_FILES['body'])) {
 
                 header('HTTP/1.1 400 Bad Request');
                 $response['status'] = 400;
-                $response['message'] = "Guide type is not set";
+                $response['message'] = "File not uploaded";
 
                 echo json_encode($response);
                 exit();
             }
-            $guide = new Guide($post->id, $guideType);
-            $guide->save();
+
+            $media = $_FILES['body'];
+
+            $filename = $body.'a'.strval($_SESSION['user']['id']).'g'.strval($gameId).'n'.strval(count(Post::getAllByTypeAndGame(EPOST_TYPE::GALLERY, $gameId)) + 1);
+            $uuid = Tript::encryptString($filename);
+
+            $post = new Post($title, "", true, $type, $game->id, $_SESSION['user']['id']);
+            $post->save();
+
+            $gallery = new GalleryEntry($post->id, $uuid);
+            $gallery->save();
+
+            S3Helper::upload(EBUCKET_LOCATION::GALLERY, $uuid, null, $media['type'], $media['tmp_name']);
         }
+
 
         header('HTTP/1.1 200 OK');
         $response['status'] = 200;
@@ -171,5 +197,66 @@ class PostController {
         if(is_null($post)) header('location: /communities');
 
         return $post->addComment($author->id, $body);
+    }
+
+    public static function vote($postId, int $value) {
+
+        $voter = null;
+
+        if(isset($_SESSION['user'])){
+            $voter = User::getById($_SESSION['user']['id'] ?? -1);
+        }
+        
+        if(is_null($voter)) {
+            header('HTTP/1.1 401 Unauthorized');
+            
+            $jsonArray = array();
+            $jsonArray['status'] = "401";
+            $jsonArray['status_text'] = "User not logged";
+            
+            echo json_encode($jsonArray);
+            exit();
+        }
+        
+        $post = Post::getById($postId);
+
+        if(is_null($post)) {
+            header('HTTP/1.1 400 Bad request');
+            
+            $jsonArray = array();
+            $jsonArray['status'] = "400";
+            $jsonArray['status_text'] = "Post does not exist";
+            
+            echo json_encode($jsonArray);
+            exit();
+        }
+
+        if($post->type != EPOST_TYPE::GALLERY) {
+            header('HTTP/1.1 400 Bad request');
+            
+            $jsonArray = array();
+            $jsonArray['status'] = "400";
+            $jsonArray['status_text'] = "Post is not a gallery entry";
+            
+            echo json_encode($jsonArray);
+            exit();
+        }
+
+        $galleryInfo = $post->getPostInfo();
+
+        if(is_null($galleryInfo) || !($galleryInfo instanceof GalleryEntry)) {
+            header('HTTP/1.1 400 Bad request');
+            
+            $jsonArray = array();
+            $jsonArray['status'] = "400";
+            $jsonArray['status_text'] = "Post does not have an associated gallery entry info";
+            
+            echo json_encode($jsonArray);
+            exit();
+        }
+
+        $galleryInfo->addVote($voter->id, $value);
+
+        
     }
 }

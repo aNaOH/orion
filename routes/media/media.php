@@ -37,6 +37,19 @@ $router->mount('/media', function() use ($router) {
 
         echo $img['body'];
     });
+
+    $router->get('/gallery/{uuid}', function($uuid) use ($router) {
+
+        $media = S3Helper::retrieve(EBUCKET_LOCATION::GALLERY, $uuid);
+
+        if(!isset($media)){
+            $router->trigger404();
+        }
+
+        header('Content-Type: '.$media['type']); //Add JSON Header to all API routes
+
+        echo $media['body'];
+    });
 });
 
 $router->set404('/media(/.*)?', function() {

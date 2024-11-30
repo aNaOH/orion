@@ -12,6 +12,12 @@ class OrionComponents {
         include 'components/Comment.php';
     }
 
+    public static function GalleryEntry(Post $post){
+        if($post->type != EPOST_TYPE::GALLERY) return;
+        $galleryInfo = $post->getPostInfo();
+        include 'components/GalleryEntry.php';
+    }
+
     public static function TokenInput(ETOKEN_TYPE $type){
 
         $token = '';

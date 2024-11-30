@@ -124,7 +124,6 @@ class User {
         $data = [
             'email' => $this->email,
             'username' => $this->username,
-            'password' => password_hash($this->password, PASSWORD_BCRYPT),
             'birthdate' => $this->birthdate,
             'role' => $this->role->value,
             'profile_pic' => $this->profile_pic,
@@ -139,6 +138,17 @@ class User {
         } else {
             return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
         }
+    }
+
+    public function savePassword(): bool {
+
+        if(!isset($this->id)) return false;
+
+        $data = [
+            'password' => password_hash($this->password, PASSWORD_BCRYPT),
+        ];
+
+        return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
     }
 
     public function delete(): ?bool {

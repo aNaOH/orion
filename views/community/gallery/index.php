@@ -5,6 +5,8 @@ $title = "Posts de $game->title en Orion";
 function showPage() {
     global $game;
     global $posts;
+
+    OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION);
     ?>
 
     <!-- Hero Section -->
@@ -26,42 +28,19 @@ function showPage() {
     <div class="container mx-auto">
         <div class="space-y-4">
 
-        <div class="max-w-xl mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-            <!-- Imagen del post -->
-            <img 
-            src="https://placehold.co/600x300" 
-            alt="Post image" 
-            class="w-full h-48 object-cover"
-            />
-
-            <!-- Contenido del post -->
-            <div class="p-4">
-            <h1 class="text-2xl font-bold text-gray-800">
-                Título del Post
-            </h1>
-            <p class="text-gray-600 mt-2">
-                Este es un ejemplo de un post estilo Reddit. Puedes votar utilizando el widget interactivo.
-            </p>
-            </div>
-
-            <!-- Componente de voto -->
-            <div class="flex items-center justify-between p-4 border-t">
-            <span class="text-gray-600 text-sm">Publicado por u/usuario123</span>
-            <gallery-vote></gallery-vote>
-            </div>
-        </div>
-
         <?php foreach ($posts as $post) { 
             if (!$post->is_public) continue;
-        ?>
-            
-        <?php } ?>
+        
+            OrionComponents::GalleryEntry($post);
+        } ?>
         </div>
     </div>
     </section><!-- /Features Section -->
 
     <script src="/assets/js/addDatesCommunity.js"></script>
     <script src="/assets/js/components/galleryvote.js"></script>
+    <script src="/assets/js/galleryIndex.js"></script>
+    
     <?php
 }
 

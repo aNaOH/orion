@@ -38,6 +38,16 @@ class GalleryEntry {
         return Post::getById($this->post_id);
     }
 
+    public function getValue(): int {
+        $sql = "SELECT SUM(modifier) FROM " + self::$table + " WHERE post_id = ?";
+        $valueDB = Connection::customQuery(ORION_DB, $sql, [$this->post_id])->fetchAll()[0][0];
+        return $valueDB;
+    }
+
+    public function addVote() {
+        //TODO
+    }
+
     public function delete(): ?bool {
         return (bool)Connection::doDelete(ORION_DB, self::$table, ['post_id' => $this->post_id]);
     }

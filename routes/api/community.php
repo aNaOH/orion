@@ -18,6 +18,7 @@ $router->mount('/communities', function() use ($router) {
             
             case 'gallery':
                 $postType = EPOST_TYPE::GALLERY;
+                $_POST['body'] = "gm";
                 break;
 
             case 'guides':
@@ -62,6 +63,28 @@ $router->mount('/communities', function() use ($router) {
         }
 
         header('location: /communities/'.strval($post->game_id).'/'.$type.'/'.strval($post->id));
+    
+    });
+
+    $router->post("/vote/(\d+)", function($postId) use ($router){
+
+        $result = false;
+
+        FormHelper::ValidateToken($_POST['tript_token'], 'tript_token', ETOKEN_TYPE::USERACTION);
+        FormHelper::ValidateRequiredField($_POST['vote'], "vote");
+
+        $vote = $_POST['vote'];
+
+        $result = PostController::vote(intval($postId), $vote);
+
+        if($result === false) {
+            $router->trigger404();
+            exit();
+        }
+
+        $post = Post::getById($postId);
+
+        header('location: /communities/'.strval($post->game_id).'/gallery/'.strval($post->id));
     
     });
 

@@ -58,6 +58,7 @@ class UserController {
 
         $user = new User($email, $username, $password, $birthdate, EUSER_TYPE::USER);
         $user->save();
+        $user->savePassword();
 
         header('HTTP/1.1 200 OK');
         $response['status'] = 200;
@@ -107,6 +108,7 @@ class UserController {
             }
 
             $user->setPassword($password);
+            $user->savePassword();
         }
 
         if(isset($profilePic)){

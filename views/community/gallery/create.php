@@ -1,12 +1,11 @@
 <?php
 
-$title = "Posts de $game->title en Orion";
+$title = "Subir en la galería de $game->title en Orion";
 
 function showPage() {
     global $game;
     ?>
-    <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.min.css">
-    <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
+    <script src="/assets/js/components/fileUpload.js"></script>
 
     <!-- Hero Section -->
     <section id="hero" class="bg-brand-500 text-white pt-20">
@@ -32,8 +31,8 @@ function showPage() {
         <!-- Cuerpo -->
         <div>
             <label for="body" class="block text-sm font-medium text-gray-200">Contenido del post</label>
-            <div class="p-2 bg-white rounded-lg shadow-lg">
-                <textarea name="body" id="body" class="w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200" rows="8" placeholder="Escribe el contenido aquí..." required></textarea>
+            <div class="p-2 ">
+                <file-upload id="body" accept-video="true" max-video-size="15MB"></file-upload>
             </div>
         </div>
 
@@ -47,26 +46,7 @@ function showPage() {
     </div>
     </section><!-- /Features Section -->
 
-    <script>
-        var simplemde = new SimpleMDE({ 
-            element: document.getElementById("body"),
-            autosave: {
-                enabled: true,
-                uniqueId: "Orion_NewPost_Body",
-                delay: 1000,
-            },
-            insertTexts: {
-                horizontalRule: ["", "\n\n-----\n\n"],
-                image: ["![](http://", ")"],
-                link: ["[", "](http://)"],
-                table: ["", "\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text      | Text     |\n\n"],
-            },
-            placeholder: "Type here...",
-            hideIcons: ["side-by-side", "fullscreen"],
-         });
-    </script>
-
-    <script src="/assets/js/forms/community-create.js"></script>
+    <script src="/assets/js/forms/gallery-create.js"></script>
 
     <?php
 }
