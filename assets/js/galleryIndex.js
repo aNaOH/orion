@@ -42,6 +42,7 @@ for (const media of mediaContainers) {
 shareBtns = $('*[data-galleryslot="shareBtn"]');
 shareLinks = $('*[data-galleryslot="shareLink"]');
 linkInputs = $('*[data-galleryslot="linkInput"]');
+values = $('*[data-galleryslot="value"]');
 galleryVotes = $('gallery-vote');
 
 function onShareBtnClick(index, postId) {
@@ -66,20 +67,35 @@ function onShareBtnClick(index, postId) {
     linkInput.select();
 }
 
-
 for (let index = 0; index < shareBtns.length; index++) {
     const shareBtn = shareBtns[index];
     shareBtn.addEventListener("click", function() {
         onShareBtnClick(index, shareBtn.dataset.postid);
     });
 
-    galleryVotes[index].addEventListener('valueChange', (event) => {
+    galleryVotes[index].addEventListener('valueChange', function(event) {
         const postId = shareBtn.dataset.postid;
         const newValue = event.detail.value;
         const previousValue = event.detail.previousValue;
 
         const token = document.getElementById("tript_token").value;
 
-        console.log("/api/communities/vote/" + postId, previousValue, newValue, token);
+        $.ajax({
+            url: '/api/communities/vote/' + postId , // The URL to which the request is sent
+            type: 'POST', // The HTTP method to use for the request (GET, POST, etc.)
+            data: { 
+                previousValue,
+                newValue,
+                token
+            }, // Data to be sent to the server
+            success: function(response) {
+                values[index].innerHTML = response.new_value;
+            },
+            error: function(xhr, status, error) {
+                const info = xhr.responseJSON;
+                console.log(info);
+                galleryVotes.setAttribute('value', previousValue);
+            }
+        });
     });
 }

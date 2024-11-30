@@ -21,6 +21,9 @@
                 <input data-galleryslot="linkInput" type="text" class="w-full p-2 border rounded bg-brand text-gray-200" readonly>
             </div>
         </div>
-        <gallery-vote></gallery-vote>
+        <div class="flex items-center justify-between gap-2">
+            <span data-galleryslot="value"><?=$galleryInfo->getValue()?></span>
+            <gallery-vote value="<?=$value?>"></gallery-vote>
+        </div>
     </div>
 </div>

@@ -15,6 +15,13 @@ class OrionComponents {
     public static function GalleryEntry(Post $post){
         if($post->type != EPOST_TYPE::GALLERY) return;
         $galleryInfo = $post->getPostInfo();
+
+        $value = 0;
+
+        if(isset($_SESSION['user'])){
+            $value = $galleryInfo->getUserValue($_SESSION['user']['id']);
+        }
+
         include 'components/GalleryEntry.php';
     }
 

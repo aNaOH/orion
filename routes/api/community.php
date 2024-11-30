@@ -67,25 +67,12 @@ $router->mount('/communities', function() use ($router) {
     });
 
     $router->post("/vote/(\d+)", function($postId) use ($router){
+        FormHelper::ValidateToken($_POST['token'], 'tript_token', ETOKEN_TYPE::USERACTION);
+        FormHelper::ValidateRequiredField($_POST['newValue'], "newValue");
 
-        $result = false;
+        $vote = $_POST['newValue'];
 
-        FormHelper::ValidateToken($_POST['tript_token'], 'tript_token', ETOKEN_TYPE::USERACTION);
-        FormHelper::ValidateRequiredField($_POST['vote'], "vote");
-
-        $vote = $_POST['vote'];
-
-        $result = PostController::vote(intval($postId), $vote);
-
-        if($result === false) {
-            $router->trigger404();
-            exit();
-        }
-
-        $post = Post::getById($postId);
-
-        header('location: /communities/'.strval($post->game_id).'/gallery/'.strval($post->id));
-    
+        PostController::vote(intval($postId), $vote);
     });
 
 });

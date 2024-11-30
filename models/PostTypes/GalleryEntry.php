@@ -39,13 +39,32 @@ class GalleryEntry {
     }
 
     public function getValue(): int {
-        $sql = "SELECT SUM(modifier) FROM " + self::$table + " WHERE post_id = ?";
-        $valueDB = Connection::customQuery(ORION_DB, $sql, [$this->post_id])->fetchAll()[0][0];
-        return $valueDB;
+        $sql = "SELECT SUM(modifier) FROM votes WHERE post_id = ?";
+        $valueDB = Connection::customQuery(ORION_DB, $sql, [$this->post_id])->fetchAll();
+        return intval($valueDB[0][0] ?? '0');
     }
 
-    public function addVote() {
-        //TODO
+    public function hasUserVoted($voter): bool {
+        $valueDB = Connection::doSelect(ORION_DB, "votes", ['post_id' => $this->post_id, 'user_id' => $voter]);
+        return count($valueDB) == 1;
+    }
+
+    public function getUserValue($voter): int {
+        $value = 0;
+        if($this->hasUserVoted($voter)){
+            $valueDB = Connection::doSelect(ORION_DB, "votes", ['post_id' => $this->post_id, 'user_id' => $voter]);
+            $value = intval($valueDB[0]["modifier"] ?? '0');
+        }
+        return $value;
+    }
+
+    public function addVote($voter, $value) {
+        $this->getValue();
+        if(!$this->hasUserVoted($voter)){
+            Connection::doInsert(ORION_DB, "votes", ['post_id' => $this->post_id, 'user_id' => $voter, 'modifier' => $value]);
+        } else {
+            Connection::doUpdate(ORION_DB, "votes", ['modifier' => $value], ['post_id' => $this->post_id, 'user_id' => $voter]);
+        }
     }
 
     public function delete(): ?bool {

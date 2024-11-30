@@ -203,6 +203,13 @@ class PostController {
 
         $voter = null;
 
+        $jsonArray = array();
+
+        $jsonArray['value'] = $value;
+        $jsonArray['oldValue'] = $_POST['previousValue'] ?? 0;
+
+        $voter = null;
+
         if(isset($_SESSION['user'])){
             $voter = User::getById($_SESSION['user']['id'] ?? -1);
         }
@@ -210,7 +217,6 @@ class PostController {
         if(is_null($voter)) {
             header('HTTP/1.1 401 Unauthorized');
             
-            $jsonArray = array();
             $jsonArray['status'] = "401";
             $jsonArray['status_text'] = "User not logged";
             
@@ -223,7 +229,6 @@ class PostController {
         if(is_null($post)) {
             header('HTTP/1.1 400 Bad request');
             
-            $jsonArray = array();
             $jsonArray['status'] = "400";
             $jsonArray['status_text'] = "Post does not exist";
             
@@ -234,7 +239,6 @@ class PostController {
         if($post->type != EPOST_TYPE::GALLERY) {
             header('HTTP/1.1 400 Bad request');
             
-            $jsonArray = array();
             $jsonArray['status'] = "400";
             $jsonArray['status_text'] = "Post is not a gallery entry";
             
@@ -244,10 +248,9 @@ class PostController {
 
         $galleryInfo = $post->getPostInfo();
 
-        if(is_null($galleryInfo) || !($galleryInfo instanceof GalleryEntry)) {
+        if(is_null($galleryInfo)) {
             header('HTTP/1.1 400 Bad request');
             
-            $jsonArray = array();
             $jsonArray['status'] = "400";
             $jsonArray['status_text'] = "Post does not have an associated gallery entry info";
             
@@ -257,6 +260,13 @@ class PostController {
 
         $galleryInfo->addVote($voter->id, $value);
 
-        
+        header('HTTP/1.1 200 OK');
+            
+        $jsonArray['status'] = "200";
+        $jsonArray['status_text'] = "Post voted";
+        $jsonArray['new_value'] = $galleryInfo->getValue();
+            
+        echo json_encode($jsonArray);
+        exit();
     }
 }

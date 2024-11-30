@@ -265,7 +265,7 @@ class Connection {
             foreach ($params as $index => $value) {
                 $stmt->bindValue($index + 1, $value); // El índice es 1-based para bindValue
             }
-            
+
             $stmt->execute();
             return $stmt;
         } catch (PDOException $e) {
