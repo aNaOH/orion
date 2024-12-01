@@ -22,6 +22,28 @@ $router->before('GET|POST', '/admin(/.*)?', function() {
     }
 });
 
+$router->before('GET|POST', '/dev/panel(/.*)?', function() {
+
+    if (isset($_SESSION['user'])) {
+
+        $user = User::getById($_SESSION['user']['id']);
+        if($user){
+            if(is_null($user->getDeveloperInfo())){
+                header('location: /');
+                exit();
+            }
+        }
+        else{
+            header('location: /');
+            exit();
+        }
+    }
+    else {
+        header('location: /');
+        exit();
+    }
+});
+
 $router->before('GET|POST', '/stripe(/.*)?', function() {
 
     if (isset($_SESSION['user'])) {

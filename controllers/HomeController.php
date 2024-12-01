@@ -2,6 +2,7 @@
 
 require_once 'models/Game.php';
 require_once 'models/User.php';
+require_once 'models/Developer.php';
 
 class HomeController {
 
@@ -25,6 +26,17 @@ class HomeController {
         header('HTTP/1.1 200 OK');
         $response['showcaseGames'] = $gameList;
         $response['users'] = $users;
+
+        echo json_encode($response);
+        exit();
+    }
+
+    public static function devDo(){
+
+        $developers = Developer::getCount();
+
+        header('HTTP/1.1 200 OK');
+        $response['developers'] = $developers;
 
         echo json_encode($response);
         exit();

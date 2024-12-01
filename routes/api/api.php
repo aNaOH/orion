@@ -1,7 +1,8 @@
 <?php
 
 require_once 'controllers/UserController.php'; //Import user Controller
-require_once 'controllers/HomeController.php'; //Import user Controller
+require_once 'controllers/HomeController.php'; //Import home Controller
+require_once 'controllers/StripeController.php'; //Import stripe Controller
 
 //API
 $router->mount('/api', function() use ($router) {
@@ -39,7 +40,15 @@ $router->mount('/api', function() use ($router) {
     });
 
     $router->get('/home', function(){
-        $games = HomeController::do();
+        HomeController::do();
+    });
+
+    $router->get('/dev', function(){
+        HomeController::devDo();
+    });
+
+    $router->post('/stripe', function(){
+        StripeController::webhook();
     });
 
     $router->post('/auth/login', function(){

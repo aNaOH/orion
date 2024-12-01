@@ -91,4 +91,10 @@ class Developer {
         if (!isset($this->id)) return null;
         return (bool)Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);
     }
+
+    public static function getCount(){
+        $count = Connection::customQuery(ORION_DB, "SELECT COUNT(id) FROM ".self::$table)->fetch(PDO::FETCH_BOTH);
+
+        return $count[0];
+    }
 }

@@ -11,7 +11,10 @@ $router->mount('/stripe', function() use ($router) {
             exit();
         }
 
-        StripeController::buy($_ENV['STRIPE_DEVACCOUNT_PRICE'], $user); 
+        StripeController::buy($_ENV['STRIPE_DEVACCOUNT_PRICE'], $user, [
+            'user' => $user->id,
+            'developer' => $_GET['devName'] ?? ''
+        ], "developer"); 
     });
 
     $router->get('/success', function(){
