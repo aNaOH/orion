@@ -1,7 +1,7 @@
 let urlSplitted = document.URL.split('/');
-let game = urlSplitted[urlSplitted.length-2];
+let game = urlSplitted[urlSplitted.length-3];
 
-mediaContainers = $('*[data-galleryslot="media"]');
+const mediaContainer = $('*[data-galleryslot="media"]')[0];
 
 async function loadMedia(mediaContainer, uuid) {
     try {
@@ -35,20 +35,15 @@ async function loadMedia(mediaContainer, uuid) {
     }
 }
 
-for (const media of mediaContainers) {
-    loadMedia(media, media.dataset.uuid);  
-}
+loadMedia(mediaContainer, mediaContainer.dataset.uuid); 
 
-shareBtns = $('*[data-galleryslot="shareBtn"]');
-shareLinks = $('*[data-galleryslot="shareLink"]');
-linkInputs = $('*[data-galleryslot="linkInput"]');
-values = $('*[data-galleryslot="value"]');
-galleryVotes = $('gallery-vote');
+const shareBtn = $('*[data-galleryslot="shareBtn"]')[0];
+const linkBox = $('*[data-galleryslot="shareLink"]')[0];
+const linkInput = $('*[data-galleryslot="linkInput"]')[0];
+const value = $('*[data-galleryslot="value"]')[0];
+const galleryVote = $('gallery-vote')[0];
 
-function onShareBtnClick(index, postId) {
-    var linkBox = shareLinks[index];
-    var linkInput = linkInputs[index];
-
+function onShareBtnClick(postId) {
     // Muestra la caja de texto
     linkBox.classList.toggle("hidden");  // Alterna la visibilidad de la caja
 
@@ -67,19 +62,18 @@ function onShareBtnClick(index, postId) {
     linkInput.select();
 }
 
-for (let index = 0; index < shareBtns.length; index++) {
-    const shareBtn = shareBtns[index];
-    shareBtn.addEventListener("click", function() {
-        onShareBtnClick(index, shareBtn.dataset.postid);
-    });
+shareBtn.addEventListener("click", function() {
+    onShareBtnClick(shareBtn.dataset.postid);
+});
 
-    galleryVotes[index].addEventListener('valueChange', function(event) {
+if(galleryVote){
+    galleryVote.addEventListener('valueChange', function(event) {
         const postId = shareBtn.dataset.postid;
         const newValue = event.detail.value;
         const previousValue = event.detail.previousValue;
-
+    
         const token = document.getElementById("tript_token").value;
-
+    
         $.ajax({
             url: '/api/communities/vote/' + postId , // The URL to which the request is sent
             type: 'POST', // The HTTP method to use for the request (GET, POST, etc.)

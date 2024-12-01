@@ -23,7 +23,13 @@
         </div>
         <div class="flex items-center justify-between gap-2">
             <span data-galleryslot="value"><?=$galleryInfo->getValue()?></span>
-            <gallery-vote value="<?=$value?>"></gallery-vote>
+            <?php if(isset($_SESSION['user'])) { ?>
+                <gallery-vote value="<?=$value?>"></gallery-vote>
+            <?php } else { ?>
+                <a href="/login" class="w-8 h-8 rounded-full bg-alt hover:bg-alt-600 cursor-pointer flex items-center justify-center">
+                    <i class="bi bi-star text-brand"></i>
+                </a>
+            <?php } ?>
         </div>
     </div>
 </div>
