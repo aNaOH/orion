@@ -132,6 +132,8 @@ class User {
         ];
 
         if (!isset($this->id) || !self::getById($this->id)) {
+            $this->setPassword($this->password);
+            $data['password'] = $this->password;
             $result = Connection::doInsert(ORION_DB, self::$table, $data);
             $this->id = ORION_DB->lastInsertId();
             return (bool)$result;
@@ -145,7 +147,7 @@ class User {
         if(!isset($this->id)) return false;
 
         $data = [
-            'password' => password_hash($this->password, PASSWORD_BCRYPT),
+            'password' => $this->password,
         ];
 
         return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);

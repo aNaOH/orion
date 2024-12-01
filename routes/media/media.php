@@ -1,7 +1,5 @@
 <?php
 
-use Intervention\Image\ImageManager;
-
 $router->mount('/media', function() use ($router) {
 
     $router->get('/profile/{uuid}', function($uuid) use ($router) {

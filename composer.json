@@ -9,6 +9,7 @@
         "aws/aws-sdk-php": "^3.324",
         "bramus/router": "~1.6",
         "intervention/image": "^3.9",
-        "erusev/parsedown": "^1.7"
+        "erusev/parsedown": "^1.7",
+        "stripe/stripe-php": "^16.3"
     }
 }
