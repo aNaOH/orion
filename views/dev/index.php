@@ -68,7 +68,7 @@ function showPage() {
 
     <!-- Call to Action Section -->
     <section data-aos="fade-up" class="text-white py-20">
-    <?php if(is_null($user)) { ?>
+    <?php if(!isset($user)) { ?>
         <div class="container mx-auto text-center">
             <h2 class="text-4xl font-bold text-alt mb-4">Únete a Orion hoy</h2>
             <p class="text-lg mb-6">Necesitas una cuenta de Orion para poder crear tu cuenta de desarrollador.</p>

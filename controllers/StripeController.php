@@ -23,12 +23,32 @@ class StripeController {
         $YOUR_DOMAIN = $_ENV['STRIPE_DOMAIN'];
 
         if($product instanceof Product){
-            $price_id = $product->default_price->id;
+            $gameId = $product->metadata['gameId'];
+            $game = Game::getById($gameId);
+            if(isset($game->discount)){
+                $coupon = \Stripe\Coupon::create([
+                    'percent_off' => ($game->discount * 100), // Descuento
+                    'duration' => 'once', // Aplicable solo una vez (puede ser 'forever' o 'repeating')
+                ]);
+            }
+            $price = Price::create([
+                'unit_amount' => ($game->base_price * 100), // $15.00 en centavos
+                'currency' => 'eur',
+                'product' => $product->id,
+            ]);
+
+            $price_id = $price->id;
         } else {
             $price_id = $product;
         }
 
         $fromText = self::getFromText($from);
+
+        $discount = [];
+
+        if(isset($coupon)){
+            $discount['coupon'] = $coupon->id;
+        }
 
         $checkout_session = \Stripe\Checkout\Session::create([
         'customer_email' => $user->email,
@@ -38,6 +58,7 @@ class StripeController {
             'price' => $price_id,
             'quantity' => 1,
         ]],
+        'discounts' => $discount,
         'mode' => 'payment',
         'success_url' => $YOUR_DOMAIN . '/stripe/success'.$fromText,
         'cancel_url' => $YOUR_DOMAIN . '/stripe/cancel'.$fromText,
