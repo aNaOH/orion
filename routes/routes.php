@@ -4,6 +4,8 @@ include('routes/auth.php');
 
 include('routes/game/community.php');
 
+include('routes/game/store.php');
+
 include('routes/admin/admin.php');
 
 include('routes/dev/dev.php');

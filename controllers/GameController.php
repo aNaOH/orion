@@ -41,6 +41,10 @@ class GameController {
         include('views/community/hub.php');
     }
 
+    public static function showStore(){
+        include('views/store/hub.php');
+    }
+
     public static function openCommunity($gameId){
         $game = Game::getById($gameId);
 

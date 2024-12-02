@@ -4,8 +4,12 @@ require_once 'models/Game.php';
 
 class OrionComponents {
 
-    public static function GameCommunity(Game $game, string $class = "col-lg-3 col-md-4 col-sm-5 mb-4"){
+    public static function GameCommunity(Game $game){
         include 'components/GameCommunity.php';
+    }
+
+    public static function GameStore(Game $game){
+        include 'components/GameStore.php';
     }
 
     public static function Comment(Comment $comment){

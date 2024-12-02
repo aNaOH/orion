@@ -1,5 +1,5 @@
 <div class="relative rounded-lg overflow-hidden group w-60 h-90 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105"> <!-- Ajustamos el tamaño del contenedor -->
-    <a href="/communities/<?= $game->id ?>">
+    <a href="/store/<?= $game->id ?>">
       <img
         src="/media/games/cover/<?= $game->id ?>"
         class="w-full h-full object-cover"
