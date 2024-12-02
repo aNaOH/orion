@@ -27,4 +27,4 @@ function showPage() {
             <?php
 }
 
-include("views/admin/template/main.php");
+include("views/dev/panel/template/main.php");

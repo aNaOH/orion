@@ -43,7 +43,7 @@ class FileUpload extends HTMLElement {
         this.maxVideoHeight = parseInt(this.getAttribute('max-video-height') || 1080);
         this.maxImageSize = this.getAttribute('max-image-size') || '5MB';
         this.maxVideoSize = this.getAttribute('max-video-size') || '5MB';
-        this.imageType = this.getAttribute('image-type') || 'png,jpg,webp';
+        this.imageType = this.getAttribute('image-type') || 'png,jpeg,webp';
         this.videoType = this.getAttribute('video-type') || 'mp4,webm';
     
         this.handleFileChange = this.handleFileChange.bind(this);
