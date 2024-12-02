@@ -4,8 +4,8 @@ if(isset($_SESSION['user'])){
     $userSession = $_SESSION['user'];
 }
 
-include('header.php');
+include('views/dev/panel/template/header.php');
 
 showPage();
 
-include('footer.php');
+include('views/dev/panel/template/footer.php');

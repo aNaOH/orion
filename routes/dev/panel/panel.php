@@ -1,6 +1,6 @@
 <?php
 
-$router->mount('/dev/panel', function() use ($router) {
+$router->mount('/panel', function() use ($router) {
 
     $router->get('/', function(){
         include('views/dev/panel/home.php');

@@ -21,7 +21,7 @@ function showPage() {
             </div> <!--end::App Content Header--> <!--begin::App Content-->
             <div class="app-content"> <!--begin::Container-->
                 <div class="container-fluid"> <!--begin::Row-->
-                    <h4>Bienvenido al panel de administración de Orion</h4>
+                    <h4>Bienvenido al panel de desarrollador de Orion</h4>
                 </div> <!--end::Container-->
             </div> <!--end::App Content-->
             <?php

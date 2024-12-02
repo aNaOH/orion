@@ -20,11 +20,11 @@
             </div> <!--end::Container-->
         </nav> <!--end::Header--> <!--begin::Sidebar-->
         <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark"> <!--begin::Sidebar Brand-->
-            <div class="sidebar-brand"> <!--begin::Brand Link--> <a href="/admin" class="brand-link"> <!--begin::Brand Text--> <span class="brand-text fw-light">Orion</span> <!--end::Brand Text--> </a> <!--end::Brand Link--> </div> <!--end::Sidebar Brand--> <!--begin::Sidebar Wrapper-->
+            <div class="sidebar-brand"> <!--begin::Brand Link--> <a href="/dev/panel/" class="brand-link"> <!--begin::Brand Text--> <span class="brand-text fw-light">Orion</span> <!--end::Brand Text--> </a> <!--end::Brand Link--> </div> <!--end::Sidebar Brand--> <!--begin::Sidebar Wrapper-->
             <div class="sidebar-wrapper">
                 <nav class="mt-2"> <!--begin::Sidebar Menu-->
                     <ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu" data-accordion="false">
-                        <li class="nav-item"> <a href="/admin/" class="nav-link"> <i class="nav-icon bi bi-house"></i>
+                        <li class="nav-item"> <a href="/dev/panel/" class="nav-link"> <i class="nav-icon bi bi-house"></i>
                                 <p>
                                     Inicio
                                 </p>
@@ -36,12 +36,16 @@
                                 </p>
                             </a>
                         </li>
-                        <li class="nav-header">MENÚ RÁPIDO</li>
-                        <li class="nav-item"> <a href="/admin/quickgame" class="nav-link"> <i class="nav-icon bi bi-download"></i>
-                                <p>Crear juego (Pre-tienda)</p>
+                        <li class="nav-header">JUEGOS</li>
+                        <li class="nav-item"> <a href="/dev/panel/games" class="nav-link"> <i class="nav-icon bi bi-download"></i>
+                                <p>Tus juegos</p>
                             </a> </li>
-                        <li class="nav-item"> <a href="/admin/guidetype" class="nav-link"> <i class="nav-icon bi bi-tag"></i>
-                                <p>Crear tipo de guía</p>
+                            <li class="nav-header">PAGOS</li>
+                        <li class="nav-item"> <a href="/dev/panel/payment" class="nav-link"> <i class="nav-icon bi bi-download"></i>
+                                <p>Configuración de pago</p>
+                            </a> </li>
+                        <li class="nav-item"> <a href="/dev/panel/wallet" class="nav-link"> <i class="nav-icon bi bi-download"></i>
+                                <p>Saldo</p>
                             </a> </li>
                     </ul> <!--end::Sidebar Menu-->
                 </nav>
