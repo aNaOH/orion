@@ -12,8 +12,9 @@ class Game {
     public ?string $launch_date;
     public ?float $base_price;
     public ?float $discount;
-    public ?string $file;
-    public ?string $version;
+    public bool $as_editor;
+    public bool $is_public;
+    public ?string $developer_name;
     public int $developer_id;
 
     public function __construct(
@@ -23,8 +24,9 @@ class Game {
         ?string $launch_date,
         ?float $base_price,
         ?float $discount,
-        ?string $file,
-        ?string $version,
+        string $as_editor,
+        bool $is_public,
+        ?string $developer_name,
         int $developer_id,
         ?int $id = null
     ) {
@@ -34,8 +36,9 @@ class Game {
         $this->launch_date = $launch_date;
         $this->base_price = $base_price;
         $this->discount = $discount;
-        $this->file = $file;
-        $this->version = $version;
+        $this->as_editor = $as_editor;
+        $this->is_public = $is_public;
+        $this->developer_name = $developer_name;
         $this->developer_id = $developer_id;
         $this->id = $id;
     }
@@ -48,8 +51,9 @@ class Game {
             'launch_date' => $this->launch_date,
             'base_price' => $this->base_price,
             'discount' => $this->discount,
-            'file' => $this->file,
-            'version' => $this->version,
+            'as_editor' => intval($this->as_editor),
+            'is_public' => intval($this->is_public),
+            'developer_name' => $this->developer_name,
             'developer_id' => $this->developer_id
         ];
 
@@ -73,8 +77,9 @@ class Game {
                 $game['launch_date'],
                 (float)$game['base_price'],
                 (float)$game['discount'],
-                $game['file'],
-                $game['version'],
+                (bool)$game['as_editor'],
+                (bool)$game['is_public'],
+                $game['developer_name'],
                 $game['developer_id'],
                 $game['id']
             );
@@ -92,8 +97,9 @@ class Game {
                 $game[0]['launch_date'],
                 (float)$game[0]['base_price'],
                 (float)$game[0]['discount'],
-                $game[0]['file'],
-                $game[0]['version'],
+                (bool)$game[0]['as_editor'],
+                (bool)$game[0]['is_public'],
+                $game[0]['developer_name'],
                 $game[0]['developer_id'],
                 $game[0]['id']
             );
@@ -124,12 +130,17 @@ class Game {
                 $game['launch_date'],
                 (float)$game['base_price'],
                 (float)$game['discount'],
-                $game['file'],
-                $game['version'],
+                (bool)$game['as_editor'],
+                (bool)$game['is_public'],
+                $game['developer_name'],
                 $game['developer_id'],
                 $game['id']
             );
         }
         return $games;
+    }
+
+    public function getBuilds(){
+        return Build::getByGame($this);
     }
 }

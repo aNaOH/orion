@@ -88,7 +88,7 @@ class StripeController {
     }
 
     public static function webhook(){
-        $endpoint_secret = "whsec_e265df41506c078c36920b4c7f89be41259733aade6ffc9b1869f17ac7bb9b04";
+        $endpoint_secret = $_ENV['STRIPE_WEBHOOK_SECRET'];
 
         $payload = @file_get_contents('php://input');
         $sig_header = $_SERVER['HTTP_STRIPE_SIGNATURE'];

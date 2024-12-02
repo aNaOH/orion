@@ -13,6 +13,10 @@ $router->mount('/panel', function() use ($router) {
         include('views/dev/panel/games/index.php');
     });
 
+    $router->get('/games/new', function(){
+        include('views/dev/panel/games/new.php');
+    });
+
 });
 
 $router->set404('/dev/panel(/.*)?', function() {

@@ -43,10 +43,6 @@ $router->mount('/api', function() use ($router) {
         HomeController::do();
     });
 
-    $router->get('/dev', function(){
-        HomeController::devDo();
-    });
-
     $router->post('/stripe', function(){
         StripeController::webhook();
     });
@@ -103,6 +99,9 @@ $router->mount('/api', function() use ($router) {
     include('routes/api/community.php');
 
     include('routes/api/admin.php');
+
+    include('routes/api/dev.php');
+
 });
 
 

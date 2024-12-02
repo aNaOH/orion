@@ -1,6 +1,6 @@
 new DataTable('#table', {
     columnDefs: [
-        { orderable: false, targets: [3,4,5] } // Deshabilita el orden en la primera columna (índice 0)
+        { orderable: false, targets: [4,5,6] } // Deshabilita el orden en la primera columna (índice 0)
     ],
     language: {
         entries: {

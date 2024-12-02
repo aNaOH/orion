@@ -26,12 +26,14 @@ function showPage() {
             </div> <!--end::App Content Header--> <!--begin::App Content-->
             <div class="app-content"> <!--begin::Container-->
                 <div class="container-fluid"> <!--begin::Row-->
+                    <a href="/dev/panel/games/new" class="btn btn-primary">Nuevo juego</a>
                     <table id="table" style="width:100%">
                         <thead>
                             <tr>
                                 <th>ID</th>
                                 <th>Título</th>
                                 <th>¿Como editora?</th>
+                                <th>Desarrolladora</th>
                                 <th>Tienda</th>
                                 <th>Comunidad</th>
                                 <th>Acciones</th>
@@ -42,10 +44,15 @@ function showPage() {
                                 <tr>
                                     <th><?= $game->id ?></th>
                                     <td><?= $game->title ?></td>
-                                    <td><?= true ? 'Si' : 'No' ?></td>
-                                    <td><a href="/store/<?=$game->id?>">Ir a la tienda</a></td>
-                                    <td><a href="/communities/<?=$game->id?>">Ir a la comunidad</a></td>
-                                    <td>Acciones</td>
+                                    <td><?= $game->as_editor ? 'Si' : 'No' ?></td>
+                                    <td><?= $game->as_editor ? $game->developer_name : $game->getDeveloper()->name ?></td>
+                                    <td><?= !$game->is_public ? '<a href="/store/'.strval($game->id).'">Ir a la tienda</a>' : 'No está disponible' ?></td>
+                                    <td><?= !$game->is_public ? '<a href="/communities/'.strval($game->id).'">Ir a la comunidad</a>' : 'No está disponible' ?></td>
+                                    <td>
+                                        <a href="/dev/panel/games/store/<?=$game->id?>" class="btn btn-primary">Editar tienda</a>
+                                        <a href="/dev/panel/games/community/<?=$game->id?>" class="btn btn-warning">Editar comunidad</a>
+                                        <a href="/dev/panel/games/delete/<?=$game->id?>" class="btn btn-danger">Borrar</a>
+                                    </td>
                                 </tr>
                             <?php } ?>
                         </tbody>

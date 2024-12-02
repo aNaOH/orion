@@ -57,6 +57,18 @@ CREATE TABLE IF NOT EXISTS `badge_unlocked` (
 
 -- La exportación de datos fue deseleccionada.
 
+-- Volcando estructura para tabla orion.builds
+CREATE TABLE IF NOT EXISTS `builds` (
+  `game_id` int NOT NULL,
+  `file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `release_date` timestamp NOT NULL,
+  KEY `FK_builds_game` (`game_id`),
+  CONSTRAINT `FK_builds_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+-- La exportación de datos fue deseleccionada.
+
 -- Volcando estructura para tabla orion.comments
 CREATE TABLE IF NOT EXISTS `comments` (
   `id` int NOT NULL AUTO_INCREMENT,
@@ -119,8 +131,8 @@ CREATE TABLE IF NOT EXISTS `game` (
   `launch_date` timestamp NULL DEFAULT NULL,
   `base_price` float DEFAULT NULL,
   `discount` float DEFAULT NULL,
-  `file` varchar(255) DEFAULT NULL,
-  `version` varchar(50) DEFAULT NULL,
+  `as_editor` tinyint(1) NOT NULL DEFAULT '0',
+  `developer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `developer_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `fk_developer_id` (`developer_id`),
