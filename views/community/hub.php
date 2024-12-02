@@ -26,9 +26,10 @@ function showPage() {
     <?php } else { ?>
         <div class="container mx-auto">
             <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                <?php foreach ($games as $game) { ?>
-                    <?php OrionComponents::GameCommunity($game); ?>
-                <?php } ?>
+                <?php foreach ($games as $game) {
+                    if(!$game->is_public) continue;
+                    OrionComponents::GameCommunity($game);
+                } ?>
             </div>
         </div>
     <?php } ?>

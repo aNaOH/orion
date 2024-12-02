@@ -51,8 +51,8 @@ class Game {
             'launch_date' => $this->launch_date,
             'base_price' => $this->base_price,
             'discount' => $this->discount,
-            'as_editor' => intval($this->as_editor),
-            'is_public' => intval($this->is_public),
+            'as_editor' => $this->as_editor ? 1 : 0,
+            'is_public' => $this->is_public ? 1 : 0,
             'developer_name' => $this->developer_name,
             'developer_id' => $this->developer_id
         ];
@@ -77,8 +77,8 @@ class Game {
                 $game['launch_date'],
                 (float)$game['base_price'],
                 (float)$game['discount'],
-                (bool)$game['as_editor'],
-                (bool)$game['is_public'],
+                $game['as_editor'] == 1,
+                $game['is_public'] == 1,
                 $game['developer_name'],
                 $game['developer_id'],
                 $game['id']
@@ -97,8 +97,8 @@ class Game {
                 $game[0]['launch_date'],
                 (float)$game[0]['base_price'],
                 (float)$game[0]['discount'],
-                (bool)$game[0]['as_editor'],
-                (bool)$game[0]['is_public'],
+                $game[0]['as_editor'] == 1,
+                $game[0]['is_public'] == 1,
                 $game[0]['developer_name'],
                 $game[0]['developer_id'],
                 $game[0]['id']
@@ -118,9 +118,9 @@ class Game {
 
     public static function pickRandom($quantity) {
 
-        $sql = "SELECT * FROM ".self::$table." ORDER BY RAND() LIMIT ".strval($quantity);
+        $sql = "SELECT * FROM ".self::$table." WHERE is_public = ? ORDER BY RAND() LIMIT ".strval($quantity);
 
-        $select = Connection::customQuery(ORION_DB, $sql)->fetchAll(PDO::FETCH_ASSOC);
+        $select = Connection::customQuery(ORION_DB, $sql, [1])->fetchAll(PDO::FETCH_ASSOC);
         $games = [];
         foreach ($select as $game) {
             $games[] = new Game(
@@ -130,8 +130,8 @@ class Game {
                 $game['launch_date'],
                 (float)$game['base_price'],
                 (float)$game['discount'],
-                (bool)$game['as_editor'],
-                (bool)$game['is_public'],
+                $game['as_editor'] == 1,
+                $game['is_public'] == 1,
                 $game['developer_name'],
                 $game['developer_id'],
                 $game['id']
