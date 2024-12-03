@@ -1,6 +1,6 @@
 <?php
 
-$title = "Comunidades en Orion";
+$title = "Orion Store";
 
 $GLOBALS['games'] = Game::all();
 $GLOBALS['randomGames'] = Game::pickRandom(4);
@@ -20,7 +20,7 @@ function showPage() {
     </section><!-- /Hero Section -->
 
     <section id="features" class="py-5">
-        <h2 class="text-2xl md:text-3xl font-semibold animate__animated animate__fadeInDown">Selección aleatoria</h2>
+        <h2 class="text-2xl md:text-3xl font-semibold animate__animated animate__fadeInDown">Pensamos que podría interesarte</h2>
 
     <?php if(!isset($games) || count($games) == 0) { ?>
         <div class="container mx-auto text-center py-16 ">

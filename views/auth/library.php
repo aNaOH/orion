@@ -1,6 +1,6 @@
 <?php
 
-$title = "Comunidades en Orion";
+$title = "Tu biblioteca en Orion";
 
 function showPage() {
     global $games;

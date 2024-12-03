@@ -1,6 +1,6 @@
 <?php
 
-$title = "¡Ups!";
+$title = "¡Enhorabuena!";
 
 function showPage() {
     global $game;
