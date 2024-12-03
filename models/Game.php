@@ -1,6 +1,7 @@
 <?php
 
 require_once './models/Developer.php';
+require_once './models/Build.php';
 
 class Game {
     public static string $table = 'game';
@@ -142,5 +143,9 @@ class Game {
 
     public function getBuilds(){
         return Build::getByGame($this);
+    }
+
+    public function getLatestBuild(){
+        return Build::getLatestForGame($this);
     }
 }

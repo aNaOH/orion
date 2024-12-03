@@ -51,6 +51,22 @@ class Build {
         return $builds;
     }
 
+    public static function getLatestForGame(Game|int $game){
+
+        $game_id = $game instanceof Game ? $game->id : $game;
+        $build = Connection::customQuery(ORION_DB, "SELECT * FROM ".self::$table." WHERE game_id = ? ORDER BY release_date DESC LIMIT 1",[$game_id])->fetchAll(PDO::FETCH_ASSOC);
+
+        if (count($build) === 1) {
+            return new Build(
+                $build[0]['game_id'],
+                $build[0]['file'],
+                $build[0]['version'],
+                $build[0]['release_date'],
+            );
+        }
+        return null;
+    }
+
     public function __construct(int $game_id, string $file, string $version, string $release_date = null) {
         $this->game_id = $game_id;
         $this->file = $file;

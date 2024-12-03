@@ -192,12 +192,12 @@ class User {
         return true;
     }
 
-    public function hasAdquiredGame(Game|int $game, &$checkoutID = null): bool {
+    public function hasAdquiredGame(Game|int $game, $addDev = true, &$checkoutID = null): bool {
         if(!($game instanceof Game)){
             $game = Game::getById($game);
         }
 
-        if($game->getDeveloper() == $this->getDeveloperInfo()) return true;
+        if($game->getDeveloper() == $this->getDeveloperInfo() && $addDev) return true;
         $select = Connection::doSelect(ORION_DB, "owns", ["game_id" => $game->id, "user_id" => $this->id]);
         
         if (count($select) === 1) {

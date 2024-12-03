@@ -37,13 +37,29 @@ $router->get('/profile', function(){
     $user = User::getById($_SESSION['user']['id']);
 
     if(!isset($user)){
-        header('location: /logout');
+        header('location: /logout?to=login');
     }
 
     $GLOBALS['user'] = $user;
     $GLOBALS['is_self'] = true;
 
     include('views/auth/profile.php');
+});
+
+$router->get('/library', function(){
+    if(!isset($_SESSION['user'])){
+        header('location: /');
+    }
+
+    $user = User::getById($_SESSION['user']['id']);
+
+    if(!isset($user)){
+        header('location: /logout?to=login');
+    }
+
+    $GLOBALS['games'] = $user->getAdquiredGames();
+
+    include('views/auth/library.php');
 });
 
 $router->get('/profile/edit', function(){

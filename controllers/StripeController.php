@@ -106,7 +106,7 @@ class StripeController {
 
                 if(is_null($game)) return false;
 
-                if(!$user->hasAdquiredGame($game, $checkoutId)) return false;
+                if(!$user->hasAdquiredGame($game, false, $checkoutId)) return false;
 
                 \Stripe\Stripe::setApiKey($_ENV['STRIPE_KEY']);
 

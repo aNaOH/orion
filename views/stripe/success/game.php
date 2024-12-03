@@ -30,7 +30,7 @@ function showPage() {
         <div class="bg-branddark flex flex-row gap-5 p-2 rounded-xl">
             <img class="aspect-[2.14/1] h-[75px] rounded-md shadow-lg" src="/media/game/thumb/<?= $game->id ?>" alt="<?= $game->title ?> thumbnail">
             <h1 class="text-2xl font-bold text-gray-200"><?= $game->title ?></h1>
-            <div class="flex flex-col gap-2 flex-1 text-right">
+            <div class="flex flex-col gap-2 flex-1 text-right my-auto">
                 <p class="text-lg text-gray-200">
                     <span class="<?= $checkoutinfo['price'] > 0 && $checkoutinfo['discountedAmount'] > 0 ? 'line-through' : '' ?>"><?= $checkoutinfo['price'] > 0 ? strval($checkoutinfo['price']) . ' €' : 'Gratis' ?></span>
                     <span class="no-underline"><?= $checkoutinfo['price'] > 0 && $checkoutinfo['discountedAmount'] > 0 ? $checkoutinfo['price']-$checkoutinfo['discountedAmount'].' €' : '' ?></span>

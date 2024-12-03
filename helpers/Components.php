@@ -12,6 +12,10 @@ class OrionComponents {
         include 'components/GameStore.php';
     }
 
+    public static function GameLibrary(Game $game){
+        include 'components/GameLibrary.php';
+    }
+
     public static function Comment(Comment $comment){
         include 'components/Comment.php';
     }
