@@ -50,8 +50,8 @@ function showPage() {
                                     <td><?= $game->is_public ? '<a href="/communities/'.strval($game->id).'">Ir a la comunidad</a>' : 'No está disponible' ?></td>
                                     <td>
                                         <a href="/dev/panel/games/<?=$game->id?>/store/" class="btn btn-primary">Editar tienda</a>
-                                        <a href="/dev/panel/games/<?=$game->id?>/community/" class="btn btn-warning">Editar comunidad</a>
-                                        <a href="/dev/panel/games/<?=$game->id?>/delete/" class="btn btn-danger">Borrar</a>
+                                        <!-- <a href="/dev/panel/games/<?=$game->id?>/community/" class="btn btn-warning">Editar comunidad</a> -->
+                                        <!-- <a href="/dev/panel/games/<?=$game->id?>/delete/" class="btn btn-danger">Borrar</a> -->
                                     </td>
                                 </tr>
                             <?php } ?>

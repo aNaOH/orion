@@ -62,6 +62,38 @@ $router->get('/library', function(){
     include('views/auth/library.php');
 });
 
+$router->get('/library/{gameid}/{version}', function($gameid, $version) use ($router) {
+    if(!isset($_SESSION['user'])){
+        header('location: /');
+    }
+
+    $user = User::getById($_SESSION['user']['id']);
+
+    if(!isset($user)){
+        header('location: /logout?to=login');
+    }
+
+    $game = Game::getById($gameid);
+    if(is_null($game)) $router->trigger404();
+
+    if(!$user->hasAdquiredGame($game)) $router->trigger404();
+
+    $build = $game->getBuildVersion($version);
+    if(is_null($build)) $router->trigger404();
+
+    $file = $build->getFile();
+    if(is_null($file)) $router->trigger404();
+
+    header('Content-Type: '.$file['type']);
+    header('Content-Disposition: attachment; filename="'.str_replace(" ", "_", $game->title).'-ver-'.$version.'.zip"');
+    header('Expires: 0');
+    header('Cache-Control: must-revalidate');
+    header('Pragma: public');
+    header('Content-Length: ' . filesize($file['body']));
+    
+    echo $file['body'];
+});
+
 $router->get('/profile/edit', function(){
     if(!isset($_SESSION['user'])){
         header('location: /');

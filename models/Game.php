@@ -145,6 +145,10 @@ class Game {
         return Build::getByGame($this);
     }
 
+    public function getBuildVersion($version){
+        return Build::get($this, $version);
+    }
+
     public function getLatestBuild(){
         return Build::getLatestForGame($this);
     }

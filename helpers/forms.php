@@ -16,6 +16,20 @@ class FormHelper {
         }
     }
 
+    public static function ValidateRequiredFile($file, $fieldId){
+        $response = [];
+
+        if(!isset($file) || !is_array($file)){
+            header('HTTP/1.1 400 Bad Request');
+            $response['status'] = 400;
+            $response['message'] = "Este campo es obligatorio.";
+            $response['field'] = $fieldId;
+
+            echo json_encode($response);
+            exit();
+        }
+    }
+
     public static function ValidateEmailField($email, $fieldId){
         $response = [];
     

@@ -6,7 +6,7 @@ class Build {
     public static string $table = 'builds';
 
     public int $game_id;
-    public string $file;
+    private ?string $file;
     public string $version;
     public ?string $release_date;
 
@@ -21,8 +21,8 @@ class Build {
         if (count($build) === 1) {
             return new Build(
                 $build[0]['game_id'],
-                $build[0]['file'],
                 $build[0]['version'],
+                $build[0]['file'],
                 $build[0]['release_date'],
             );
         }
@@ -42,8 +42,8 @@ class Build {
             foreach ($buildDB as $build) {
                 $builds[] = new Build(
                     $build['game_id'],
-                    $build['file'],
                     $build['version'],
+                    $build['file'],
                     $build['release_date'],
                 );
             }
@@ -59,15 +59,15 @@ class Build {
         if (count($build) === 1) {
             return new Build(
                 $build[0]['game_id'],
-                $build[0]['file'],
                 $build[0]['version'],
+                $build[0]['file'],
                 $build[0]['release_date'],
             );
         }
         return null;
     }
 
-    public function __construct(int $game_id, string $file, string $version, string $release_date = null) {
+    public function __construct(int $game_id, string $version, string $file = null, string $release_date = null) {
         $this->game_id = $game_id;
         $this->file = $file;
         $this->version = $version;
@@ -91,5 +91,19 @@ class Build {
         } else {
             return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['game_id' => $this->game_id, 'version' => $this->version]);
         }
+    }
+    public function getUUID() {
+        return Tript::encryptString("buildg".strval($this->getParentGame()->id)."v".$this->version);
+    }
+
+    public function setFile($file) {
+        $uuid = $this->getUUID();
+        $this->file = $uuid;
+        return S3Helper::upload(EBUCKET_LOCATION::GAME_BUILD, $uuid, null, $file['type'], $file['tmp_name']);
+    }
+
+    public function getFile() {
+        var_dump($this->file);
+        return is_null($this->file) ? null : S3Helper::retrieve(EBUCKET_LOCATION::GAME_BUILD, $this->file);
     }
 }

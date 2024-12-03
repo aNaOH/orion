@@ -17,6 +17,16 @@ $router->mount('/panel', function() use ($router) {
         include('views/dev/panel/games/new.php');
     });
 
+    $router->get('/games/{gameId}/store', function($gameId) use ($router){
+        $user = User::getById($_SESSION['user']['id']);
+        $game = Game::getById($gameId);
+        if(is_null($game) || $game->getDeveloper() != $user->getDeveloperInfo()){
+            $router->trigger404();
+        }
+        $GLOBALS['game'] = $game;
+        include('views/dev/panel/games/store/store.php');
+    });
+
 });
 
 $router->set404('/dev/panel(/.*)?', function() {
