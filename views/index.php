@@ -16,16 +16,16 @@ function showPage() {
 
         <!-- Contenedores prefijados para juegos flotantes -->
         <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute w-[200px] h-[100px] showcase-item top-10 left-10"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item top-20 right-10"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item top-1/2 left-1/4"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item top-[30%] right-[20%]"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item bottom-[20%] left-[15%]"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item bottom-10 right-1/4"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item top-[40%] left-[60%]"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item bottom-[30%] right-[10%]"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item bottom-10 left-[30%]"></div>
-            <div class="absolute w-[200px] h-[100px] showcase-item top-[5%] right-[40%]"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item top-10 left-10"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item top-20 right-10"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item top-1/2 left-1/4"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item top-[30%] right-[20%]"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item bottom-[20%] left-[15%]"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item bottom-10 right-1/4"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item top-[40%] left-[60%]"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item bottom-[30%] right-[10%]"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item bottom-10 left-[30%]"></div>
+            <div class="absolute w-[213px] h-[100px] showcase-item top-[5%] right-[40%]"></div>
         </div>
 
         <!-- Contenido principal -->

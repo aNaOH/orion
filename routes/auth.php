@@ -18,7 +18,15 @@ $router->get('/logout', function(){
     if(isset($_SESSION['user'])){
         session_destroy();
     }
-    header('location: /');
+
+    $location = '/';
+
+    if(isset($_GET['to'])){
+        $location = $_GET['to'].'?from=logout';
+    }
+
+
+    header('location: '.$location);
 });
 
 $router->get('/profile', function(){

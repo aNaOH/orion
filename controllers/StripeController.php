@@ -4,6 +4,7 @@ use \Stripe\Product;
 use \Stripe\Price;
 
 require_once 'models/User.php';
+require_once 'models/Game.php';
 require_once 'models/Developer.php';
 
 class StripeController {
@@ -16,26 +17,43 @@ class StripeController {
         return ((strlen(trim($from)) == 0) ? '' : '?from='.urlencode($from));
     }
 
-    public static function buy(Product|string $product, User $user, $metadata = [], $from = ""){
+    public static function buy(Game|string $product, User $user, $metadata = [], $from = ""){
         \Stripe\Stripe::setApiKey($_ENV['STRIPE_KEY']);
         header('Content-Type: application/json');
 
         $YOUR_DOMAIN = $_ENV['STRIPE_DOMAIN'];
 
-        if($product instanceof Product){
-            $gameId = $product->metadata['gameId'];
-            $game = Game::getById($gameId);
-            if(isset($game->discount)){
+        if($product instanceof Game){
+
+
+            if(!is_null($product->discount) && is_float($product->discount) && $product->discount > 0){
                 $coupon = \Stripe\Coupon::create([
-                    'percent_off' => ($game->discount * 100), // Descuento
+                    'percent_off' => ($product->discount * 100), // Descuento
                     'duration' => 'once', // Aplicable solo una vez (puede ser 'forever' o 'repeating')
                 ]);
             }
-            $price = Price::create([
-                'unit_amount' => ($game->base_price * 100), // $15.00 en centavos
+
+            $priceInfo = [
+                'unit_amount' => ($product->base_price * 100),
                 'currency' => 'eur',
-                'product' => $product->id,
+            ];
+
+            $productQuery = Product::search([
+                'query' => 'name:\''.$product->title.'\''
             ]);
+
+            if(count($productQuery->data) > 0){
+                $priceInfo['product'] = $productQuery->data[0]->id;
+            } else {
+                $priceInfo['product_data'] = [
+                    'name' => $product->title,
+                    'metadata' => [
+                        'id' => $product->id
+                    ]
+                ];
+            }
+
+            $price = Price::create($priceInfo);
 
             $price_id = $price->id;
         } else {
@@ -44,29 +62,30 @@ class StripeController {
 
         $fromText = self::getFromText($from);
 
-        $discount = [];
+        $checkout_session_array = [
+            'customer_email' => $user->email,
+            'billing_address_collection' => 'required',
+            'line_items' => [[
+                # Provide the exact Price ID (e.g. pr_1234) of the product you want to sell
+                'price' => $price_id,
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => $YOUR_DOMAIN . '/stripe/success'.$fromText,
+            'cancel_url' => $YOUR_DOMAIN . '/stripe/cancel'.$fromText,
+            'automatic_tax' => [
+                'enabled' => true,
+            ],
+            'metadata' => $metadata
+        ];
 
         if(isset($coupon)){
-            $discount['coupon'] = $coupon->id;
+            $discounts = [];
+            $discounts['coupon'] = $coupon->id;
+            $checkout_session_array['discounts'] = [$discounts];
         }
 
-        $checkout_session = \Stripe\Checkout\Session::create([
-        'customer_email' => $user->email,
-        'billing_address_collection' => 'required',
-        'line_items' => [[
-            # Provide the exact Price ID (e.g. pr_1234) of the product you want to sell
-            'price' => $price_id,
-            'quantity' => 1,
-        ]],
-        'discounts' => $discount,
-        'mode' => 'payment',
-        'success_url' => $YOUR_DOMAIN . '/stripe/success'.$fromText,
-        'cancel_url' => $YOUR_DOMAIN . '/stripe/cancel'.$fromText,
-        'automatic_tax' => [
-            'enabled' => true,
-        ],
-        'metadata' => $metadata
-        ]);
+        $checkout_session = \Stripe\Checkout\Session::create($checkout_session_array);
 
         header("HTTP/1.1 303 See Other");
         header("Location: " . $checkout_session->url);
@@ -76,6 +95,38 @@ class StripeController {
         if(isset($_GET['from'])){
             if($_GET['from'] == "developer"){
                 include('views/stripe/success/dev.php');
+                exit();
+            }
+
+            if (preg_match('/^game(\d+)$/', $_GET['from'], $matches)) {
+                $gameId = $matches[1];
+                $user = User::getById($_SESSION['user']['id']);
+
+                $game = Game::getById($gameId);
+
+                if(is_null($game)) return false;
+
+                if(!$user->hasAdquiredGame($game, $checkoutId)) return false;
+
+                \Stripe\Stripe::setApiKey($_ENV['STRIPE_KEY']);
+
+                $checkout_session = \Stripe\Checkout\Session::retrieve($checkoutId);
+
+                $price = $checkout_session->amount_subtotal;
+                $discountedAmount = $checkout_session->total_details->amount_discount ?? 0;
+
+                if($price > 0){
+                    $discount = intval(($discountedAmount / $price) * 100);
+                }
+
+                $GLOBALS['game'] = $game;
+                $GLOBALS['checkoutinfo'] = [
+                    "price" => ($price / 100),
+                    "discountedAmount" => ($discountedAmount / 100),
+                    "discount" => $discount ?? 0
+                ];
+                
+                include('views/stripe/success/game.php');
                 exit();
             }
         }
@@ -122,6 +173,7 @@ class StripeController {
         // Set your secret key. Remember to switch to your live secret key in production.
         // See your keys here: https://dashboard.stripe.com/apikeys
         $stripe = self::getStripe();
+        \Stripe\Stripe::setApiKey($_ENV['STRIPE_KEY']);
       
         // TODO: Log the string "Fulfilling Checkout Session $session_id"
       
@@ -139,7 +191,8 @@ class StripeController {
         // Check the Checkout Session's payment_status property
         // to determine if fulfillment should be peformed
         if ($checkout_session->payment_status != 'unpaid') {
-          $price_id = $checkout_session->line_items->data[0]->price->id;
+          $line_items = $checkout_session->line_items;
+          $price_id = $line_items->data[0]->price->id;
           $user_id = $checkout_session->metadata['user'];
 
           $user = User::getById($user_id);
@@ -147,6 +200,16 @@ class StripeController {
           if($price_id == $_ENV['STRIPE_DEVACCOUNT_PRICE']){
             $dev_name = $checkout_session->metadata['developer'] ?? $user->username;
             $user->addDeveloperInfo($dev_name);
+          } else {
+            $maybeProduct = $line_items->data[0]->price->product;
+
+            $product = $maybeProduct instanceof Product ? $maybeProduct : Product::retrieve($maybeProduct);
+
+            $game = Game::getById(intval($product->metadata['id']));
+
+            if(!is_null($game)){
+                $user->adquireGame($game, $checkout_session->id);
+            }
           }
         }
       }

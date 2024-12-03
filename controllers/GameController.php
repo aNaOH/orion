@@ -26,7 +26,7 @@ class GameController {
             FormHelper::ValidateRequiredField($developerName, 'developerName');
         }
 
-        $game = new Game($title, null, null, null, null, null, $asEditor, true, $developerName, 1);
+        $game = new Game($title, $shortDescription, null, null, null, null, $asEditor, true, $developerName, 1);
         $game->save();
 
         header('HTTP/1.1 200 OK');
@@ -53,6 +53,16 @@ class GameController {
         $GLOBALS['game'] = $game;
 
         include('views/community/index.php');
+    }
+
+    public static function openGame($gameId){
+        $game = Game::getById($gameId);
+
+        if(is_null($game)) return false;
+
+        $GLOBALS['game'] = $game;
+
+        include('views/store/index.php');
     }
 
 }

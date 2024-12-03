@@ -21,10 +21,6 @@ $router->mount('/media', function() use ($router) {
 
     $router->get('/guidetype/{uuid}', function($uuid) use ($router) {
 
-        if($uuid == "default"){
-            $uuid .= ".png";
-        }
-
         $img = S3Helper::retrieve(EBUCKET_LOCATION::GUIDE_TYPE_ICON, $uuid);
 
         if(!isset($img)){
@@ -48,33 +44,45 @@ $router->mount('/media', function() use ($router) {
 
         echo $media['body'];
     });
+
+    $router->get('/game/{type}/{uuid}', function($type, $uuid) use ($router) {
+
+        $bucketLocation = EBUCKET_LOCATION::NONE;
+
+        switch ($type) {
+            case 'cover':
+                $bucketLocation = EBUCKET_LOCATION::GAME_COVER;
+                break;
+            case 'thumb':
+                $bucketLocation = EBUCKET_LOCATION::GAME_THUMB;
+                break;
+            case 'achievement':
+                $bucketLocation = EBUCKET_LOCATION::GAME_ACHIEVEMENT;
+                break;
+            case 'badge':
+                $bucketLocation = EBUCKET_LOCATION::GAME_BADGE;
+                break;
+        }
+
+        $img = S3Helper::retrieve($bucketLocation, $uuid);
+
+        if(!isset($img)){
+            $router->trigger404();
+        }
+
+        header('Content-Type: '.$img['type']); //Add JSON Header to all API routes
+
+        echo $img['body'];
+    });
 });
 
 $router->set404('/media(/.*)?', function() {
     header('HTTP/1.1 404 Not Found');
-
-    //$manager = new ImageManager(
-    //    new Intervention\Image\Drivers\Gd\Driver()
-    //);
-
-    $requestedRoute = $_SERVER['REQUEST_URI'];
-
+    
     $img = S3Helper::retrieve(EBUCKET_LOCATION::MISC, "404.png");
+
     $bodyData = $img['body']->getContents();
 
-    //$image = $manager->read($bodyData);
-
-    // Modificar el regex para capturar el segmento después de /media/games/
-    //if (preg_match('#^/media/games/([^/]+)#', $requestedRoute, $matches)) {
-    //    $subroute = $matches[1]; 
-    //    switch ($subroute) {
-    //        case 'cover':
-    //            $image->resize(600, 900);
-    //            break;
-    //    }
-    //}
-
     header('Content-Type: image/jpeg');
-    //echo $image->toJpeg();
     echo $bodyData;
 });

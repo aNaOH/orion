@@ -46,8 +46,8 @@ function showPage() {
                                     <td><?= $game->title ?></td>
                                     <td><?= $game->as_editor ? 'Si' : 'No' ?></td>
                                     <td><?= $game->as_editor ? $game->developer_name : $game->getDeveloper()->name ?></td>
-                                    <td><?= !$game->is_public ? '<a href="/store/'.strval($game->id).'">Ir a la tienda</a>' : 'No está disponible' ?></td>
-                                    <td><?= !$game->is_public ? '<a href="/communities/'.strval($game->id).'">Ir a la comunidad</a>' : 'No está disponible' ?></td>
+                                    <td><?= $game->is_public ? '<a href="/store/'.strval($game->id).'">Ir a la tienda</a>' : 'No está disponible' ?></td>
+                                    <td><?= $game->is_public ? '<a href="/communities/'.strval($game->id).'">Ir a la comunidad</a>' : 'No está disponible' ?></td>
                                     <td>
                                         <a href="/dev/panel/games/<?=$game->id?>/store/" class="btn btn-primary">Editar tienda</a>
                                         <a href="/dev/panel/games/<?=$game->id?>/community/" class="btn btn-warning">Editar comunidad</a>

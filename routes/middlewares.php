@@ -50,12 +50,12 @@ $router->before('GET|POST', '/stripe(/.*)?', function() {
 
         $user = User::getById($_SESSION['user']['id']);
         if(is_null($user)){
-            header('location: /');
+            header('location: /login');
             exit();
         }
     }
     else {
-        header('location: /');
+        header('location: /login');
         exit();
     }
 });

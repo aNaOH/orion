@@ -3,7 +3,7 @@
 $title = "Comunidades en Orion";
 
 $GLOBALS['games'] = Game::all();
-$GLOBALS['randomGames'] = Game::pickRandom(5);
+$GLOBALS['randomGames'] = Game::pickRandom(4);
 
 function showPage() {
     global $games;
@@ -15,7 +15,7 @@ function showPage() {
     <section id="hero" class="bg-brand-500 text-white py-20">
     <div class="container mx-auto text-center">
         <h2 class="text-4xl md:text-5xl font-bold animate__animated animate__fadeInDown">Tienda</h2>
-        <p class="text-lg md:text-xl mt-4">Explora y únete a comunidades apasionadas por los videojuegos.</p>
+        <p class="text-lg md:text-xl mt-4">¡Descubre tu próximo videojuego!</p>
     </div>
     </section><!-- /Hero Section -->
 

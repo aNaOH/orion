@@ -2,6 +2,7 @@
 
 require_once './models/Badge.php';
 require_once './models/Developer.php';
+require_once './models/Game.php';
 
 class User {
     public static string $table = 'users';
@@ -175,6 +176,51 @@ class User {
         }
 
         return false;
+    }
+
+    public function adquireGame(Game|int $game, $checkoutID, &$errorReason = ""): bool {
+        if($this->hasAdquiredGame($game)){
+            $errorReason = "Juego ya adquirido";
+            return false;
+        }
+        $gameId = $game instanceof Game ? $game->id : $game;
+        
+        if(!Connection::doInsert(ORION_DB, "owns", ["game_id" => $gameId, "user_id" => $this->id, "checkout_id" => $checkoutID])) {
+            $errorReason = "Fallo en la inserción en la base de datos";
+            return false;
+        }
+        return true;
+    }
+
+    public function hasAdquiredGame(Game|int $game, &$checkoutID = null): bool {
+        if(!($game instanceof Game)){
+            $game = Game::getById($game);
+        }
+
+        if($game->getDeveloper() == $this->getDeveloperInfo()) return true;
+        $select = Connection::doSelect(ORION_DB, "owns", ["game_id" => $game->id, "user_id" => $this->id]);
+        
+        if (count($select) === 1) {
+            $checkoutID = $select[0]['checkout_id'];
+            return true;
+        }
+        return false;
+    }
+
+    public function getAdquiredGames($addDev = true): array {
+        if($addDev && !is_null($this->getDeveloperInfo())){
+            $games = $this->getDeveloperInfo()->getGames();
+        } else {
+            $games = [];
+        }
+
+        $select = Connection::doSelect(ORION_DB, "owns", ["user_id" => $this->id]);
+        
+        foreach ($select as $gameRow) {
+            $games[] = Game::getById($gameRow['game_id']);
+        }
+
+        return $games;
     }
 
     // Relationship with Badge

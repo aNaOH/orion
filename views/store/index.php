@@ -1,91 +1,83 @@
 <?php
 
-$title = "Comunidad de $game->title en Orion";
+$title = $game->title." | Orion Store";
+
+function getBuyWidget($game){
+    if(isset($_SESSION['user'])) {
+        $user = User::getById($_SESSION['user']['id']);
+
+        if(!is_null($user)){
+            if($user->hasAdquiredGame($game)) { ?>
+                <p class="text-lg text-gray-200">Ya tienes este juego</p>
+                <a href="/library#game<?= $game->id ?>" class="text-lg font-bold text-gray-200 rounded-xl p-2 bg-alt hover:bg-alt-600 transition-colors duration-300">
+                    Ver en la biblioteca
+                </a>
+            <?php } else { ?>
+                <p class="text-lg text-gray-200"><?= $game->base_price > 0 ? strval($game->base_price) . ' €' : 'Gratis' ?> </p>
+                <a href="/stripe/game/<?= $game->id ?>" class="text-lg font-bold text-gray-200 rounded-xl p-2 bg-alt hover:bg-alt-600 transition-colors duration-300">
+                    <?= $game->base_price > 0 ? 'COMPRAR' : 'OBTENER' ?>
+                </a>
+            <?php }
+        } else { ?>
+            <script>
+                location.href = '/logout?to=login';
+            </script>
+        <?php }
+    } else { ?>
+        <p class="text-lg text-gray-200"><?= $game->base_price > 0 ? strval($game->base_price) . ' €' : 'Gratis' ?> </p>
+        <a href="/login" class="text-lg font-bold text-gray-200 rounded-xl p-2 bg-alt hover:bg-alt-600 transition-colors duration-300">
+            <?= 'Inicia sesión para '.($game->base_price > 0 ? 'comprarlo' : 'obtenerlo') ?>
+        </a>
+        <?php }
+}
 
 function showPage() {
-    global $game;
+
+  global $game;
     ?>
 
-    <!-- Hero Section -->
-    <section id="hero" class="bg-brand-500 text-white py-20">
-    <div class="container mx-auto text-center">
-        <h2 class="text-4xl md:text-5xl font-bold animate__animated animate__fadeInDown"><?= $game->title ?></h2>
-        <p class="text-lg md:text-xl mt-4">Explora y contribuye al contenido creado por la comunidad de este juego.</p>
-        <div class="flex justify-center gap-6 mt-6">
-        <a href="/communities/<?= $game->id ?>/posts" class="px-6 py-3 bg-alt text-white font-semibold rounded-lg shadow-md hover:bg-alt-400 transition animate__animated animate__fadeInUp">
-            Posts
-        </a>
-        <a href="/communities/<?= $game->id ?>/gallery" class="px-6 py-3 bg-alt text-white font-semibold rounded-lg shadow-md hover:bg-alt-400 transition animate__animated animate__fadeInUp">
-            Galería
-        </a>
-        <a href="/communities/<?= $game->id ?>/guides" class="px-6 py-3 bg-alt text-white font-semibold rounded-lg shadow-md hover:bg-alt-400 transition animate__animated animate__fadeInUp">
-            Guías
-        </a>
+    <!-- Store Page -->
+    <section id="store" class="py-20">
+        <h1 class="text-2xl font-bold text-gray-200 mx-auto max-w-4xl mb-3"><?= $game->title ?></h1>
+      <div class="container mx-auto max-w-4xl bg-branddark shadow-lg rounded-lg p-8">
+        <!-- Header -->
+        <div class="flex">
+          <div class="text-left flex-1">
+            <img class="aspect-[2.14/1] h-[65%] rounded-md shadow-lg" src="/media/game/thumb/<?= $game->id ?>" alt="<?= $game->title ?> thumbnail">
+            <p class="text-lg text-gray-200"><?= $game->short_description ?? 'No hay información' ?></p>
+          </div>
+          <div class="flex-1 flex flex-col gap-2 content-between">
+            <div class="flex flex-row gap-2 items-center mx-auto">
+                <?php getBuyWidget($game); ?>
+            </div>
+            <div class="text-center flex flex-row">
+                <div class="flex-1 flex flex-col">
+                    <p class="text-lg font-bold text-gray-200">DESARROLLADOR</p>
+                    <p class="text-md text-gray-400"><?= $game->as_editor ? $game->developer_name : $game->getDeveloper()->name; ?></p>
+                </div>
+            <?php if($game->as_editor) { ?>
+                <div class="flex-1 flex flex-col">
+                    <p class="text-lg font-bold text-gray-200">EDITOR</p>
+                    <p class="text-md text-gray-400"><?= $game->getDeveloper()->name; ?></p>
+                </div>
+            <?php } ?>
+            </div>
+          </div>
         </div>
-    </div>
-    </section><!-- /Hero Section -->
-
-    <!-- Features Section -->
-    <section id="features" class="py-20">
-    <div class="container mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-        <!-- Últimos posts -->
-        <div class="bg-brand-600 shadow-lg rounded-lg p-6">
-            <div class="text-center mb-4">
-            <h3 class="text-2xl text-gray-200 font-semibold text-brand-500">Últimos posts</h3>
-            <p class="text-gray-200 text-sm">Descubre lo que la comunidad está compartiendo sobre este juego.</p>
-            </div>
-            <div class="space-y-2">
-            <!-- Aquí puedes agregar dinámicamente los posts -->
-            <p class="text-gray-200">- Post 1: Descripción breve...</p>
-            <p class="text-gray-200">- Post 2: Descripción breve...</p>
-            </div>
-            <div class="text-center mt-4">
-            <a href="/communities/<?= $game->id ?>/posts" class="text-alt-500 font-medium hover:text-alt-700 transition">
-                Ver más...
-            </a>
-            </div>
+        
+        <!-- Store Details -->
+        <div>
+          <div class="bg-brand-900 rounded-lg p-6 shadow-sm">
+              <div id="description container mx-auto p-6">
+                <?php
+                $Parsedown = new TailwindParsedown();
+                echo $Parsedown->text($game->description ?? '### No hay descripción');
+                ?>
+              </div>
+          </div>
         </div>
-
-        <!-- Galería -->
-        <div class="bg-brand-600 shadow-lg rounded-lg p-6">
-            <div class="text-center mb-4">
-            <h3 class="text-2xl text-gray-200 font-semibold text-brand-500">Galería</h3>
-            <p class="text-gray-200 text-sm">Explora imágenes y contenido visual creado por la comunidad.</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-            <!-- Aquí puedes agregar imágenes dinámicas -->
-            <img src="/path-to-image1.jpg" alt="Imagen 1" class="rounded-lg shadow-sm">
-            <img src="/path-to-image2.jpg" alt="Imagen 2" class="rounded-lg shadow-sm">
-            </div>
-            <div class="text-center mt-4">
-            <a href="/communities/<?= $game->id ?>/gallery" class="text-alt-500 font-medium hover:text-alt-700 transition">
-                Ver más...
-            </a>
-            </div>
-        </div>
-
-        <!-- Últimas guías -->
-        <div class="bg-brand-600 shadow-lg rounded-lg p-6">
-            <div class="text-center mb-4">
-            <h3 class="text-2xl text-gray-200 font-semibold text-brand-500">Últimas guías</h3>
-            <p class="text-gray-200 text-sm">Consulta las mejores estrategias y tutoriales creados por jugadores.</p>
-            </div>
-            <div class="space-y-2">
-            <!-- Aquí puedes agregar dinámicamente las guías -->
-            <p class="text-gray-200">- Guía 1: Descripción breve...</p>
-            <p class="text-gray-200">- Guía 2: Descripción breve...</p>
-            </div>
-            <div class="text-center mt-4">
-            <a href="/communities/<?= $game->id ?>/guides" class="text-alt-500 font-medium hover:text-alt-700 transition">
-                Ver más...
-            </a>
-            </div>
-        </div>
-        </div>
-    </div>
-    </section><!-- /Features Section -->
-
+      </div>
+    </section>
 
 
     <?php

@@ -12,7 +12,7 @@ $router->mount('/store', function() use ($router) {
 
     $router->get("/(\d+)/", function($gameId) use ($router){
 
-        $result = GameController::openCommunity($gameId);
+        $result = GameController::openGame($gameId);
 
         if($result === false) $router->trigger404();
     });
