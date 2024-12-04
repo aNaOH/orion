@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS `builds` (
   `game_id` int NOT NULL,
   `file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `release_date` timestamp NOT NULL,
+  `release_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `FK_builds_game` (`game_id`),
   CONSTRAINT `FK_builds_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS `comments` (
   KEY `post_id` (`post_id`),
   CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`),
   CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS `developers` (
   PRIMARY KEY (`id`),
   KEY `owner_id` (`owner_id`),
   CONSTRAINT `developers_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -129,7 +129,7 @@ CREATE TABLE IF NOT EXISTS `game` (
   `short_description` varchar(255) DEFAULT NULL,
   `description` text,
   `launch_date` timestamp NULL DEFAULT NULL,
-  `original_launch_date` date NULL DEFAULT NULL,
+  `original_launch_date` date DEFAULT NULL,
   `base_price` float DEFAULT NULL,
   `discount` float DEFAULT NULL,
   `as_editor` tinyint(1) NOT NULL DEFAULT '0',
@@ -139,7 +139,7 @@ CREATE TABLE IF NOT EXISTS `game` (
   PRIMARY KEY (`id`),
   KEY `fk_developer_id` (`developer_id`),
   CONSTRAINT `fk_developer_id` FOREIGN KEY (`developer_id`) REFERENCES `developers` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -183,8 +183,7 @@ CREATE TABLE IF NOT EXISTS `leaderboards` (
 CREATE TABLE IF NOT EXISTS `owns` (
   `user_id` int NOT NULL,
   `game_id` int NOT NULL,
-  `base_price` float NOT NULL,
-  `discount` float NOT NULL,
+  `checkout_id` text NOT NULL,
   KEY `user_id` (`user_id`),
   KEY `game_id` (`game_id`),
   CONSTRAINT `owns_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
@@ -209,7 +208,7 @@ CREATE TABLE IF NOT EXISTS `posts` (
   KEY `author_id` (`author_id`),
   CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`),
   CONSTRAINT `posts_ibfk_2` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -242,7 +241,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   UNIQUE KEY `email` (`email`),
   KEY `fk_badge_id` (`badge_id`),
   CONSTRAINT `fk_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- La exportación de datos fue deseleccionada.
 
@@ -256,6 +255,9 @@ CREATE TABLE IF NOT EXISTS `votes` (
   CONSTRAINT `votes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   CONSTRAINT `votes_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO `users` (`id`, `email`, `username`, `password`, `birthdate`, `role`, `profile_pic`, `motd`, `badge_id`, `created_at`) VALUES
+	(1, 'admin@togetheronorion.com', 'Orion', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '2004-11-28', 1, 'czNVL0pobW53cWxmSTU4Y1RtOWhyUT09', 'Orion\'s official account', NULL, '2024-10-30 15:24:12'),
 
 -- La exportación de datos fue deseleccionada.
 
