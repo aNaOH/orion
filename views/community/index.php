@@ -25,69 +25,6 @@ function showPage() {
     </div>
     </section><!-- /Hero Section -->
 
-    <!-- Features Section -->
-    <section id="features" class="py-20">
-    <div class="container mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
-        <!-- Últimos posts -->
-        <div class="bg-brand-600 shadow-lg rounded-lg p-6">
-            <div class="text-center mb-4">
-            <h3 class="text-2xl text-gray-200 font-semibold text-brand-500">Últimos posts</h3>
-            <p class="text-gray-200 text-sm">Descubre lo que la comunidad está compartiendo sobre este juego.</p>
-            </div>
-            <div class="space-y-2">
-            <!-- Aquí puedes agregar dinámicamente los posts -->
-            <p class="text-gray-200">- Post 1: Descripción breve...</p>
-            <p class="text-gray-200">- Post 2: Descripción breve...</p>
-            </div>
-            <div class="text-center mt-4">
-            <a href="/communities/<?= $game->id ?>/posts" class="text-alt-500 font-medium hover:text-alt-700 transition">
-                Ver más...
-            </a>
-            </div>
-        </div>
-
-        <!-- Galería -->
-        <div class="bg-brand-600 shadow-lg rounded-lg p-6">
-            <div class="text-center mb-4">
-            <h3 class="text-2xl text-gray-200 font-semibold text-brand-500">Galería</h3>
-            <p class="text-gray-200 text-sm">Explora imágenes y contenido visual creado por la comunidad.</p>
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-            <!-- Aquí puedes agregar imágenes dinámicas -->
-            <img src="/path-to-image1.jpg" alt="Imagen 1" class="rounded-lg shadow-sm">
-            <img src="/path-to-image2.jpg" alt="Imagen 2" class="rounded-lg shadow-sm">
-            </div>
-            <div class="text-center mt-4">
-            <a href="/communities/<?= $game->id ?>/gallery" class="text-alt-500 font-medium hover:text-alt-700 transition">
-                Ver más...
-            </a>
-            </div>
-        </div>
-
-        <!-- Últimas guías -->
-        <div class="bg-brand-600 shadow-lg rounded-lg p-6">
-            <div class="text-center mb-4">
-            <h3 class="text-2xl text-gray-200 font-semibold text-brand-500">Últimas guías</h3>
-            <p class="text-gray-200 text-sm">Consulta las mejores estrategias y tutoriales creados por jugadores.</p>
-            </div>
-            <div class="space-y-2">
-            <!-- Aquí puedes agregar dinámicamente las guías -->
-            <p class="text-gray-200">- Guía 1: Descripción breve...</p>
-            <p class="text-gray-200">- Guía 2: Descripción breve...</p>
-            </div>
-            <div class="text-center mt-4">
-            <a href="/communities/<?= $game->id ?>/guides" class="text-alt-500 font-medium hover:text-alt-700 transition">
-                Ver más...
-            </a>
-            </div>
-        </div>
-        </div>
-    </div>
-    </section><!-- /Features Section -->
-
-
-
     <?php
 }
 

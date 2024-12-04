@@ -23,7 +23,7 @@ function showPage() {
         <!-- Título -->
         <div>
             <label for="title" class="block text-sm font-medium text-gray-200">Título</label>
-            <input class="form-control block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200"
+            <input class="form-control block w-full p-4 border border-gray-300 text-brand rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200"
                 id="title" name="title" type="text" placeholder="Título" required />
             <div id="titleError" class="text-sm text-red-500 mt-2 hidden"></div>
         </div>
