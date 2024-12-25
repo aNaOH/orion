@@ -377,4 +377,25 @@ class User {
 
         return $count[0];
     }
+
+    public static function all(): array {
+        $select = Connection::doSelect(ORION_DB, self::$table);
+        $users = [];
+        foreach ($select as $user) {
+            $users[] = new User(
+                $user['email'],
+                $user['username'],
+                $user['password'],
+                $user['birthdate'],
+                $user['role'],
+                $user['profile_pic'],
+                $user['motd'],
+                $user['badge_id'],
+                $user['id'],
+                $user['created_at'],
+                $user['is_archived']
+            );
+        }
+        return $users;
+    }
 }

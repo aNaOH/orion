@@ -66,9 +66,22 @@ class Badge {
         if (!isset($this->id) || !self::getById($this->id)) {
             $result = Connection::doInsert(ORION_DB, self::$table, $data);
             $this->id = ORION_DB->lastInsertId();
+            $this->checkForUsersWithAllAchievements();
             return (bool)$result;
         } else {
             return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
+        }
+    }
+
+    private function checkForUsersWithAllAchievements(): void {
+        $allAchievements = Achievement::getAllByGame($this->game_id);
+        $users = User::all();
+
+        foreach ($users as $user) {
+            $unlockedAchievements = $user->getUnlockedAchievements();
+            if (count($allAchievements) === count($unlockedAchievements)) {
+                $user->unlockBadge($this);
+            }
         }
     }
 
