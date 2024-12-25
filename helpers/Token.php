@@ -111,3 +111,34 @@ class UserActionToken {
             );
     }
 }
+
+class UserLibraryToken {
+    private static $magicWord = 'orionuserlibrary';
+
+    public static function createToken(int $userId, int $gameId): string {
+        return Tript::encryptString(self::$magicWord . '_' . $userId . '_' . $gameId);
+    }
+
+    public static function validateToken(string $token): bool {
+        $parsedToken = Tript::decryptString($token);
+        $tokenParts = explode('_', $parsedToken);
+
+        return self::validationRules($tokenParts);
+    }
+
+    private static function validationRules(array $tokenParts): bool {
+        if ($tokenParts[0] !== self::$magicWord) {
+            return false;
+        }
+
+        $userId = intval($tokenParts[1]);
+        $gameId = intval($tokenParts[2]);
+
+        $user = User::getById($userId);
+        if (!$user || !$user->hasAdquiredGame($gameId)) {
+            return false;
+        }
+
+        return true;
+    }
+}
