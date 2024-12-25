@@ -19,7 +19,7 @@ function showPage() {
           </div>
           <!-- User Info -->
           <div>
-            <h1 class="text-4xl font-bold text-gray-200"><?= $user->username ?></h1>
+            <h1 class="text-4xl font-bold text-gray-200"><?= $user->username ?> <span class="text-2xl font-normal text-gray-400"><?=$user->getHandle()?></span></h1>
             <p class="text-gray-400 text-lg"><?= $user->motd ?? 'Sin mensaje personalizado.' ?></p>
             <?php if (isset($is_self) && $is_self) { ?>
               <div class="mt-6">
