@@ -14,8 +14,9 @@ class Achievement {
     public ?int $game_id;
     public EACHIEVEMENT_TYPE $type;
     public ?int $stat_id;
+    public ?int $stat_value;
 
-    public function __construct(int $id, string $name, string $description, string $icon, ?string $locked_icon, bool $secret, ?int $game_id, EACHIEVEMENT_TYPE|int $type, ?int $stat_id = null) {
+    public function __construct(int $id, string $name, string $description, string $icon, ?string $locked_icon, bool $secret, ?int $game_id, EACHIEVEMENT_TYPE|int $type, ?int $stat_id = null, ?int $stat_value = null) {
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
@@ -25,6 +26,7 @@ class Achievement {
         $this->game_id = $game_id;
         $this->type = is_numeric($type) ? EACHIEVEMENT_TYPE::from($type) : $type;
         $this->stat_id = $stat_id;
+        $this->stat_value = $stat_value;
     }
 
     public static function getById(int $id): ?Achievement {
@@ -40,10 +42,21 @@ class Achievement {
                 $achievement[0]['secret'],
                 $achievement[0]['game_id'],
                 EACHIEVEMENT_TYPE::from($achievement[0]['type']),
-                $achievement[0]['stat_id']
+                $achievement[0]['stat_id'],
+                $achievement[0]['stat_value']
             );
         }
         return null;
+    }
+
+    public static function getAllByStat(int $statId): array {
+        $achievements = [];
+        $select = Connection::doSelect(ORION_DB, self::$table, ["stat_id" => $statId]);
+
+        foreach ($select as $achievementRow) {
+            $achievements[] = Achievement::getById($achievementRow['id']);
+        }
+        return $achievements;
     }
 
     public function save(): bool {
@@ -56,6 +69,7 @@ class Achievement {
             'game_id' => $this->game_id,
             'type' => $this->type->value,
             'stat_id' => $this->stat_id,
+            'stat_value' => $this->stat_value,
         ];
 
         if (!isset($this->id) || !self::getById($this->id)) {

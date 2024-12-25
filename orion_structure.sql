@@ -119,6 +119,7 @@ CREATE TABLE IF NOT EXISTS `achievements` (
   `game_id` int DEFAULT NULL,
   `type` int NOT NULL,
   `stat_id` int DEFAULT NULL,
+  `stat_value` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `game_id` (`game_id`),
   KEY `stat_id` (`stat_id`),
