@@ -21,6 +21,9 @@ class TestEmail extends Email {
 
     protected function formatBody(string $content): string {
         $styles = file_get_contents(__DIR__ . '/email.css');
-        return "<html><head><style>{$styles}</style></head><body>{$content}</body></html>";
+        $fontStyles = '
+            <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Lexend:wght@100..900&display=swap" rel="stylesheet">
+        ';
+        return "<html><head>{$fontStyles}<style>{$styles}</style></head><body>{$content}</body></html>";
     }
 }
