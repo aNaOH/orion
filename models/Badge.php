@@ -39,6 +39,21 @@ class Badge {
         return null;
     }
 
+    // Get by Game
+    public static function getByGame(int $gameId): ?Badge {
+        $badge = Connection::doSelect(ORION_DB, self::$table, ["game_id" => $gameId]);
+        if (count($badge) === 1) {
+            return new Badge(
+                $badge[0]['name'],
+                $badge[0]['description'],
+                $badge[0]['icon'],
+                $badge[0]['game_id'],
+                $badge[0]['id']
+            );
+        }
+        return null;
+    }
+
     // Save badge
     public function save(): bool {
         $data = [

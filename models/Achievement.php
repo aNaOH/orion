@@ -59,6 +59,27 @@ class Achievement {
         return $achievements;
     }
 
+    public static function getAllByGame(int $gameId): array {
+        $achievements = [];
+        $select = Connection::doSelect(ORION_DB, self::$table, ["game_id" => $gameId]);
+
+        foreach ($select as $achievementRow) {
+            $achievements[] = new Achievement(
+                $achievementRow['id'],
+                $achievementRow['name'],
+                $achievementRow['description'],
+                $achievementRow['icon'],
+                $achievementRow['locked_icon'],
+                $achievementRow['secret'],
+                $achievementRow['game_id'],
+                EACHIEVEMENT_TYPE::from($achievementRow['type']),
+                $achievementRow['stat_id'],
+                $achievementRow['stat_value']
+            );
+        }
+        return $achievements;
+    }
+
     public function save(): bool {
         $data = [
             'name' => $this->name,

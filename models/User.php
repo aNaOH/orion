@@ -279,12 +279,28 @@ class User {
     public function unlockAchievement(Achievement|int $achievement): bool {
         $achievementId = $achievement instanceof Achievement ? $achievement->id : $achievement;
         if (!$this->hasUnlockedAchievement($achievementId)) {
-            return Connection::doInsert(ORION_DB, 'unlocks', [
+            if (Connection::doInsert(ORION_DB, 'unlocks', [
                 "achievement_id" => $achievementId,
                 "user_id" => $this->id
-            ]);
+            ])) {
+                $this->checkForAllAchievementsUnlocked();
+                return true;
+            }
         }
         return false;
+    }
+
+    private function checkForAllAchievementsUnlocked(): void {
+        $gameId = $this->getUnlockedAchievements()[0]->game_id;
+        $allAchievements = Achievement::getAllByGame($gameId);
+        $unlockedAchievements = $this->getUnlockedAchievements();
+
+        if (count($allAchievements) === count($unlockedAchievements)) {
+            $badge = Badge::getByGame($gameId);
+            if ($badge) {
+                $this->unlockBadge($badge);
+            }
+        }
     }
 
     public function hasUnlockedAchievement(Achievement|int $achievement, ?string &$dateUnlocked = null): bool {
