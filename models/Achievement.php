@@ -12,8 +12,10 @@ class Achievement {
     public ?string $locked_icon;
     public bool $secret;
     public ?int $game_id;
+    public EACHIEVEMENT_TYPE $type;
+    public ?int $stat_id;
 
-    public function __construct(int $id, string $name, string $description, string $icon, ?string $locked_icon, bool $secret, ?int $game_id) {
+    public function __construct(int $id, string $name, string $description, string $icon, ?string $locked_icon, bool $secret, ?int $game_id, EACHIEVEMENT_TYPE|int $type, ?int $stat_id = null) {
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
@@ -21,6 +23,8 @@ class Achievement {
         $this->locked_icon = $locked_icon;
         $this->secret = $secret;
         $this->game_id = $game_id;
+        $this->type = is_numeric($type) ? EACHIEVEMENT_TYPE::from($type) : $type;
+        $this->stat_id = $stat_id;
     }
 
     public static function getById(int $id): ?Achievement {
@@ -34,7 +38,9 @@ class Achievement {
                 $achievement[0]['icon'],
                 $achievement[0]['locked_icon'],
                 $achievement[0]['secret'],
-                $achievement[0]['game_id']
+                $achievement[0]['game_id'],
+                EACHIEVEMENT_TYPE::from($achievement[0]['type']),
+                $achievement[0]['stat_id']
             );
         }
         return null;
@@ -48,6 +54,8 @@ class Achievement {
             'locked_icon' => $this->locked_icon,
             'secret' => $this->secret,
             'game_id' => $this->game_id,
+            'type' => $this->type->value,
+            'stat_id' => $this->stat_id,
         ];
 
         if (!isset($this->id) || !self::getById($this->id)) {
@@ -66,5 +74,9 @@ class Achievement {
 
     public function getGame(): ?Game {
         return isset($this->game_id) ? Game::getById($this->game_id) : null;
+    }
+
+    public function getStat(): ?Stat {
+        return isset($this->stat_id) ? Stat::getById($this->stat_id) : null;
     }
 }

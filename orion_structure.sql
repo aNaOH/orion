@@ -117,9 +117,13 @@ CREATE TABLE IF NOT EXISTS `achievements` (
   `locked_icon` varchar(255) DEFAULT NULL,
   `secret` tinyint(1) DEFAULT '0',
   `game_id` int DEFAULT NULL,
+  `type` int NOT NULL,
+  `stat_id` int DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `game_id` (`game_id`),
-  CONSTRAINT `achievements_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+  KEY `stat_id` (`stat_id`),
+  CONSTRAINT `achievements_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `achievements_ibfk_2` FOREIGN KEY (`stat_id`) REFERENCES `stat` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando estructura para tabla orion.badge_unlocked

@@ -36,4 +36,9 @@ enum EBUCKET_LOCATION : string {
     case NONE = '';
 }
 
+enum EACHIEVEMENT_TYPE : int {
+    case TRIGGERED = 0;
+    case STAT = 1;
+}
+
 ?>
