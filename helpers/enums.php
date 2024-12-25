@@ -10,6 +10,7 @@ enum EPOST_TYPE : int {
     case POST = 0;
     case GALLERY = 1;
     case GUIDE = 2;
+    case GAME_NEWS = 3;
 }
 
 enum EUSER_TYPE : int {
@@ -17,7 +18,7 @@ enum EUSER_TYPE : int {
     case ADMIN = 1;
 }
 
-enum ELEADERBOARD_TYPE : int {
+enum ESTAT_TYPE : int {
     case INCREMENTAL = 0;
     case BEST = 1;
 }

@@ -17,6 +17,7 @@ class User {
     public ?string $motd;
     public ?int $badge;
     public ?string $created_at;
+    public bool $is_archived;
 
     // Constructor
     public function __construct(
@@ -29,7 +30,8 @@ class User {
         ?string $motd = null, 
         ?int $badge = null, 
         ?int $id = null,
-        ?string $created_at = null
+        ?string $created_at = null,
+        bool $is_archived = false
     ) {
         $this->role = is_numeric($role) ? EUSER_TYPE::from($role) : $role;
         $this->email = $email;
@@ -41,6 +43,7 @@ class User {
         $this->badge = $badge;
         $this->id = $id;
         $this->created_at = $created_at;
+        $this->is_archived = $is_archived;
     }
 
     // Get by ID
@@ -58,7 +61,8 @@ class User {
                 $user[0]['motd'], 
                 $user[0]['badge_id'], 
                 $user[0]['id'],
-                $user[0]['created_at']
+                $user[0]['created_at'],
+                $user[0]['is_archived']
             );
         }
         return null;
@@ -78,7 +82,8 @@ class User {
                 $user[0]['motd'], 
                 $user[0]['badge_id'], 
                 $user[0]['id'],
-                $user[0]['created_at']
+                $user[0]['created_at'],
+                $user[0]['is_archived']
             );
         }
         return null;
@@ -113,7 +118,8 @@ class User {
                 $user[0]['motd'], 
                 $user[0]['badge_id'], 
                 $user[0]['id'],
-                $user[0]['created_at']
+                $user[0]['created_at'],
+                $user[0]['is_archived']
             );
             return $userObj->getHandle() === $handle ? $userObj : null;
         }
@@ -130,6 +136,7 @@ class User {
             'profile_pic' => $this->profile_pic,
             'motd' => $this->motd,
             'badge_id' => $this->badge,
+            'is_archived' => $this->is_archived,
         ];
 
         if (!isset($this->id) || !self::getById($this->id)) {
@@ -268,6 +275,78 @@ class User {
         return false;
     }
 
+    // Relationship with Achievement
+    public function unlockAchievement(Achievement|int $achievement): bool {
+        $achievementId = $achievement instanceof Achievement ? $achievement->id : $achievement;
+        if (!$this->hasUnlockedAchievement($achievementId)) {
+            return Connection::doInsert(ORION_DB, 'unlocks', [
+                "achievement_id" => $achievementId,
+                "user_id" => $this->id
+            ]);
+        }
+        return false;
+    }
+
+    public function hasUnlockedAchievement(Achievement|int $achievement, ?string &$dateUnlocked = null): bool {
+        $achievementId = $achievement instanceof Achievement ? $achievement->id : $achievement;
+        $select = Connection::doSelect(ORION_DB, "unlocks", ["achievement_id" => $achievementId, "user_id" => $this->id]);
+
+        if (count($select) === 1) {
+            $dateUnlocked = $select[0]['date'];
+            return true;
+        }
+        return false;
+    }
+
+    public function getUnlockedAchievements(): array {
+        $achievements = [];
+        $select = Connection::doSelect(ORION_DB, "unlocks", ["user_id" => $this->id]);
+
+        foreach ($select as $achievementRow) {
+            $achievements[] = Achievement::getById($achievementRow['achievement_id']);
+        }
+        return $achievements;
+    }
+
+    public function getUnlockedAchievementDate(Achievement|int $achievement): ?string {
+        $achievementId = $achievement instanceof Achievement ? $achievement->id : $achievement;
+        $select = Connection::doSelect(ORION_DB, "unlocks", ["achievement_id" => $achievementId, "user_id" => $this->id]);
+
+        return count($select) === 1 ? $select[0]['date'] : null;
+    }
+
+    // Relationship with Stat
+    public function updateStat(Stat|int $stat, int $value): bool {
+        $statId = $stat instanceof Stat ? $stat->id : $stat;
+        $currentValue = $this->getStatValue($statId);
+
+        if ($stat instanceof Stat && $stat->type === ESTAT_TYPE::BEST) {
+            if ($currentValue !== null && $value <= $currentValue) {
+                return false;
+            }
+        }
+
+        if ($this->hasStat($statId)) {
+            return (bool)Connection::doUpdate(ORION_DB, 'has_stat', ['value' => $value], ['user_id' => $this->id, 'stat_id' => $statId]);
+        } else {
+            return (bool)Connection::doInsert(ORION_DB, 'has_stat', ['user_id' => $this->id, 'stat_id' => $statId, 'value' => $value]);
+        }
+    }
+
+    public function hasStat(Stat|int $stat): bool {
+        $statId = $stat instanceof Stat ? $stat->id : $stat;
+        $select = Connection::doSelect(ORION_DB, "has_stat", ["stat_id" => $statId, "user_id" => $this->id]);
+
+        return count($select) === 1;
+    }
+
+    public function getStatValue(Stat|int $stat): ?int {
+        $statId = $stat instanceof Stat ? $stat->id : $stat;
+        $select = Connection::doSelect(ORION_DB, "has_stat", ["stat_id" => $statId, "user_id" => $this->id]);
+
+        return count($select) === 1 ? $select[0]['value'] : null;
+    }
+    
     // Auth related
     public function toSessionArray(): array {
         return isset($this->id) ? [
