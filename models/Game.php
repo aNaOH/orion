@@ -17,6 +17,7 @@ class Game {
     public bool $is_public;
     public ?string $developer_name;
     public int $developer_id;
+    public ?int $genre_id;
 
     public function __construct(
         string $title,
@@ -29,6 +30,7 @@ class Game {
         bool $is_public,
         ?string $developer_name,
         int $developer_id,
+        ?int $genre_id = null,
         ?int $id = null
     ) {
         $this->title = $title;
@@ -41,6 +43,7 @@ class Game {
         $this->is_public = $is_public;
         $this->developer_name = $developer_name;
         $this->developer_id = $developer_id;
+        $this->genre_id = $genre_id;
         $this->id = $id;
     }
 
@@ -55,7 +58,8 @@ class Game {
             'as_editor' => $this->as_editor ? 1 : 0,
             'is_public' => $this->is_public ? 1 : 0,
             'developer_name' => $this->developer_name,
-            'developer_id' => $this->developer_id
+            'developer_id' => $this->developer_id,
+            'genre_id' => $this->genre_id
         ];
 
         if (!isset($this->id) || !self::getById($this->id)) {
@@ -82,6 +86,7 @@ class Game {
                 $game['is_public'] == 1,
                 $game['developer_name'],
                 $game['developer_id'],
+                $game['genre_id'],
                 $game['id']
             );
         }
@@ -102,6 +107,7 @@ class Game {
                 $game[0]['is_public'] == 1,
                 $game[0]['developer_name'],
                 $game[0]['developer_id'],
+                $game[0]['genre_id'],
                 $game[0]['id']
             );
         }
@@ -135,6 +141,7 @@ class Game {
                 $game['is_public'] == 1,
                 $game['developer_name'],
                 $game['developer_id'],
+                $game['genre_id'],
                 $game['id']
             );
         }
@@ -151,5 +158,9 @@ class Game {
 
     public function getLatestBuild(){
         return Build::getLatestForGame($this);
+    }
+
+    public function getGenre(): ?GameGenre {
+        return isset($this->genre_id) ? GameGenre::getById($this->genre_id) : null;
     }
 }

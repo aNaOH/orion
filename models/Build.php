@@ -9,6 +9,7 @@ class Build {
     private ?string $file;
     public string $version;
     public ?string $release_date;
+    public ?string $patch_notes;
 
     public static function get(Game|int $game, string $version){
 
@@ -24,6 +25,7 @@ class Build {
                 $build[0]['version'],
                 $build[0]['file'],
                 $build[0]['release_date'],
+                $build[0]['patch_notes']
             );
         }
         return null;
@@ -45,6 +47,7 @@ class Build {
                     $build['version'],
                     $build['file'],
                     $build['release_date'],
+                    $build['patch_notes']
                 );
             }
         }
@@ -62,16 +65,18 @@ class Build {
                 $build[0]['version'],
                 $build[0]['file'],
                 $build[0]['release_date'],
+                $build[0]['patch_notes']
             );
         }
         return null;
     }
 
-    public function __construct(int $game_id, string $version, string $file = null, string $release_date = null) {
+    public function __construct(int $game_id, string $version, string $file = null, string $release_date = null, string $patch_notes = null) {
         $this->game_id = $game_id;
         $this->file = $file;
         $this->version = $version;
         $this->release_date = $release_date;
+        $this->patch_notes = $patch_notes;
     }
 
     public function getParentGame() {
@@ -83,6 +88,7 @@ class Build {
             'game_id' => $this->game_id,
             'file' => $this->file,
             'version' => $this->version,
+            'patch_notes' => $this->patch_notes,
         ];
 
         if (!isset($this->release_date) || !self::get($this->game_id, $this->version)) {
