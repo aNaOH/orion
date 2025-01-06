@@ -2,6 +2,7 @@
 
 require_once './models/Developer.php';
 require_once './models/Build.php';
+require_once './models/GameGenre.php';
 
 class Game {
     public static string $table = 'game';

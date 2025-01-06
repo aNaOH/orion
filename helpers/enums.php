@@ -4,6 +4,8 @@ enum ETOKEN_TYPE : int {
     case COMMON = 0;
     case AUTHFORM = 1;
     case USERACTION = 2;
+    case USERLIBRARY = 3;
+    case DEVACTION = 4;
 }
 
 enum EPOST_TYPE : int {
