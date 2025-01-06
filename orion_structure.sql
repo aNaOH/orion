@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `is_archived` tinyint(1) DEFAULT '0',
   PRIMARY KEY (`id`),
   UNIQUE KEY `email` (`email`),
-  KEY `fk_badge_id` (`badge_id`),
+  KEY `fk_badge_id` (`badge_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- Volcando estructura para tabla orion.developers
@@ -202,7 +202,7 @@ CREATE TABLE IF NOT EXISTS `game_news_categories` (
 -- Volcando estructura para tabla orion.game_news
 CREATE TABLE IF NOT EXISTS `game_news` (
   `post_id` int NOT NULL,
-  `category_id` varchar(255) NOT NULL,
+  `category_id` int NOT NULL,
   PRIMARY KEY (`post_id`),
   CONSTRAINT `game_news_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `game_news_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `game_news_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
