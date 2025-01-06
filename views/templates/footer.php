@@ -9,7 +9,7 @@
 
         <!-- Quick Links Section -->
         <div>
-          <h2 class="text-2xl font-bold mb-4">Enlaces legales (en inglés)</h2>
+          <h2 class="text-2xl font-bold mb-4">Enlaces legales</h2>
           <ul class="space-y-2 text-lg">
             <li><a href="/legal/privacy" class="hover:text-alt-500">Política de privacidad</a></li>
             <li><a href="/legal/terms" class="hover:text-alt-500">Términos y condiciones</a></li>
