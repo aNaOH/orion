@@ -3,6 +3,9 @@
 require_once './models/Developer.php';
 require_once './models/Build.php';
 require_once './models/GameGenre.php';
+require_once './models/Achievement.php';
+require_once './models/Stat.php';
+require_once './models/Leaderboard.php';
 
 class Game {
     public static string $table = 'game';
@@ -163,5 +166,18 @@ class Game {
 
     public function getGenre(): ?GameGenre {
         return isset($this->genre_id) ? GameGenre::getById($this->genre_id) : null;
+    }
+
+    // Functions to get Achievements, Stats and Leaderboards
+    public function getAchievements(){
+        return Achievement::getAllByGame($this);
+    }
+
+    public function getStats(){
+        return Stat::getAllByGame($this);
+    }
+
+    public function getLeaderboards(){
+        return Leaderboard::getAllByGame($this);
     }
 }

@@ -59,9 +59,10 @@ class Achievement {
         return $achievements;
     }
 
-    public static function getAllByGame(int $gameId): array {
+    public static function getAllByGame(Game|int $game): array {
+        $game_id = $game instanceof Game ? $game->id : $game;
         $achievements = [];
-        $select = Connection::doSelect(ORION_DB, self::$table, ["game_id" => $gameId]);
+        $select = Connection::doSelect(ORION_DB, self::$table, ["game_id" => $game_id]);
 
         foreach ($select as $achievementRow) {
             $achievements[] = new Achievement(

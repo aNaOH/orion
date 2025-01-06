@@ -32,6 +32,22 @@ class Leaderboard {
         return null;
     }
 
+    public static function getAllByGame(Game|int $game): array {
+        $game_id = $game instanceof Game ? $game->id : $game;
+        $leaderboards = [];
+        $select = Connection::doSelect(ORION_DB, self::$table, ["game_id" => $game_id]);
+
+        foreach ($select as $leaderboardRow) {
+            $leaderboards[] = new Leaderboard(
+                $leaderboardRow['id'],
+                $leaderboardRow['concept'],
+                $leaderboardRow['game_id'],
+                $leaderboardRow['stat_id']
+            );
+        }
+        return $leaderboards;
+    }
+
     public function save(): bool {
         $data = [
             'concept' => $this->concept,

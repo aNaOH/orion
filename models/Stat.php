@@ -34,6 +34,23 @@ class Stat {
         return null;
     }
 
+    public static function getAllByGame(Game|int $game): array {
+        $game_id = $game instanceof Game ? $game->id : $game;
+        $stats = [];
+        $select = Connection::doSelect(ORION_DB, self::$table, ["game_id" => $game_id]);
+
+        foreach ($select as $statRow) {
+            $stats[] = new Stat(
+                $statRow['id'],
+                $statRow['game_id'],
+                $statRow['name'],
+                $statRow['number'],
+                ESTAT_TYPE::from($statRow['type'])
+            );
+        }
+        return $stats;
+    }
+
     public function save(): bool {
         $data = [
             'game_id' => $this->game_id,

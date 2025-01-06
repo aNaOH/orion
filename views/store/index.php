@@ -68,12 +68,34 @@ function showPage() {
         <!-- Store Details -->
         <div>
           <div class="bg-brand-900 rounded-lg p-6 shadow-sm">
-              <div id="description container mx-auto p-6">
-                <?php
-                $Parsedown = new TailwindParsedown();
-                echo $Parsedown->text($game->description ?? '### No hay descripción');
-                ?>
-              </div>
+            <div class="flex flex-row gap-4">
+                <div id="description container mx-auto p-6 flex-1">
+                    <?php
+                    $Parsedown = new TailwindParsedown();
+                    echo $Parsedown->text($game->description ?? '### No hay descripción');
+                    ?>
+                </div>
+                <?php if(sizeof($game->getAchievements()) > 0 || sizeof($game->getLeaderboards()) > 0 || sizeof($game->getStats()) > 0) { ?>
+                <div class="flex-[0.25]">
+                    <p class="text-lg font-bold text-gray-200">CARACTERÍSTICAS</p>
+                    <?php if(sizeof($game->getAchievements()) > 0) { ?>
+                        <div class="bg-brand rounded-lg">
+                            Logros
+                        </div>
+                    <?php } ?>
+                    <?php if(sizeof($game->getLeaderboards()) > 0) { ?>
+                        <div class="bg-brand rounded-lg">
+                            Tablas de clasificación
+                        </div>
+                    <?php } ?>
+                    <?php if(sizeof($game->getStats()) > 0) { ?>
+                        <div class="bg-brand rounded-lg">
+                            Estadísticas de juego
+                        </div>
+                    <?php } ?>
+                </div>
+                <?php } ?>
+            </div>
           </div>
         </div>
       </div>
