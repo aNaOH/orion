@@ -102,6 +102,8 @@ $router->mount('/api', function() use ($router) {
 
     include('routes/api/dev.php');
 
+    include('routes/api/library.php');
+
 });
 
 

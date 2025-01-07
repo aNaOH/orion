@@ -90,3 +90,14 @@ body {
     main {
     flex-grow: 1;
     }
+
+.library-game {
+    padding-left: 0rem;
+    border-left: solid 0rem transparent;
+    transition: padding-left 0.3s ease, border-left 0.3s ease;
+}
+
+.library-game.active {
+    padding-left: 1rem;
+    border-left: solid 0.2rem #DEAB18;
+}

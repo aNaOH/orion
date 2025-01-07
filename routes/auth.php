@@ -57,8 +57,6 @@ $router->get('/library', function(){
         header('location: /logout?to=login');
     }
 
-    $GLOBALS['games'] = $user->getAdquiredGames();
-
     include('views/auth/library.php');
 });
 
