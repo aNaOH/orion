@@ -76,7 +76,12 @@ $router->get('/library/{gameid}/{version}', function($gameid, $version) use ($ro
 
     if(!$user->hasAdquiredGame($game)) $router->trigger404();
 
-    $build = $game->getBuildVersion($version);
+    if($version == 'latest'){
+        $build = $game->getLatestBuild();
+    } else {
+        $build = $game->getBuildVersion($version);
+    }
+
     if(is_null($build)) $router->trigger404();
 
     $file = $build->getFile();

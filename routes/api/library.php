@@ -71,10 +71,21 @@ $router->mount('/library', function() use ($router) {
     
         $game = Game::getById($id);
 
+        $builds = $game->getBuilds();
+        $buildsArray = [];
+
+        foreach ($builds as $build) {
+            $buildsArray[] = [
+                'version' => $build->version,
+                'release_date' => $build->release_date,
+                'patch_notes' => $build->patch_notes
+            ];
+        }
+
         $response['data'] = [
             'id' => $game->id,
             'title' => $game->title,
-            'description' => $game->description,
+            'builds' => $buildsArray,
             'isDeveloper' => ($game->getDeveloper()->getOwner()->id == $user->id)
         ];
     

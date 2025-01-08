@@ -49,11 +49,11 @@ function showGamesOnLibrary(games) {
     // If there isn't an element with data-gameid with the query parameter as value, show the first game.
     if (games.length > 0) {
         $('#sidebar').show();
-        const queryParam = new URLSearchParams(window.location.search).get('game');
-        if (queryParam) {
-            const gameElement = $('[data-gameid="' + queryParam + '"]');
+        const gameSelectParam = new URLSearchParams(window.location.search).get('game');
+        if (gameSelectParam) {
+            const gameElement = $('[data-gameid="' + gameSelectParam + '"]');
             if (gameElement.length > 0) {
-                changeGameShown(queryParam[0]);
+                changeGameShown(parseInt(gameSelectParam));
             } else {
                 changeGameShown(games[0].id);
             }
@@ -95,9 +95,33 @@ function changeGameShown(id) {
 }
 
 function showGameInfo(game) {
+    console.log(game);
+
     $('#game-title').text(game.title);
-    $('#game-description').text(game.description);
     $('#game-image').attr('src', '/media/game/thumb/' + game.id);
-    //$('#game-link').attr('href', '/game/' + game.id);
+
+    $('#game-download').hide();
+    $('#no-download-avaliable').show();
+
+    // Parse build info
+    if(game.builds.length > 0) {
+        $('#game-download').show();
+        $('#no-download-avaliable').hide();
+        $('#version').empty();
+        $('#version').append('<option value="latest">Última versión</option>');
+        game.builds.forEach(build => {
+            const buildElement = `
+                <option value="${build.version}">${build.version}</option>
+            `;
+            $('#version').append(buildElement);
+        });
+    }
+
     $('#game-info').show();
+}
+
+function downloadGame() {
+    const gameId = $('[data-gameid].active').data('gameid');
+    const version = $('#version').val();
+    window.location.href = '/library/' + gameId + '/' + version;
 }

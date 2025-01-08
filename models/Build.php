@@ -34,9 +34,8 @@ class Build {
     public static function getByGame(Game|int $game){
 
         $game_id = $game instanceof Game ? $game->id : $game;
-        $buildDB = Connection::doSelect(ORION_DB, self::$table, [
-            "game_id" => $game_id
-        ]);
+        //Turn this into a custom query to use ORDER BY
+        $buildDB = Connection::customQuery(ORION_DB, "SELECT * FROM ".self::$table." WHERE game_id = ? ORDER BY release_date DESC",[$game_id])->fetchAll(PDO::FETCH_ASSOC);
 
         $builds = [];
 
