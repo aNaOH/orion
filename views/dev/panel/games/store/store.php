@@ -128,6 +128,10 @@ function showPage() {
                                         <label class="form-label d-block" for="thumbFile">Miniatura (Una imagen de 920x430)</label>
                                         <file-upload id="thumbFile" min-image-width="920" max-image-width="920" min-image-height="430" max-image-height="430"></file-upload>
                                     </div>
+                                    <div class="mb-3">
+                                        <label class="form-label d-block" for="iconFile">Icono del juego (Imagen, mínimo 64x64, máximo 256x256, cuadrada)</label>
+                                        <file-upload id="iconFile" min-image-width="64" max-image-width="256" min-image-height="64" max-image-height="256" image-aspect-ratio="1:1"></file-upload>
+                                    </div>
                                     <div class="d-grid">
                                         <button class="btn btn-primary btn-lg" id="submitButtonEdit" type="submit">Cambiar</button>
                                         <button class="btn btn-warning btn-lg" data-status="<?=$game->is_public ? 'public' : 'hidden'?>" id="changeVisibility"><?= $game->is_public ? 'Ocultar' : 'Publicar' ?></button>

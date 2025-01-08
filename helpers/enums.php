@@ -32,6 +32,7 @@ enum EBUCKET_LOCATION : string {
     case GUIDE_TYPE_ICON = 'community/guide/type/';
     case GAME_COVER = 'game/cover/';
     case GAME_THUMB = 'game/thumb/';
+    case GAME_ICON = 'game/icon/';
     case GAME_BADGE = 'game/badge/';
     case GAME_ACHIEVEMENT = 'game/achievement/';
     case GAME_BUILD = 'game/build/';

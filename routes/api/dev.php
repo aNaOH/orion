@@ -41,6 +41,7 @@ $router->mount('/dev', function() use ($router) {
 
         $cover = $_FILES['coverFile'] ?? null;
         $thumb = $_FILES['thumbFile'] ?? null;
+        $icon = $_FILES['iconFile'] ?? null;
 
         $game->title = $title;
         $game->short_description = $shortDescription;
@@ -58,6 +59,10 @@ $router->mount('/dev', function() use ($router) {
 
         if(!is_null($thumb)){
             S3Helper::upload(EBUCKET_LOCATION::GAME_THUMB, $game->id, null, $thumb['type'], $thumb['tmp_name']);
+        }
+
+        if(!is_null($icon)){
+            S3Helper::upload(EBUCKET_LOCATION::GAME_ICON, $game->id, null, $icon['type'], $icon['tmp_name']);
         }
 
         header('HTTP/1.1 200 OK');

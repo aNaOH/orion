@@ -56,6 +56,9 @@ $router->mount('/media', function() use ($router) {
             case 'thumb':
                 $bucketLocation = EBUCKET_LOCATION::GAME_THUMB;
                 break;
+            case 'icon':
+                $bucketLocation = EBUCKET_LOCATION::GAME_ICON;
+                break;
             case 'achievement':
                 $bucketLocation = EBUCKET_LOCATION::GAME_ACHIEVEMENT;
                 break;
@@ -67,7 +70,11 @@ $router->mount('/media', function() use ($router) {
         $img = S3Helper::retrieve($bucketLocation, $uuid);
 
         if(!isset($img)){
+            if($type == 'icon'){
+                $img = S3Helper::retrieve(EBUCKET_LOCATION::GAME_ICON, "default");
+            } else {
             $router->trigger404();
+            }
         }
 
         header('Content-Type: '.$img['type']); //Add JSON Header to all API routes

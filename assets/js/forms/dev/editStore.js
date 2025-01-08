@@ -79,6 +79,10 @@ formEdit.onsubmit = (e) => {
         formData.append("thumbFile", document.getElementById("thumbFile").getFileInput()[0]);
     }
 
+    if(document.getElementById("iconFile").getFileInput()){
+        formData.append("iconFile", document.getElementById("iconFile").getFileInput()[0]);
+    }
+
     submitEdit.classList.add("disabled");
 
     $.ajax({
