@@ -53,6 +53,9 @@ function showPage() {
                             </div>
                             <div id="game-details" class="flex-1">
                                 <h2 class="text-2xl">Novedades</h2>
+                                <div id="game-news" class="flex flex-col w-full gap-2">
+
+                                </div>
                             </div>
                         </div>
                     </div>

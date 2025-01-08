@@ -95,13 +95,13 @@ function changeGameShown(id) {
 }
 
 function showGameInfo(game) {
-    console.log(game);
-
     $('#game-title').text(game.title);
     $('#game-image').attr('src', '/media/game/thumb/' + game.id);
 
     $('#game-download').hide();
     $('#no-download-avaliable').show();
+
+    let gameNews = [];
 
     // Parse build info
     if(game.builds.length > 0) {
@@ -114,8 +114,35 @@ function showGameInfo(game) {
                 <option value="${build.version}">${build.version}</option>
             `;
             $('#version').append(buildElement);
+            gameNews.push(new News('Actualización ' + build.version, build.patchNotes, build.date, 'update'));
         });
     }
+
+    //Order gameNews by date
+    gameNews.sort((a, b) => {
+        return new Date(b.date) - new Date(a.date);
+    });
+    //Trim gameNews to 5 elements
+    gameNews = gameNews.slice(0, 5);
+    console.log(gameNews);
+
+    //Parse gameNews to HTML
+    $('#game-news').empty();
+    gameNews.forEach(news => {
+        let description;
+        if(news.newsType == 'update') {
+            description = news.description || 'Sin notas de parche';
+        } else {
+            description = news.description || 'Sin descripción';
+        }
+        const newsElement = `
+            <div class="bg-branddark p-2 rounded-lg shadow-lg">
+                <h3 class="text-xl">${news.title}</h3>
+                <p>${description}</p>
+            </div>
+        `;
+        $('#game-news').append(newsElement);
+    });
 
     $('#game-info').show();
 }
@@ -124,4 +151,13 @@ function downloadGame() {
     const gameId = $('[data-gameid].active').data('gameid');
     const version = $('#version').val();
     window.location.href = '/library/' + gameId + '/' + version;
+}
+
+class News {
+    constructor(title, description, date, newsType = 'news') {
+        this.title = title;
+        this.description = description;
+        this.date = date;
+        this.newsType = newsType;
+    }
 }

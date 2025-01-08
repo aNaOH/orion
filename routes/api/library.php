@@ -77,8 +77,8 @@ $router->mount('/library', function() use ($router) {
         foreach ($builds as $build) {
             $buildsArray[] = [
                 'version' => $build->version,
-                'release_date' => $build->release_date,
-                'patch_notes' => $build->patch_notes
+                'date' => $build->release_date,
+                'patchNotes' => $build->patch_notes
             ];
         }
 
