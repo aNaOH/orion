@@ -37,7 +37,8 @@ function showGamesOnLibrary(games) {
 
     games.forEach(game => {
         const gameElement = `
-            <div class="library-game cursor-pointer" data-gameid="${game.id}" ${game.isDeveloper ? 'data-isdev' : ''} onclick="changeGameShown(${game.id})">
+            <div class="library-game cursor-pointer flex flex-row gap-2 items-center" data-gameid="${game.id}" ${game.isDeveloper ? 'data-isdev' : ''} onclick="changeGameShown(${game.id})">
+                <img src="/media/game/icon/${game.id}" alt="${game.title}" class="w-5 h-5">
                 <h3 class="text-xl">${game.title}</h3>
             </div>
         `;
@@ -95,14 +96,19 @@ function changeGameShown(id) {
 }
 
 function showGameInfo(game) {
+    //Game basic info
     $('#game-title').text(game.title);
     $('#game-image').attr('src', '/media/game/thumb/' + game.id);
 
-    $('#game-download').hide();
-    $('#no-download-avaliable').show();
+    //Store and community links
+    $('#game-store-link').attr('href', '/store/' + game.id);
+    $('#game-community-link').attr('href', '/communities/' + game.id);
 
+    // Get builds and news
     let gameNews = [];
 
+    $('#game-download').hide();
+    $('#no-download-avaliable').show();
     // Parse build info
     if(game.builds.length > 0) {
         $('#game-download').show();

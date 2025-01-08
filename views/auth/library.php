@@ -47,8 +47,8 @@ function showPage() {
                                     <span class="text-lg">No hay descargas disponibles :(</span>
                                 </div>
                                 <div class="ml-auto flex flex-row gap-4 bg-branddark-600 p-3 rounded-md">
-                                    <a href="/store/" class="text-lg link-hover transition-all duration-[50ms]">Tienda</a>
-                                    <a href="/communities/" class="text-lg link-hover transition-all duration-[50ms]">Comunidad</a>
+                                    <a id="game-store-link" href="/store/" class="text-lg link-hover transition-all duration-[50ms]">Tienda</a>
+                                    <a id="game-community-link" href="/communities/" class="text-lg link-hover transition-all duration-[50ms]">Comunidad</a>
                                 </div>
                             </div>
                             <div id="game-details" class="flex-1">
