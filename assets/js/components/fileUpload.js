@@ -17,7 +17,9 @@ class FileUpload extends HTMLElement {
             'max-image-size',
             'max-video-size',
             'image-type',
-            'video-type'
+            'video-type',
+            'image-aspect-ratio',
+            'video-aspect-ratio'
         ];
     }
 
@@ -45,6 +47,8 @@ class FileUpload extends HTMLElement {
         this.maxVideoSize = this.getAttribute('max-video-size') || '5MB';
         this.imageType = this.getAttribute('image-type') || 'png,jpeg,webp';
         this.videoType = this.getAttribute('video-type') || 'mp4,webm';
+        this.imageAspectRatio = this.getAttribute('image-aspect-ratio') || 'any';
+        this.videoAspectRatio = this.getAttribute('video-aspect-ratio') || 'any';
     
         this.handleFileChange = this.handleFileChange.bind(this);
         this.handleDrop = this.handleDrop.bind(this);
@@ -142,12 +146,15 @@ class FileUpload extends HTMLElement {
     validateImage(file) {
         const img = new Image();
         img.onload = () => {
+          const aspectRatio = img.width / img.height;
           if (img.width < this.minImageWidth || img.width > this.maxImageWidth || img.height < this.minImageHeight || img.height > this.maxImageHeight) {
             this.displayError(`Las dimensiones de la imagen deben estar entre ${this.minImageWidth}x${this.minImageHeight} y ${this.maxImageWidth}x${this.maxImageHeight}`);
           } else if (file.size > this.parseSize(this.maxImageSize)) {
             this.displayError(`El archivo excede el tamaño máximo de ${this.maxImageSize}`);
           } else if (!this.isAcceptedImageType(file)) {
             this.displayError(`Tipo de imagen no permitido: ${file.type}`);
+          } else if (this.imageAspectRatio !== 'any' && !this.isAcceptedAspectRatio(aspectRatio, this.imageAspectRatio)) {
+            this.displayError(`La relación de aspecto de la imagen debe ser ${this.imageAspectRatio}`);
           } else {
             this.previewImage(file);
           }
@@ -164,12 +171,15 @@ class FileUpload extends HTMLElement {
     validateVideo(file) {
         const video = document.createElement('video');
         video.onloadedmetadata = () => {
+          const aspectRatio = video.videoWidth / video.videoHeight;
           if (video.videoWidth < this.minVideoWidth || video.videoWidth > this.maxVideoWidth || video.videoHeight < this.minVideoHeight || video.videoHeight > this.maxVideoHeight) {
             this.displayError(`Las dimensiones del video deben estar entre ${this.minVideoWidth}x${this.minVideoHeight} y ${this.maxVideoWidth}x${this.maxVideoHeight}`);
           } else if (file.size > this.parseSize(this.maxVideoSize)) {
             this.displayError(`El archivo excede el tamaño máximo de ${this.maxVideoSize}`);
           } else if (!this.isAcceptedVideoType(file)) {
             this.displayError(`Tipo de video no permitido: ${file.type}`);
+          } else if (this.videoAspectRatio !== 'any' && !this.isAcceptedAspectRatio(aspectRatio, this.videoAspectRatio)) {
+            this.displayError(`La relación de aspecto del video debe ser ${this.videoAspectRatio}`);
           } else {
             this.previewVideo(file);
           }
@@ -223,6 +233,12 @@ class FileUpload extends HTMLElement {
       videoElement.controls = true;
       videoElement.classList.add('preview');
       this.shadowRoot.querySelector('#preview-container').appendChild(videoElement);
+    }
+
+    isAcceptedAspectRatio(aspectRatio, acceptedAspectRatio) {
+        const [acceptedWidth, acceptedHeight] = acceptedAspectRatio.split(':').map(Number);
+        const acceptedRatio = acceptedWidth / acceptedHeight;
+        return Math.abs(aspectRatio - acceptedRatio) < 0.01; // Allow a small margin of error
     }
 
     getFileInput(){
