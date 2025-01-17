@@ -33,7 +33,7 @@ class OrionComponents {
         include 'components/GalleryEntry.php';
     }
 
-    public static function TokenInput(ETOKEN_TYPE $type){
+    public static function TokenInput(ETOKEN_TYPE $type, $params = []){
 
         $token = '';
 
@@ -48,6 +48,10 @@ class OrionComponents {
 
             case ETOKEN_TYPE::USERACTION:
                 $token = UserActionToken::createToken();
+                break;
+
+            case ETOKEN_TYPE::DEVACTION:
+                $token = DevActionToken::createToken($params['userID'], $params['gameID']);
                 break;
         }
 

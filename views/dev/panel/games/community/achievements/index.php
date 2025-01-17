@@ -55,8 +55,8 @@ function showPage() {
                                     <td><?= $achievement->type == EACHIEVEMENT_TYPE::TRIGGERED ? 'Por activación' : 'Por estadística' ?></td>
                                     <td><?= $achievement->type == EACHIEVEMENT_TYPE::STAT && !is_null($achievement->stat_id) ? $achievement->stat_id : 'No' ?></td>
                                     <td><?= $achievement->secret ? 'Si' : 'No' ?></td>
-                                    <td><?= $achievement->icon ?></td>
-                                    <td><?= $achievement->locked_icon ?></td>
+                                    <td><img src="/media/game/achievement/<?= $achievement->icon ?>" alt="Ícono para el logro de <?= $game->name ?> '<?= $achievement->name ?>'"></td>
+                                    <td><img src="/media/game/achievement/<?= $achievement->locked_icon ?>" alt="Ícono para el logro de <?= $game->name ?> '<?= $achievement->name ?>' bloqueado"></td>
                                     <td>
                                         <a href="/dev/panel/games/<?= $game->id ?>/community/achievements/<?=$achievement->id?>/edit/" class="btn btn-primary">Tienda</a>
                                         <a href="/dev/panel/games/<?=$game->id?>/community/achievements/<?=$achievement->id?>/delete/" class="btn btn-primary">Comunidad</a>

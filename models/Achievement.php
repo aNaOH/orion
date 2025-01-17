@@ -5,7 +5,7 @@ require_once "models/Game.php";
 class Achievement {
     public static string $table = 'achievements';
 
-    public int $id;
+    public ?int $id;
     public string $name;
     public string $description;
     public string $icon;
@@ -16,7 +16,7 @@ class Achievement {
     public ?int $stat_id;
     public ?int $stat_value;
 
-    public function __construct(int $id, string $name, string $description, string $icon, ?string $locked_icon, bool $secret, ?int $game_id, EACHIEVEMENT_TYPE|int $type, ?int $stat_id = null, ?int $stat_value = null) {
+    public function __construct(?int $id, string $name, string $description, string $icon, ?string $locked_icon, bool $secret, ?int $game_id, EACHIEVEMENT_TYPE|int $type, ?int $stat_id = null, ?int $stat_value = null) {
         $this->id = $id;
         $this->name = $name;
         $this->description = $description;
@@ -87,7 +87,7 @@ class Achievement {
             'description' => $this->description,
             'icon' => $this->icon,
             'locked_icon' => $this->locked_icon,
-            'secret' => $this->secret,
+            'secret' => intval($this->secret),
             'game_id' => $this->game_id,
             'type' => $this->type->value,
             'stat_id' => $this->stat_id,
