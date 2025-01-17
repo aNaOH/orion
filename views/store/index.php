@@ -76,21 +76,21 @@ function showPage() {
                     ?>
                 </div>
                 <?php if(sizeof($game->getAchievements()) > 0 || sizeof($game->getLeaderboards()) > 0 || sizeof($game->getStats()) > 0) { ?>
-                <div class="flex-[0.25]">
+                <div class="flex flex-col gap-2">
                     <p class="text-lg font-bold text-gray-200">CARACTERÍSTICAS</p>
                     <?php if(sizeof($game->getAchievements()) > 0) { ?>
-                        <div class="bg-brand rounded-lg">
-                            Logros
+                        <div class="bg-brand rounded-lg p-1">
+                            <i class="bi bi-trophy-fill"></i> Logros
                         </div>
                     <?php } ?>
                     <?php if(sizeof($game->getLeaderboards()) > 0) { ?>
-                        <div class="bg-brand rounded-lg">
-                            Tablas de clasificación
+                        <div class="bg-brand rounded-lg p-1">
+                            <i class="bi bi-award-fill"></i> Tablas de clasificación
                         </div>
                     <?php } ?>
                     <?php if(sizeof($game->getStats()) > 0) { ?>
-                        <div class="bg-brand rounded-lg">
-                            Estadísticas de juego
+                        <div class="bg-brand rounded-lg p-1">
+                            <i class="bi bi-bar-chart-line-fill"></i> Estadísticas de juego
                         </div>
                     <?php } ?>
                 </div>
