@@ -37,6 +37,18 @@ $router->mount('/panel', function() use ($router) {
         include('views/dev/panel/games/community/community.php');
     });
 
+    $router->get('/games/{gameId}/community/achievements', function($gameId) use ($router){
+        $user = User::getById($_SESSION['user']['id']);
+        $game = Game::getById($gameId);
+        if(is_null($game) || $game->getDeveloper() != $user->getDeveloperInfo()){
+            $router->trigger404();
+        }
+        $GLOBALS['game'] = $game;
+        $GLOBALS['achievements'] = $game->getAchievements();
+
+        include('views/dev/panel/games/community/achievements/index.php');
+    });
+
 });
 
 $router->set404('/dev/panel(/.*)?', function() {
