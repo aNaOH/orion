@@ -173,3 +173,39 @@ class DevActionToken {
         return true;
     }
 }
+
+class ClientToken {
+    private static $magicWord = 'orionclient';
+
+    public static function createToken(int $userId, string $dateExpiration): string {
+        return Tript::encryptString(self::$magicWord . '_' . $userId . '_' . $dateExpiration);
+    }
+
+    public static function validateToken(string $token, int $userId): bool {
+        $parsedToken = Tript::decryptString($token);
+        $tokenParts = explode('_', $parsedToken);
+
+        return self::validationRules($tokenParts, $userId);
+    }
+
+    private static function validationRules(array $tokenParts, int $userId): bool {
+        if ($tokenParts[0] !== self::$magicWord) {
+            return false;
+        }
+
+        $tokenUserId = intval($tokenParts[1]);
+        if($tokenUserId != $userId) return false;
+
+        if($tokenParts[2] != "none") {
+            $dateExpiration = new DateTime($tokenParts[2]);
+            $currentDate = new DateTime();
+
+            if($currentDate > $dateExpiration) {
+                return false;
+            }
+        }
+        
+
+        return true;
+    }
+}
