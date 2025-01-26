@@ -47,6 +47,36 @@ $router->mount('/lib', function() use ($router) {
     $router->post('/validate', function(){
         $token = $_POST['token'];
         $id = $_POST['id'];
+
+        $response = [];
+
+        $response['result'] = ClientToken::validateToken($token, $id);
+
+        header('HTTP/1.1 200 OK');
+        echo json_encode($response);
+    });
+
+    $router->get('/profile/{id}', function($id){
+        $user = User::getById($id);
+
+        if(is_null($user)){
+            header('HTTP/1.1 400 Bad Request');
+            $response['status'] = 400;
+            $response['message'] = "No existe un usuario con ese ID.";
+            $response['value'] = $id;
+            $response['field'] = "id";
+
+            echo json_encode($response);
+            exit();
+        }
+
+        header('HTTP/1.1 200 OK');
+        $response['id'] = $user->id;
+        $response['username'] = $user->username;
+        $response['motd'] = $user->motd;
+        $response['profilePicUUID'] = $user->profile_pic ?? "default";
+
+        echo json_encode($response);
     });
 
 });

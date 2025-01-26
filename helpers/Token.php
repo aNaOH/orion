@@ -205,7 +205,6 @@ class ClientToken {
             }
         }
         
-
         return true;
     }
 }
