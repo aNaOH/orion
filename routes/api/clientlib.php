@@ -79,4 +79,95 @@ $router->mount('/lib', function() use ($router) {
         echo json_encode($response);
     });
 
+    $router->post('/ownership', function(){
+        $token = $_POST['token'];
+        $gameId = $_POST['game'];
+        $userId = $_POST['user'];
+
+        $tokenValid = ClientToken::validateToken($token, $userId);
+
+        $response = [];
+
+        if(!$tokenValid){
+            header('HTTP/1.1 400 Bad Request');
+            $response['result'] = false;
+
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($userId);
+
+        $response['result'] = $user->hasAdquiredGame($gameId);
+
+        header('HTTP/1.1 200 OK');
+        echo json_encode($response);
+    });
+
+    $router->post('/achievement', function(){
+        $token = $_POST['token'];
+        $achievementId = $_POST['achievement'];
+        $gameId = $_POST['game'];
+        $userId = $_POST['user'];
+
+        $tokenValid = ClientToken::validateToken($token, $userId);
+
+        $response = [];
+
+        if(!$tokenValid){
+            header('HTTP/1.1 400 Bad Request');
+            $response['result'] = false;
+
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($userId);
+
+        if(!$user->hasAdquiredGame($gameId)){
+            header('HTTP/1.1 400 Bad Request');
+            $response['result'] = false;
+
+            echo json_encode($response);
+            exit();
+        }
+
+        $achievement = Achievement::getById($achievementId);
+        if(is_null($achievement)){
+            header('HTTP/1.1 400 Bad Request');
+            $response['result'] = false;
+
+            echo json_encode($response);
+            exit();
+        }
+
+        if($achievement->game_id != $gameId){
+            header('HTTP/1.1 400 Bad Request');
+            $response['result'] = false;
+
+            echo json_encode($response);
+            exit();
+        }
+
+        if($user->hasUnlockedAchievement($achievement)){
+            header('HTTP/1.1 200 OK');
+            $response['result'] = false;
+
+            echo json_encode($response);
+            exit();
+        }
+
+        if($achievement->type !== EACHIEVEMENT_TYPE::TRIGGERED){
+            header('HTTP/1.1 400 Bad Request');
+            $response['result'] = false;
+
+            echo json_encode($response);
+            exit();
+        }
+
+        $response['result'] = $user->unlockAchievement($achievement);
+
+        header('HTTP/1.1 200 OK');
+        echo json_encode($response);
+    });
 });
