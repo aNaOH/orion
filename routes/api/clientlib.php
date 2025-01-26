@@ -34,7 +34,7 @@ $router->mount('/lib', function() use ($router) {
             exit();
         }
 
-        $token = ClientToken::createToken(0, $expirationString);
+        $token = ClientToken::createToken($user->id, $expirationString);
 
         header('HTTP/1.1 200 OK');
         $response["token"] = $token;
