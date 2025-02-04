@@ -65,12 +65,12 @@ function showPage() {
                             <div class="invalid-feedback" id="statError"></div>
                         </div>
                         <div class="form-floating mb-3">
-                            <file-upload id="icon" name="icon" accept-image="true" accept-video="false" min-image-width="64" max-image-width="64" min-image-height="64" max-image-height="64" max-image-size="1MB" image-type="png,jpeg,webp"></file-upload>
+                            <file-upload id="icon" name="icon" accept-image="true" accept-video="false" min-image-width="64" max-image-width="64" min-image-height="64" max-image-height="64" max-image-size="1MB" image-type="png"></file-upload>
                             <label for="icon">Icono</label>
                             <div class="invalid-feedback" id="iconError"></div>
                         </div>
                         <div class="form-floating mb-3">
-                            <file-upload id="lockedIcon" name="lockedIcon" accept-image="true" accept-video="false" min-image-width="64" max-image-width="64" min-image-height="64" max-image-height="64" max-image-size="1MB" image-type="png,jpeg,webp"></file-upload>
+                            <file-upload id="lockedIcon" name="lockedIcon" accept-image="true" accept-video="false" min-image-width="64" max-image-width="64" min-image-height="64" max-image-height="64" max-image-size="1MB" image-type="png"></file-upload>
                             <label for="lockedIcon">Icono (bloqueado) - Opcional</label>
                             <div class="invalid-feedback" id="lockedIconError"></div>
                         </div>

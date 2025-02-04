@@ -72,6 +72,8 @@ $router->mount('/media', function() use ($router) {
         if(!isset($img)){
             if($type == 'icon'){
                 $img = S3Helper::retrieve(EBUCKET_LOCATION::GAME_ICON, "default");
+            } elseif($type == 'achievement'){
+                $img = S3Helper::retrieve(EBUCKET_LOCATION::GAME_ACHIEVEMENT, "default");
             } else {
             $router->trigger404();
             }
