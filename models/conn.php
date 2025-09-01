@@ -103,10 +103,13 @@ class Connection {
 
             // Enlazar condiciones
             foreach ($conditions as $key => $value) {
-                if (is_array($value)) {
-                    $stmt->bindValue(":" . $value['param'], $value['value']);
+                if (is_array($value) && isset($value['modifier']) && $value['modifier'] === self::DBMODIFIER_IN) {
+                    // Enlazar cada valor del array IN
+                    foreach ($value['value'] as $i => $v) {
+                        $stmt->bindValue($i + 1, $v); // Los parámetros IN son posicionales (?)
+                    }
                 } else {
-                    $stmt->bindValue(":$key", $value);
+                    $stmt->bindValue(":$key", is_array($value) ? $value['value'] : $value);
                 }
             }
 

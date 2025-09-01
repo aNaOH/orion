@@ -3,11 +3,18 @@
 $title = "Orion Store";
 
 $GLOBALS['games'] = Game::all();
+
+if (isset($_SESSION['user'])) {
+    $user = User::getById($_SESSION['user']['id']);
+    $GLOBALS['recommended'] = Recommender::getRecommendations($user);
+}
+
 $GLOBALS['randomGames'] = Game::pickRandom(4);
 
 function showPage() {
     global $games;
     global $randomGames;
+    global $recommended;
 
     ?>
 
@@ -19,8 +26,31 @@ function showPage() {
     </div>
     </section><!-- /Hero Section -->
 
+    <?php if(isset($recommended) && count($recommended) > 0) { ?>
+        <!-- Recommended Section -->
+        <section id="features" class="py-5">
+            <h2 class="text-2xl md:text-3xl font-semibold animate__animated animate__fadeInDown">Pensamos que podría interesarte</h2>
+
+            <?php if(!isset($games) || count($games) == 0) { ?>
+                <div class="container mx-auto text-center py-16 ">
+                <h1 class="text-3xl md:text-4xl font-bold text-brand-800">No hay juegos...</h1>
+                <p class="text-lg text-gray-600 mt-4">¡Vuelve pronto para descubrir nuevos títulos increíbles!</p>
+                </div>
+            <?php } else { ?>
+                <div class="container mx-auto mt-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        <?php foreach ($recommended as $game) {
+                            if(!$game->is_public) continue;
+                            OrionComponents::GameStore($game);
+                        } ?>
+                    </div>
+                </div>
+            <?php } ?>
+        </section>
+    <?php } ?>
+
     <section id="features" class="py-5">
-        <h2 class="text-2xl md:text-3xl font-semibold animate__animated animate__fadeInDown">Pensamos que podría interesarte</h2>
+        <h2 class="text-2xl md:text-3xl font-semibold animate__animated animate__fadeInDown">Algunos juegos de nuestro catálogo</h2>
 
     <?php if(!isset($games) || count($games) == 0) { ?>
         <div class="container mx-auto text-center py-16 ">
