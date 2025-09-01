@@ -36,13 +36,10 @@ function showPage() {
             <form id="searchForm" class="flex items-center space-x-2 p-2 rounded-full bg-branddark bg-opacity-75 shadow-md w-[50%] mx-auto">
                 <!-- Selector -->
                 <div class="relative">
-                    <select name="where" id="where" class="bg-transparent text-gray-200 px-4 py-2 rounded-full border-none outline-none appearance-none cursor-pointer">
-                        <option value="/store" class="text-gray-200 bg-branddark">Tienda</option>
-                        <option value="/communities" class="text-gray-200 bg-branddark" selected>Comunidad</option>
+                    <select name="where" id="where" class="bg-transparent text-gray-200 px-4 py-2 rounded-full border-none outline-none cursor-pointer">
+                        <option value="/store">Tienda</option>
+                        <option value="/communities" selected>Comunidad</option>
                     </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center pointer-events-none">
-                        <i class="bi bi-caret-down-fill text-gray-200"></i>
-                    </div>
                 </div>
 
                 <!-- Campo de Búsqueda -->
