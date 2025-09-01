@@ -105,8 +105,6 @@ $router->mount('/api', function() use ($router) {
     include('routes/api/library.php');
 
     include('routes/api/game.php');
-
-    include('routes/api/clientlib.php');
 });
 
 

@@ -24,48 +24,81 @@ class S3Helper {
         ]);
     }
 
+        // Limpia archivos de caché que tengan más de 1 día
+    public static function cleanCache() {
+        $cacheDir = __DIR__ . '/../cache/bucket/';
+        if (!is_dir($cacheDir)) return;
+        $files = glob($cacheDir . '*');
+        $now = time();
+        foreach ($files as $file) {
+            if (is_file($file) && ($now - filemtime($file)) > 86400) {
+                unlink($file);
+            }
+        }
+    }
+
+
     public static function upload(EBUCKET_LOCATION $location, $name, $body, $contentType = null, $sourceFile = null) {
+        self::cleanCache();
         $key = $location->value . $name;
         $params = [
             'Bucket' => self::getBucketName(),
             'Key'    => $key,
         ];
-    
+
         if ($sourceFile) {
             $params['SourceFile'] = $sourceFile;
         } else {
             $params['Body'] = $body;
         }
-    
+
         if ($contentType) {
             $params['ContentType'] = $contentType;
         }
-    
+
+        // Eliminar caché si existe
+        $shouldCache = $location !== EBUCKET_LOCATION::GAME_BUILD;
+        $cacheDir = __DIR__ . '/../cache/bucket/';
+        $cacheFile = $cacheDir . md5($key);
+        if ($shouldCache && file_exists($cacheFile)) {
+            unlink($cacheFile);
+        }
+
         $result = self::getClient()->putObject($params);
-    
+
         return isset($result);
-    }    
+    }
 
     public static function retrieve(EBUCKET_LOCATION $location, $name) {
+        self::cleanCache();
+            $key = $location->value . $name;
+            $shouldCache = $location !== EBUCKET_LOCATION::GAME_BUILD;
+            $cacheDir = __DIR__ . '/../cache/bucket/';
+            $cacheFile = $cacheDir . md5($key);
 
-        $key = $location->value . $name;
+            if ($shouldCache && file_exists($cacheFile)) {
+                $body = file_get_contents($cacheFile);
+                $type = mime_content_type($cacheFile);
+                return ["body" => $body, "type" => $type];
+            }
 
-        try {
-            // Obtener el objeto
-            $result = self::getClient()->getObject([
-                'Bucket' => self::getBucketName(),
-                'Key'    => $key,
-            ]);
+            try {
+                $result = self::getClient()->getObject([
+                    'Bucket' => self::getBucketName(),
+                    'Key'    => $key,
+                ]);
 
-            return [
-                "body" => $result['Body'],
-                "type" => $result['ContentType']
-            ];
-        
-        } catch (AwsException $e) {
-            // Manejo de errores
-            return null;
-        }
+                if ($shouldCache && isset($result['Body'])) {
+                    file_put_contents($cacheFile, (string)$result['Body']);
+                }
+
+                return [
+                    "body" => $result['Body'],
+                    "type" => $result['ContentType']
+                ];
+            } catch (AwsException $e) {
+                return null;
+            }
     }
 }
 
