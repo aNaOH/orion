@@ -152,6 +152,39 @@ class Game {
         return $games;
     }
 
+    /**
+     * Busca juegos por título usando un patrón LIKE.
+     * @param string $query El texto a buscar en el título.
+     * @return array Lista de instancias Game que coinciden.
+     */
+    public static function search(string $query): array {
+        $results = Connection::searchInTable(
+            ORION_DB,
+            self::$table,
+            $query,
+            'title',
+            Connection::DBSEARCH_BOTH
+        );
+        $games = [];
+        foreach ($results as $game) {
+            $games[] = new Game(
+                $game['title'],
+                $game['short_description'],
+                $game['description'],
+                $game['launch_date'],
+                (float)$game['base_price'],
+                (float)$game['discount'],
+                $game['as_editor'] == 1,
+                $game['is_public'] == 1,
+                $game['developer_name'],
+                $game['developer_id'],
+                $game['genre_id'],
+                $game['id']
+            );
+        }
+        return $games;
+    }
+
     public function getBuilds(){
         return Build::getByGame($this);
     }

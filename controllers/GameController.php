@@ -45,6 +45,13 @@ class GameController {
         include('views/store/hub.php');
     }
 
+    public static function showSearch(string $query){
+        $GLOBALS['searchQuery'] = $query;
+        $GLOBALS['games'] = Game::search($query);
+
+        include('views/store/search.php');
+    }
+
     public static function openCommunity($gameId){
         $game = Game::getById($gameId);
 
