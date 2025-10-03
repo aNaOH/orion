@@ -62,7 +62,7 @@ class User {
                 $user[0]['badge_id'], 
                 $user[0]['id'],
                 $user[0]['created_at'],
-                $user[0]['is_archived']
+                (bool)$user[0]['is_archived']
             );
         }
         return null;
@@ -83,7 +83,7 @@ class User {
                 $user[0]['badge_id'], 
                 $user[0]['id'],
                 $user[0]['created_at'],
-                $user[0]['is_archived']
+                (bool)$user[0]['is_archived']
             );
         }
         return null;
@@ -136,7 +136,7 @@ class User {
             'profile_pic' => $this->profile_pic,
             'motd' => $this->motd,
             'badge_id' => $this->badge,
-            'is_archived' => $this->is_archived,
+            'is_archived' => (int)$this->is_archived,
         ];
 
         if (!isset($this->id) || !self::getById($this->id)) {

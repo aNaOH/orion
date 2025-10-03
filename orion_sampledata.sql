@@ -75,8 +75,8 @@ INSERT INTO `owns` (`user_id`, `game_id`, `checkout_id`) VALUES
 -- Volcando datos para la tabla orion.unlocks: ~0 rows (aproximadamente)
 
 -- Volcando datos para la tabla orion.users: ~3 rows (aproximadamente)
-INSERT INTO `users` (`id`, `email`, `username`, `password`, `birthdate`, `role`, `profile_pic`, `motd`, `badge_id`, `created_at`) VALUES
-	(2, 'abehsosa2004@gmail.com', 'Abel', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '2004-05-25', 0, NULL, '', NULL, '2024-12-01 18:04:42');
+INSERT INTO `users` (`id`, `email`, `username`, `password`, `birthdate`, `role`, `profile_pic`, `motd`, `badge_id`, `created_at`, `is_archived`) VALUES
+	(2, 'abehsosa2004@gmail.com', 'Abel', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '2004-05-25', 0, NULL, '', NULL, '2024-12-01 18:04:42', `false`);
 
 -- Volcando datos para la tabla orion.votes: ~0 rows (aproximadamente)
 

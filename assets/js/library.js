@@ -35,6 +35,10 @@ function showGamesOnLibrary(games) {
     const sidebar = $('#game-list');
     sidebar.empty();
 
+    if(games == undefined){
+        games = []
+    }
+
     games.forEach(game => {
         const gameElement = `
             <div class="library-game cursor-pointer flex flex-row gap-2 items-center" data-gameid="${game.id}" ${game.isDeveloper ? 'data-isdev' : ''} onclick="changeGameShown(${game.id})">

@@ -70,17 +70,17 @@ class S3Helper {
     }
 
     public static function retrieve(EBUCKET_LOCATION $location, $name) {
-        self::cleanCache();
+        //self::cleanCache();
             $key = $location->value . $name;
             $shouldCache = $location !== EBUCKET_LOCATION::GAME_BUILD;
             $cacheDir = __DIR__ . '/../cache/bucket/';
             $cacheFile = $cacheDir . md5($key);
 
-            if ($shouldCache && file_exists($cacheFile)) {
-                $body = file_get_contents($cacheFile);
-                $type = mime_content_type($cacheFile);
-                return ["body" => $body, "type" => $type];
-            }
+            //if ($shouldCache && file_exists($cacheFile)) {
+            //    $body = file_get_contents($cacheFile);
+            //    $type = mime_content_type($cacheFile);
+            //    return ["body" => $body, "type" => $type];
+            //}
 
             try {
                 $result = self::getClient()->getObject([
@@ -89,6 +89,7 @@ class S3Helper {
                 ]);
 
                 if ($shouldCache && isset($result['Body'])) {
+                    //CHECK FOLDER
                     file_put_contents($cacheFile, (string)$result['Body']);
                 }
 
