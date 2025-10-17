@@ -30,9 +30,17 @@ class S3Helper
         ]);
     }
 
+    public static function isCacheEnabled()
+    {
+        return isset($_ENV["ENABLE_CACHE"]) && $_ENV["ENABLE_CACHE"] == "true";
+    }
+
     // Limpia archivos de caché que tengan más de 1 día
     public static function cleanCache()
     {
+        if (!self::isCacheEnabled()) {
+            return;
+        }
         $cacheDir = __DIR__ . "/../cache/bucket/";
         if (!is_dir($cacheDir)) {
             return;
@@ -70,12 +78,14 @@ class S3Helper
             $params["ContentType"] = $contentType;
         }
 
-        // Eliminar caché si existe
-        $shouldCache = $location !== EBUCKET_LOCATION::GAME_BUILD;
-        $cacheDir = __DIR__ . "/../cache/bucket/";
-        $cacheFile = $cacheDir . md5($key);
-        if ($shouldCache && file_exists($cacheFile)) {
-            unlink($cacheFile);
+        if (self::isCacheEnabled()) {
+            // Eliminar caché si existe
+            $shouldCache = $location !== EBUCKET_LOCATION::GAME_BUILD;
+            $cacheDir = __DIR__ . "/../cache/bucket/";
+            $cacheFile = $cacheDir . md5($key);
+            if ($shouldCache && file_exists($cacheFile)) {
+                unlink($cacheFile);
+            }
         }
 
         $result = self::getClient()->putObject($params);
@@ -91,7 +101,7 @@ class S3Helper
         $cacheDir = __DIR__ . "/../cache/bucket/";
         $cacheFile = $cacheDir . md5($key);
 
-        if ($shouldCache && file_exists($cacheFile)) {
+        if (self::isCacheEnabled() && $shouldCache && file_exists($cacheFile)) {
             $body = file_get_contents($cacheFile);
             $type = mime_content_type($cacheFile);
             return ["body" => $body, "type" => $type];
@@ -103,7 +113,11 @@ class S3Helper
                 "Key" => $key,
             ]);
 
-            if ($shouldCache && isset($result["Body"])) {
+            if (
+                self::isCacheEnabled() &&
+                $shouldCache &&
+                isset($result["Body"])
+            ) {
                 if (!file_exists($cacheDir)) {
                     mkdir($cacheDir, 0777, true);
                 }
