@@ -1,40 +1,6 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Versión del servidor:         8.0.30 - MySQL Community Server - GPL
--- SO del servidor:              Win64
--- HeidiSQL Versión:             12.1.0.6537
--- --------------------------------------------------------
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
--- Volcando datos para la tabla orion.achievements: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.badges: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.badge_unlocked: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.builds: ~0 rows (aproximadamente)
-INSERT INTO `builds` (`game_id`, `file`, `version`, `release_date`) VALUES
-	(1, 'UjNPM3lXQ1RoMkR6YUUxMENQOXZ2dHpZR1dOc1BoVHRHSzFpUFJUcEVvUT0=', '3.4.50-2.1.3', '2024-12-03 22:02:13');
-
--- Volcando datos para la tabla orion.comments: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.developers: ~1 rows (aproximadamente)
 INSERT INTO `developers` (`id`, `name`, `profile_pic`, `motd`, `owner_id`) VALUES
 	(1, 'Orion', NULL, 'Experience it united', 1);
 
--- Volcando datos para la tabla orion.entries: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.gallery_entries: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.game: ~20 rows (aproximadamente)
 INSERT INTO `game` (`id`, `title`, `short_description`, `description`, `launch_date`, `original_launch_date`, `base_price`, `discount`, `as_editor`, `is_public`, `developer_name`, `developer_id`, `genre_id`) VALUES
 	(1, 'Minecraft', 'Crea. Explora. Sobrevive.', '                                                                                        Experimenta las distintas formas de explorar, sobrevivir y crear en Minecraft con Minecraft: Deluxe Collection para PC con Java y Bedrock y el iniciador de Minecraft incluidos. Juega Bedrock Edition en un PC para examinar contenido ilimitado creado por la comunidad en el Mercado de Minecraft, descubre nuevos estilos de juego a través de diferentes mapas y exprésate con emoticonos y elementos del Creador de personajes.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion                                                                                                                        ', '2024-12-02 23:00:00', '2011-11-18', 29.99, 0, 1, 1, 'Mojang', 1, 1),
 	(2, 'The Elder Scrolls V: Skyrim', 'Un RPG épico de mundo abierto', '**The Elder Scrolls V: Skyrim** ofrece un vasto mundo abierto lleno de misiones y aventuras.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '2011-11-11', 29.99, 20, 1, 1, 'Bethesda', 1, 2),
@@ -57,31 +23,15 @@ INSERT INTO `game` (`id`, `title`, `short_description`, `description`, `launch_d
 	(19, 'Portal', 'Innovación en puzzles y física', '**Portal** es un juego de rompecabezas en primera persona que introduce mecánicas únicas con portales.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '2007-10-10', 19.99, 0.1, 1, 1, 'Valve', 1, 7),
 	(20, 'Grand Theft Auto: San Andreas', 'Mundo abierto revolucionario', '**Grand Theft Auto: San Andreas** redefine el género de mundo abierto con una historia rica y libertad de exploración.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '2004-10-26', 19.99, 0.15, 1, 1, 'Rockstar Games', 1, 5);
 
--- Volcando datos para la tabla orion.guides: ~0 rows (aproximadamente)
+INSERT INTO `builds` (`game_id`, `file`, `version`, `release_date`) VALUES
+	(1, 'UjNPM3lXQ1RoMkR6YUUxMENQOXZ2dHpZR1dOc1BoVHRHSzFpUFJUcEVvUT0=', '3.4.50-2.1.3', '2024-12-03 22:02:13');
 
--- Volcando datos para la tabla orion.guide_types: ~1 rows (aproximadamente)
 INSERT INTO `guide_types` (`id`, `icon`, `type`, `tint`) VALUES
 	(1, 'MTY0bjlsK2pRL0NYYWxDOVF4OTdUUFZvT21SVjdxbml4eHBlRHJqaVNFbz0=', 'Logro', '#DEAB18'),
 	(2, 'cm5zQzFwSWE4eE1ya3JYSFdEZzJQLzU1WjkvWXVuQXdSY044ZU84OHlHZz0=', 'Nivel/Mapa', '#978af4');
 
--- Volcando datos para la tabla orion.leaderboards: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.owns: ~0 rows (aproximadamente)
-INSERT INTO `owns` (`user_id`, `game_id`, `checkout_id`) VALUES
-	(5, 9, 'cs_test_a1zIeQidrbi11bX4T1AfN0LrJr2k9ElvQEXutRggPl04eQ35H45aIWMAIR');
-
--- Volcando datos para la tabla orion.posts: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.unlocks: ~0 rows (aproximadamente)
-
--- Volcando datos para la tabla orion.users: ~3 rows (aproximadamente)
 INSERT INTO `users` (`id`, `email`, `username`, `password`, `birthdate`, `role`, `profile_pic`, `motd`, `badge_id`, `created_at`, `is_archived`) VALUES
-	(2, 'abehsosa2004@gmail.com', 'Abel', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '2004-05-25', 0, NULL, '', NULL, '2024-12-01 18:04:42', `false`);
+	(2, 'abehsosa2004@gmail.com', 'Abel', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '2004-05-25', 0, NULL, '', NULL, '2024-12-01 18:04:42', false);
 
--- Volcando datos para la tabla orion.votes: ~0 rows (aproximadamente)
-
-/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+INSERT INTO `owns` (`user_id`, `game_id`, `checkout_id`) VALUES
+	(2, 9, 'cs_test_a1zIeQidrbi11bX4T1AfN0LrJr2k9ElvQEXutRggPl04eQ35H45aIWMAIR');

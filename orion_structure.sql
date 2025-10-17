@@ -1,284 +1,327 @@
--- --------------------------------------------------------
--- Host:                         127.0.0.1
--- Versión del servidor:         8.0.30 - MySQL Community Server - GPL
--- SO del servidor:              Win64
--- HeidiSQL Versión:             12.1.0.6537
--- --------------------------------------------------------
+-- -----------------------------------------------------
+-- Estructura de la base de datos ORION
+-- -----------------------------------------------------
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET NAMES utf8 */;
-/*!50503 SET NAMES utf8mb4 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+-- ===========================
+-- TABLAS BASE
+-- ===========================
 
--- Volcando estructura para tabla orion.users
 CREATE TABLE IF NOT EXISTS `users` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `email` varchar(255) NOT NULL,
-  `username` varchar(100) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `birthdate` date NOT NULL,
-  `role` int NOT NULL,
-  `profile_pic` varchar(255) DEFAULT NULL,
-  `motd` varchar(255) DEFAULT NULL,
-  `badge_id` int DEFAULT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `is_archived` tinyint(1) DEFAULT '0',
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `email` VARCHAR(255) NOT NULL,
+  `username` VARCHAR(100) NOT NULL,
+  `password` VARCHAR(255) NOT NULL,
+  `birthdate` DATE NOT NULL,
+  `role` INT NOT NULL,
+  `profile_pic` VARCHAR(255) DEFAULT NULL,
+  `motd` VARCHAR(255) DEFAULT NULL,
+  `badge_id` INT DEFAULT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `is_archived` TINYINT(1) DEFAULT '0',
   PRIMARY KEY (`id`),
-  UNIQUE KEY `email` (`email`),
-  KEY `fk_badge_id` (`badge_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  UNIQUE KEY `uk_users_email` (`email`),
+  KEY `fk_users_badge_id` (`badge_id`)
+) ENGINE=InnoDB;
 
--- Volcando estructura para tabla orion.developers
-CREATE TABLE IF NOT EXISTS `developers` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `profile_pic` varchar(255) DEFAULT NULL,
-  `motd` varchar(255) DEFAULT NULL,
-  `owner_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  KEY `owner_id` (`owner_id`),
-  CONSTRAINT `developers_ibfk_1` FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Volcando estructura para tabla orion.game_genres
 CREATE TABLE IF NOT EXISTS `game_genres` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `tint` varchar(7) NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `tint` VARCHAR(7) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB;
 
--- Volcando estructura para tabla orion.game
-CREATE TABLE IF NOT EXISTS `game` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `short_description` varchar(255) DEFAULT NULL,
-  `description` text,
-  `launch_date` timestamp NULL DEFAULT NULL,
-  `original_launch_date` date DEFAULT NULL,
-  `base_price` float DEFAULT NULL,
-  `discount` float DEFAULT NULL,
-  `as_editor` tinyint(1) NOT NULL DEFAULT '0',
-  `is_public` tinyint(1) NOT NULL DEFAULT '0',
-  `developer_name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
-  `developer_id` int DEFAULT NULL,
-  `genre_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_developer_id` (`developer_id`),
-  KEY `fk_genre_id` (`genre_id`),
-  CONSTRAINT `fk_developer_id` FOREIGN KEY (`developer_id`) REFERENCES `developers` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `fk_genre_id` FOREIGN KEY (`genre_id`) REFERENCES `game_genres` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Volcando estructura para tabla orion.badges
-CREATE TABLE IF NOT EXISTS `badges` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `icon` varchar(255) NOT NULL,
-  `game_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `fk_game_id` (`game_id`),
-  CONSTRAINT `fk_game_id` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Añadir relación con 'badges' para 'users'
-ALTER TABLE `users`
-  ADD CONSTRAINT `fk_badge_id` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`) ON DELETE SET NULL ON UPDATE CASCADE;
-
--- Volcando estructura para tabla orion.posts
-CREATE TABLE IF NOT EXISTS `posts` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `title` varchar(255) NOT NULL,
-  `body` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `last_updated_at` timestamp NULL DEFAULT NULL,
-  `is_public` tinyint(1) DEFAULT '0',
-  `type` int DEFAULT NULL,
-  `game_id` int DEFAULT NULL,
-  `author_id` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `game_id` (`game_id`),
-  KEY `author_id` (`author_id`),
-  CONSTRAINT `posts_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `posts_ibfk_2` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Volcando estructura para tabla orion.achievements
-CREATE TABLE IF NOT EXISTS `achievements` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `description` varchar(255) NOT NULL,
-  `icon` varchar(255) NOT NULL,
-  `locked_icon` varchar(255) DEFAULT NULL,
-  `secret` tinyint(1) DEFAULT '0',
-  `game_id` int DEFAULT NULL,
-  `type` int NOT NULL,
-  `stat_id` int DEFAULT NULL,
-  `stat_value` int DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  KEY `game_id` (`game_id`),
-  KEY `stat_id` (`stat_id`),
-  CONSTRAINT `achievements_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `achievements_ibfk_2` FOREIGN KEY (`stat_id`) REFERENCES `stat` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Volcando estructura para tabla orion.badge_unlocked
-CREATE TABLE IF NOT EXISTS `badge_unlocked` (
-  `badge_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY `badge_id` (`badge_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `badge_unlocked_ibfk_1` FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `badge_unlocked_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Volcando estructura para tabla orion.builds
-CREATE TABLE IF NOT EXISTS `builds` (
-  `game_id` int NOT NULL,
-  `file` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `version` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `patch_notes` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci,
-  `release_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY `FK_builds_game` (`game_id`),
-  CONSTRAINT `FK_builds_game` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Volcando estructura para tabla orion.comments
-CREATE TABLE IF NOT EXISTS `comments` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `author_id` int NOT NULL,
-  `post_id` int NOT NULL,
-  `body` text NOT NULL,
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `author_id` (`author_id`),
-  KEY `post_id` (`post_id`),
-  CONSTRAINT `comments_ibfk_1` FOREIGN KEY (`author_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `comments_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Volcando estructura para tabla orion.gallery_entries
-CREATE TABLE IF NOT EXISTS `gallery_entries` (
-  `post_id` int NOT NULL,
-  `media` varchar(255) NOT NULL,
-  PRIMARY KEY (`post_id`),
-  CONSTRAINT `gallery_entries_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
-
--- Volcando estructura para tabla orion.guide_types
 CREATE TABLE IF NOT EXISTS `guide_types` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `icon` varchar(255) NOT NULL,
-  `type` varchar(100) NOT NULL,
-  `tint` varchar(7) NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `icon` VARCHAR(255) NOT NULL,
+  `type` VARCHAR(100) NOT NULL,
+  `tint` VARCHAR(7) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB;
 
--- Volcando estructura para tabla orion.guides
-CREATE TABLE IF NOT EXISTS `guides` (
-  `post_id` int NOT NULL,
-  `type_id` int NOT NULL,
-  PRIMARY KEY (`post_id`),
-  KEY `type_id` (`type_id`),
-  CONSTRAINT `guides_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `guides_ibfk_2` FOREIGN KEY (`type_id`) REFERENCES `guide_types` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- Volcando estructura para tabla orion.game_news_categories
 CREATE TABLE IF NOT EXISTS `game_news_categories` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `tint` varchar(7) NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `tint` VARCHAR(7) NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB;
 
--- Volcando estructura para tabla orion.game_news
-CREATE TABLE IF NOT EXISTS `game_news` (
-  `post_id` int NOT NULL,
-  `category_id` int NOT NULL,
-  PRIMARY KEY (`post_id`),
-  CONSTRAINT `game_news_ibfk_1` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `game_news_ibfk_2` FOREIGN KEY (`category_id`) REFERENCES `game_news_categories` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- ===========================
+-- TABLAS DEPENDIENTES DE USERS
+-- ===========================
 
--- Volcando estructura para tabla orion.leaderboards
-CREATE TABLE IF NOT EXISTS `leaderboards` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `concept` int NOT NULL,
-  `game_id` int DEFAULT NULL,
-  `stat_id` int DEFAULT NULL,
+CREATE TABLE IF NOT EXISTS `developers` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(255) NOT NULL,
+  `profile_pic` VARCHAR(255) DEFAULT NULL,
+  `motd` VARCHAR(255) DEFAULT NULL,
+  `owner_id` INT NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `game_id` (`game_id`),
-  KEY `stat_id` (`stat_id`),
-  CONSTRAINT `leaderboards_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `leaderboards_ibfk_2` FOREIGN KEY (`stat_id`) REFERENCES `stat` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_developers_owner_id` (`owner_id`),
+  CONSTRAINT `fk_developers_owner_id`
+    FOREIGN KEY (`owner_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
--- Volcando estructura para tabla orion.owns
-CREATE TABLE IF NOT EXISTS `owns` (
-  `user_id` int NOT NULL,
-  `game_id` int NOT NULL,
-  `checkout_id` text NOT NULL,
-  KEY `user_id` (`user_id`),
-  KEY `game_id` (`game_id`),
-  CONSTRAINT `owns_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `owns_ibfk_2` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+-- ===========================
+-- TABLAS DE JUEGOS
+-- ===========================
 
--- Volcando estructura para tabla orion.stat
+CREATE TABLE IF NOT EXISTS `game` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `short_description` VARCHAR(255) DEFAULT NULL,
+  `description` TEXT,
+  `launch_date` TIMESTAMP NULL DEFAULT NULL,
+  `original_launch_date` DATE DEFAULT NULL,
+  `base_price` FLOAT DEFAULT NULL,
+  `discount` FLOAT DEFAULT NULL,
+  `as_editor` TINYINT(1) NOT NULL DEFAULT '0',
+  `is_public` TINYINT(1) NOT NULL DEFAULT '0',
+  `developer_name` VARCHAR(255) DEFAULT NULL,
+  `developer_id` INT DEFAULT NULL,
+  `genre_id` INT DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_game_developer_id` (`developer_id`),
+  KEY `fk_game_genre_id` (`genre_id`),
+  CONSTRAINT `fk_game_developer_id`
+    FOREIGN KEY (`developer_id`) REFERENCES `developers` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_game_genre_id`
+    FOREIGN KEY (`genre_id`) REFERENCES `game_genres` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ===========================
+-- TABLAS RELACIONADAS CON GAME
+-- ===========================
+
+CREATE TABLE IF NOT EXISTS `badges` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `icon` VARCHAR(255) NOT NULL,
+  `game_id` INT DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_badges_game_id` (`game_id`),
+  CONSTRAINT `fk_badges_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+ALTER TABLE `users`
+  ADD CONSTRAINT `fk_users_badge_id`
+  FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`)
+  ON DELETE SET NULL ON UPDATE CASCADE;
+
 CREATE TABLE IF NOT EXISTS `stat` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `game_id` int NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `number` int NOT NULL,
-  `type` int NOT NULL,
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `game_id` INT NOT NULL,
+  `name` VARCHAR(255) NOT NULL,
+  `number` INT NOT NULL,
+  `type` INT NOT NULL,
   PRIMARY KEY (`id`),
-  KEY `game_id` (`game_id`),
-  CONSTRAINT `stat_ibfk_1` FOREIGN KEY (`game_id`) REFERENCES `game` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  KEY `fk_stat_game_id` (`game_id`),
+  CONSTRAINT `fk_stat_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
--- Volcando estructura para tabla orion.has_stat
-CREATE TABLE IF NOT EXISTS `has_stat` (
-  `user_id` int NOT NULL,
-  `stat_id` int NOT NULL,
-  `value` int NOT NULL,
-  KEY `user_id` (`user_id`),
-  KEY `stat_id` (`stat_id`),
-  CONSTRAINT `has_stat_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `has_stat_ibfk_2` FOREIGN KEY (`stat_id`) REFERENCES `stat` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `achievements` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `name` VARCHAR(100) NOT NULL,
+  `description` VARCHAR(255) NOT NULL,
+  `icon` VARCHAR(255) NOT NULL,
+  `locked_icon` VARCHAR(255) DEFAULT NULL,
+  `secret` TINYINT(1) DEFAULT '0',
+  `game_id` INT DEFAULT NULL,
+  `type` INT NOT NULL,
+  `stat_id` INT DEFAULT NULL,
+  `stat_value` INT DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_achievements_game_id` (`game_id`),
+  KEY `fk_achievements_stat_id` (`stat_id`),
+  CONSTRAINT `fk_achievements_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_achievements_stat_id`
+    FOREIGN KEY (`stat_id`) REFERENCES `stat` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
--- Volcando estructura para tabla orion.unlocks
-CREATE TABLE IF NOT EXISTS `unlocks` (
-  `achievement_id` int NOT NULL,
-  `user_id` int NOT NULL,
-  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  KEY `achievement_id` (`achievement_id`),
-  KEY `user_id` (`user_id`),
-  CONSTRAINT `unlocks_ibfk_1` FOREIGN KEY (`achievement_id`) REFERENCES `achievements` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `unlocks_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE IF NOT EXISTS `leaderboards` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `concept` INT NOT NULL,
+  `game_id` INT DEFAULT NULL,
+  `stat_id` INT DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_leaderboards_game_id` (`game_id`),
+  KEY `fk_leaderboards_stat_id` (`stat_id`),
+  CONSTRAINT `fk_leaderboards_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_leaderboards_stat_id`
+    FOREIGN KEY (`stat_id`) REFERENCES `stat` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
--- Volcando estructura para tabla orion.votes
+CREATE TABLE IF NOT EXISTS `builds` (
+  `game_id` INT NOT NULL,
+  `file` VARCHAR(255) NOT NULL,
+  `version` VARCHAR(50) NOT NULL,
+  `patch_notes` LONGTEXT,
+  `release_date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `fk_builds_game_id` (`game_id`),
+  CONSTRAINT `fk_builds_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `owns` (
+  `user_id` INT NOT NULL,
+  `game_id` INT NOT NULL,
+  `checkout_id` TEXT NOT NULL,
+  KEY `fk_owns_user_id` (`user_id`),
+  KEY `fk_owns_game_id` (`game_id`),
+  CONSTRAINT `fk_owns_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_owns_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ===========================
+-- PUBLICACIONES Y CONTENIDO
+-- ===========================
+
+CREATE TABLE IF NOT EXISTS `posts` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `title` VARCHAR(255) NOT NULL,
+  `body` LONGTEXT NOT NULL,
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `last_updated_at` TIMESTAMP NULL DEFAULT NULL,
+  `is_public` TINYINT(1) DEFAULT '0',
+  `type` INT DEFAULT NULL,
+  `game_id` INT DEFAULT NULL,
+  `author_id` INT DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_posts_game_id` (`game_id`),
+  KEY `fk_posts_author_id` (`author_id`),
+  CONSTRAINT `fk_posts_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `fk_posts_author_id`
+    FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `comments` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `author_id` INT NOT NULL,
+  `post_id` INT NOT NULL,
+  `body` TEXT NOT NULL,
+  `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_comments_author_id` (`author_id`),
+  KEY `fk_comments_post_id` (`post_id`),
+  CONSTRAINT `fk_comments_author_id`
+    FOREIGN KEY (`author_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_comments_post_id`
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS `votes` (
-  `user_id` int NOT NULL,
-  `post_id` int NOT NULL,
-  `modifier` tinyint(1) DEFAULT '0',
-  KEY `user_id` (`user_id`),
-  KEY `post_id` (`post_id`),
-  CONSTRAINT `votes_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `votes_ibfk_2` FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `user_id` INT NOT NULL,
+  `post_id` INT NOT NULL,
+  `modifier` TINYINT(1) DEFAULT '0',
+  KEY `fk_votes_user_id` (`user_id`),
+  KEY `fk_votes_post_id` (`post_id`),
+  CONSTRAINT `fk_votes_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_votes_post_id`
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
 
-/*!40103 SET TIME_ZONE=IFNULL(@OLD_TIME_ZONE, 'system') */;
-/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
-/*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
+CREATE TABLE IF NOT EXISTS `gallery_entries` (
+  `post_id` INT NOT NULL,
+  `media` VARCHAR(255) NOT NULL,
+  PRIMARY KEY (`post_id`),
+  CONSTRAINT `fk_gallery_entries_post_id`
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `guides` (
+  `post_id` INT NOT NULL,
+  `type_id` INT NOT NULL,
+  PRIMARY KEY (`post_id`),
+  KEY `fk_guides_type_id` (`type_id`),
+  CONSTRAINT `fk_guides_post_id`
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_guides_type_id`
+    FOREIGN KEY (`type_id`) REFERENCES `guide_types` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `game_news` (
+  `post_id` INT NOT NULL,
+  `category_id` INT NOT NULL,
+  PRIMARY KEY (`post_id`),
+  CONSTRAINT `fk_game_news_post_id`
+    FOREIGN KEY (`post_id`) REFERENCES `posts` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_game_news_category_id`
+    FOREIGN KEY (`category_id`) REFERENCES `game_news_categories` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+-- ===========================
+-- ESTADÍSTICAS Y LOGROS
+-- ===========================
+
+CREATE TABLE IF NOT EXISTS `has_stat` (
+  `user_id` INT NOT NULL,
+  `stat_id` INT NOT NULL,
+  `value` INT NOT NULL,
+  KEY `fk_has_stat_user_id` (`user_id`),
+  KEY `fk_has_stat_stat_id` (`stat_id`),
+  CONSTRAINT `fk_has_stat_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_has_stat_stat_id`
+    FOREIGN KEY (`stat_id`) REFERENCES `stat` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `unlocks` (
+  `achievement_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `fk_unlocks_achievement_id` (`achievement_id`),
+  KEY `fk_unlocks_user_id` (`user_id`),
+  CONSTRAINT `fk_unlocks_achievement_id`
+    FOREIGN KEY (`achievement_id`) REFERENCES `achievements` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_unlocks_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `badge_unlocked` (
+  `badge_id` INT NOT NULL,
+  `user_id` INT NOT NULL,
+  `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  KEY `fk_badge_unlocked_badge_id` (`badge_id`),
+  KEY `fk_badge_unlocked_user_id` (`user_id`),
+  CONSTRAINT `fk_badge_unlocked_badge_id`
+    FOREIGN KEY (`badge_id`) REFERENCES `badges` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_badge_unlocked_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
