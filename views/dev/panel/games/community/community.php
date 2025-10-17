@@ -1,13 +1,12 @@
 <?php
 
-$title = "Editar comunidad para ".$game->title." | Orion Dev Panel";
-
+$title = "Editar comunidad para " . $game->title . " | Orion Dev Panel";
 
 //$hasTable = "/admin/js/tables/dev/games.js";
 
-function showPage() {
-    global $game;
-    ?>
+function showPage()
+{
+    global $game; ?>
 
 <script src="/assets/js/components/fileUpload.js"></script>
 
@@ -16,7 +15,7 @@ function showPage() {
                 <div class="container-fluid"> <!--begin::Row-->
                     <div class="row">
                         <div class="col-sm-6">
-                            <h3 class="mb-0">Editar comunidad para <?=$game->title?></h3>
+                            <h3 class="mb-0">Editar comunidad para <?= $game->title ?></h3>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-end">
@@ -31,7 +30,38 @@ function showPage() {
             </div> <!--end::App Content Header--> <!--begin::App Content-->
             <div class="app-content"> <!--begin::Container-->
                 <div class="container-fluid"> <!--begin::Row-->
-                    
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="text-center">Logros</h3>
+                        </div>
+                        <div class="col">
+                            <h3 class="text-center">Estadísticas</h3>
+                        </div>
+                        <div class="col">
+                            <h3 class="text-center">Tablas de Clasificación</h3>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <h3 class="text-center">Normas de la comunidad</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <a href="/dev/panel/games/<?= $game->id ?>/community/rules" class="btn btn-primary">Editar normas</a>
+                                </div>
+                                <div class="col">
+                                    <a href="/communities/<?= $game->id ?>/rules" class="btn btn-primary">Ver normas</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col">
+                            <h3 class="text-center">Noticias</h3>
+                            <div class="row">
+                                <div class="col">
+                                    <a href="/dev/panel/games/<?= $game->id ?>/community/news/create" class="btn btn-primary">Escribir noticia</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div> <!--end::Container-->
             </div> <!--end::App Content-->
 
@@ -44,4 +74,4 @@ function showPage() {
             <?php
 }
 
-include("views/dev/panel/template/main.php");
+include "views/dev/panel/template/main.php";
