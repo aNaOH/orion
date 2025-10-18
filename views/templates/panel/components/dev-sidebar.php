@@ -33,6 +33,15 @@
     </a>
   </nav>
 
+  <!-- Volver -->
+  <div class="p-4 border-t border-branddark-500">
+    <a href="/" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all w-full"
+      data-tooltip="Volver a Orion">
+      <i class="bi bi-arrow-left text-alt-400 text-lg"></i>
+      <span class="menu-text text-sm font-medium">Volver a Orion</span>
+    </a>
+  </div>
+
   <!-- Perfil -->
   <div class="border-t border-branddark-500 p-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
@@ -41,8 +50,5 @@
         <p class="text-sm font-semibold"><?= $developer->name ?></p>
       </div>
     </div>
-    <button class="text-gray-400 hover:text-alt-400 transition">
-      <i class="bi bi-box-arrow-right text-lg"></i>
-    </button>
   </div>
 </aside>
