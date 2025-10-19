@@ -2,38 +2,52 @@ let form = document.getElementById("newGameForm");
 let asEditor = document.getElementById("asEditor");
 let developerNameContainer = document.getElementById("developerNameContainer");
 let submit = document.getElementById("submitButton");
+let spinner = document.getElementById("spinner");
 
-asEditor.onchange = (e) => {
-    if(asEditor.checked) {
-        developerNameContainer.classList.remove("d-none");
-    } else {
-        developerNameContainer.classList.add("d-none");
-    }
-}
+asEditor.onchange = () => {
+  if (asEditor.checked) {
+    developerNameContainer.classList.remove("hidden");
+  } else {
+    developerNameContainer.classList.add("hidden");
+  }
+};
 
-form.onsubmit = (e) => {
-    e.preventDefault();
+form.onsubmit = async (e) => {
+  e.preventDefault();
 
-    let fields = e.target.elements;
+  let fields = e.target.elements;
 
-    resetField('title');
-    resetField('shortDescription');
-    resetField('developerName');
+  resetField("title");
+  resetField("shortDescription");
+  resetField("developerName");
 
-    submit.classList.add("disabled");
+  // Desactivar botón y mostrar spinner
+  submit.disabled = true;
+  spinner.classList.remove("hidden");
 
-    $.ajax({
-        url: '/api/dev/game', // The URL to which the request is sent
-        type: 'POST', // The HTTP method to use for the request (GET, POST, etc.)
-        data: { title: fields['title'].value, shortDescription: fields['shortDescription'].value, asEditor: asEditor.checked, developerName: fields['developerName'].value  }, // Data to be sent to the server
-        success: function(response) {
-            location.href = "/dev/panel/games";
-        },
-        error: function(xhr, status, error) {
-            const info = xhr.responseJSON;
-            console.log(info);
-            showError(info);
-            submit.classList.remove("disabled");
-        }
+  try {
+    const response = await fetch("/api/dev/game", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        title: fields["title"].value,
+        shortDescription: fields["shortDescription"].value,
+        asEditor: asEditor.checked,
+        developerName: fields["developerName"].value,
+      }),
     });
+
+    if (response.ok) {
+      //window.location.href = "/dev/panel/games";
+      return;
+    }
+
+    const info = await response.json();
+    showError(info);
+  } catch (err) {
+    console.error("Error:", err);
+  } finally {
+    submit.disabled = false;
+    spinner.classList.add("hidden");
+  }
 };

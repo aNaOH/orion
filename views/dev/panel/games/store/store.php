@@ -1,10 +1,10 @@
 <?php
 
-$title = "Editar tienda para ".$game->title." | Orion Dev Panel";
+$title = "Editar tienda para " . $game->title . " | Orion Dev Panel";
 
-function showPage() {
-    global $game;
-    ?>
+function showPage()
+{
+    global $game; ?>
 
 <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.min.css">
 <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
@@ -15,7 +15,7 @@ function showPage() {
                 <div class="container-fluid"> <!--begin::Row-->
                     <div class="row">
                         <div class="col-sm-6">
-                            <h3 class="mb-0">Editar tienda para <?=$game->title?></h3>
+                            <h3 class="mb-0">Editar tienda para <?= $game->title ?></h3>
                         </div>
                         <div class="col-sm-6">
                             <ol class="breadcrumb float-sm-end">
@@ -51,65 +51,126 @@ function showPage() {
                                 <h3>Página de la tienda</h3>
                                 <form id="editGameForm">
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="title" name="title" type="text" placeholder="Título" value="<?=$game->title?>" />
+                                        <input class="form-control" id="title" name="title" type="text" placeholder="Título" value="<?= $game->title ?>" />
                                         <label for="title">Título</label>
                                         <div class="invalid-feedback" id="titleError"></div>
                                     </div>
                                     <div class="form-floating mb-3">
-                                        <input class="form-control" id="shortDescription" name="shortDescription" type="text" placeholder="Descripción corta" value="<?=$game->short_description?>" />
+                                        <input class="form-control" id="shortDescription" name="shortDescription" type="text" placeholder="Descripción corta" value="<?= $game->short_description ?>" />
                                         <label for="shortDescription">Descripción corta</label>
                                         <div class="invalid-feedback" id="shortDescriptionError"></div>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label d-block"></label>
                                         <div class="form-check form-check-inline">
-                                            <input class="form-check-input" id="asEditor" type="checkbox" name="asEditor" <?= $game->as_editor ? 'checked' : '' ?> />
+                                            <input class="form-check-input" id="asEditor" type="checkbox" name="asEditor" <?= $game->as_editor
+                                                ? "checked"
+                                                : "" ?> />
                                             <label class="form-check-label" for="asEditor">¿Eres la editora?</label>
                                         </div>
                                     </div>
                                     <div class="d-none form-floating mb-3" id="developerNameContainer">
-                                        <input class="form-control" id="developerName" name="developerName" type="text" placeholder="Desarrollador" value="<?=$game->developer_name?>"/>
+                                        <input class="form-control" id="developerName" name="developerName" type="text" placeholder="Desarrollador" value="<?= $game->developer_name ?>"/>
                                         <label for="developerName">Desarrollador</label>
                                         <div class="invalid-feedback" id="developerNameError"></div>
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label d-block" for="price">Precio</label>
                                         <select class="form-control" id="price" name="price">
-                                            <option value="0" <?= is_null($game->base_price) || $game->base_price == 0 ? 'selected' : '' ?>>Gratis</option>
-                                            <option value="1.99" <?= $game->base_price == 1.99 ? 'selected' : '' ?>>1,99 €</option>
-                                            <option value="2.99" <?= $game->base_price == 2.99 ? 'selected' : '' ?>>2,99 €</option>
-                                            <option value="3.99" <?= $game->base_price == 3.99 ? 'selected' : '' ?>>3,99 €</option>
-                                            <option value="4.99" <?= $game->base_price == 4.99 ? 'selected' : '' ?>>4,99 €</option>
-                                            <option value="5.99" <?= $game->base_price == 5.99 ? 'selected' : '' ?>>5,99 €</option>
-                                            <option value="6.99" <?= $game->base_price == 6.99 ? 'selected' : '' ?>>6,99 €</option>
-                                            <option value="7.99" <?= $game->base_price == 7.99 ? 'selected' : '' ?>>7,99 €</option>
-                                            <option value="8.99" <?= $game->base_price == 8.99 ? 'selected' : '' ?>>8,99 €</option>
-                                            <option value="9.99" <?= $game->base_price == 9.99 ? 'selected' : '' ?>>9,99 €</option>
-                                            <option value="14.99" <?= $game->base_price == 14.99 ? 'selected' : '' ?>>14,99 €</option>
-                                            <option value="19.99" <?= $game->base_price == 19.99 ? 'selected' : '' ?>>19,99 €</option>
-                                            <option value="24.99" <?= $game->base_price == 24.99 ? 'selected' : '' ?>>24,99 €</option>
-                                            <option value="29.99" <?= $game->base_price == 29.99 ? 'selected' : '' ?>>29,99 €</option>
-                                            <option value="39.99" <?= $game->base_price == 39.99 ? 'selected' : '' ?>>39,99 €</option>
-                                            <option value="49.99" <?= $game->base_price == 49.99 ? 'selected' : '' ?>>49,99 €</option>
-                                            <option value="59.99" <?= $game->base_price == 59.99 ? 'selected' : '' ?>>59,99 €</option>
-                                            <option value="69.99" <?= $game->base_price == 69.99 ? 'selected' : '' ?>>69,99 €</option>
-                                            <option value="79.99" <?= $game->base_price == 79.99 ? 'selected' : '' ?>>79,99 €</option>
+                                            <option value="0" <?= is_null(
+                                                $game->base_price,
+                                            ) || $game->base_price == 0
+                                                ? "selected"
+                                                : "" ?>>Gratis</option>
+                                            <option value="1.99" <?= $game->base_price ==
+                                            1.99
+                                                ? "selected"
+                                                : "" ?>>1,99 €</option>
+                                            <option value="2.99" <?= $game->base_price ==
+                                            2.99
+                                                ? "selected"
+                                                : "" ?>>2,99 €</option>
+                                            <option value="3.99" <?= $game->base_price ==
+                                            3.99
+                                                ? "selected"
+                                                : "" ?>>3,99 €</option>
+                                            <option value="4.99" <?= $game->base_price ==
+                                            4.99
+                                                ? "selected"
+                                                : "" ?>>4,99 €</option>
+                                            <option value="5.99" <?= $game->base_price ==
+                                            5.99
+                                                ? "selected"
+                                                : "" ?>>5,99 €</option>
+                                            <option value="6.99" <?= $game->base_price ==
+                                            6.99
+                                                ? "selected"
+                                                : "" ?>>6,99 €</option>
+                                            <option value="7.99" <?= $game->base_price ==
+                                            7.99
+                                                ? "selected"
+                                                : "" ?>>7,99 €</option>
+                                            <option value="8.99" <?= $game->base_price ==
+                                            8.99
+                                                ? "selected"
+                                                : "" ?>>8,99 €</option>
+                                            <option value="9.99" <?= $game->base_price ==
+                                            9.99
+                                                ? "selected"
+                                                : "" ?>>9,99 €</option>
+                                            <option value="14.99" <?= $game->base_price ==
+                                            14.99
+                                                ? "selected"
+                                                : "" ?>>14,99 €</option>
+                                            <option value="19.99" <?= $game->base_price ==
+                                            19.99
+                                                ? "selected"
+                                                : "" ?>>19,99 €</option>
+                                            <option value="24.99" <?= $game->base_price ==
+                                            24.99
+                                                ? "selected"
+                                                : "" ?>>24,99 €</option>
+                                            <option value="29.99" <?= $game->base_price ==
+                                            29.99
+                                                ? "selected"
+                                                : "" ?>>29,99 €</option>
+                                            <option value="39.99" <?= $game->base_price ==
+                                            39.99
+                                                ? "selected"
+                                                : "" ?>>39,99 €</option>
+                                            <option value="49.99" <?= $game->base_price ==
+                                            49.99
+                                                ? "selected"
+                                                : "" ?>>49,99 €</option>
+                                            <option value="59.99" <?= $game->base_price ==
+                                            59.99
+                                                ? "selected"
+                                                : "" ?>>59,99 €</option>
+                                            <option value="69.99" <?= $game->base_price ==
+                                            69.99
+                                                ? "selected"
+                                                : "" ?>>69,99 €</option>
+                                            <option value="79.99" <?= $game->base_price ==
+                                            79.99
+                                                ? "selected"
+                                                : "" ?>>79,99 €</option>
                                         </select>
                                         <div class="invalid-feedback" id="priceError"></div>
                                     </div>
                                     <div class="mb-3">
-                                        <label class="form-label d-block" for="discount">Descuento</label> 
+                                        <label class="form-label d-block" for="discount">Descuento</label>
                                         <div class="input-group">
-                                            <input 
-                                                class="form-control" 
-                                                id="discount" 
-                                                name="discount" 
-                                                type="number" 
-                                                min="0" 
-                                                max="100" 
-                                                step="1" 
-                                                placeholder="Introduce un porcentaje" 
-                                                value="<?=$game->discount * 100?>" 
+                                            <input
+                                                class="form-control"
+                                                id="discount"
+                                                name="discount"
+                                                type="number"
+                                                min="0"
+                                                max="100"
+                                                step="1"
+                                                placeholder="Introduce un porcentaje"
+                                                value="<?= $game->discount *
+                                                    100 ?>"
                                             />
                                             <span class="input-group-text">%</span>
                                         </div>
@@ -117,7 +178,7 @@ function showPage() {
                                     </div>
                                     <div class="mb-3">
                                         <label class="form-label d-block" for="description">Descripción</label>
-                                        <textarea name="description" id="description" rows="8" placeholder="Escribe el contenido aquí..." required><?=$game->description?></textarea>
+                                        <textarea name="description" id="description" rows="8" placeholder="Escribe el contenido aquí..." required><?= $game->description ?></textarea>
                                         <div class="invalid-feedback" id="descriptionError"></div>
                                     </div>
                                     <div class="mb-3">
@@ -134,7 +195,11 @@ function showPage() {
                                     </div>
                                     <div class="d-grid">
                                         <button class="btn btn-primary btn-lg" id="submitButtonEdit" type="submit">Cambiar</button>
-                                        <button class="btn btn-warning btn-lg" data-status="<?=$game->is_public ? 'public' : 'hidden'?>" id="changeVisibility"><?= $game->is_public ? 'Ocultar' : 'Publicar' ?></button>
+                                        <button class="btn btn-warning btn-lg" data-status="<?= $game->is_public
+                                            ? "public"
+                                            : "hidden" ?>" id="changeVisibility"><?= $game->is_public
+    ? "Ocultar"
+    : "Publicar" ?></button>
                                     </div>
                                 </form>
                             </div>
@@ -162,11 +227,11 @@ function showPage() {
             </div> <!--end::App Content-->
 
             <script>
-                var simplemde = new SimpleMDE({ 
+                var simplemde = new SimpleMDE({
                     element: document.getElementById("description"),
                     autosave: {
                         enabled: true,
-                        uniqueId: "Orion_StoreGame_<?=$game->id?>_Description",
+                        uniqueId: "Orion_StoreGame_<?= $game->id ?>_Description",
                         delay: 1000,
                     },
                     insertTexts: {
@@ -188,6 +253,6 @@ function showPage() {
             <?php
 }
 
-include("views/dev/panel/template/main.php");
+include "views/templates/panel/dev.php";
 
-unset($GLOBALS['game']);
+unset($GLOBALS["game"]);

@@ -53,3 +53,30 @@ html,
 body {
     overflow-x: hidden;
 }
+
+.main-content {
+    width: 100%;
+    min-height: 100vh;
+    background-color: #0f172a;
+}
+
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th,
+td {
+    white-space: nowrap;
+}
+
+#tooltip {
+    transition:
+        opacity 0.2s ease,
+        transform 0.2s ease;
+    opacity: 0;
+}
+#tooltip:not(.hidden) {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-4px);
+}

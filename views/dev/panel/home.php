@@ -1,6 +1,6 @@
 <?php
 
-$title = "Orion | Developer Panel";
+$title = "Inicio | Orion Dev Panel";
 
 function showPage($developer)
 {

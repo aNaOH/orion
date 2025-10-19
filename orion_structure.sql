@@ -38,6 +38,14 @@ CREATE TABLE IF NOT EXISTS `guide_types` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS `game_features` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `icon` VARCHAR(255) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `tint` VARCHAR(7) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS `game_news_categories` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
@@ -187,6 +195,19 @@ CREATE TABLE IF NOT EXISTS `owns` (
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_owns_game_id`
     FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `game_has_feature` (
+  `game_id` INT NOT NULL,
+  `feature_id` INT NOT NULL,
+  KEY `fk_game_has_feature_game_id` (`game_id`),
+  KEY `fk_game_has_feature_feature_id` (`feature_id`),
+  CONSTRAINT `fk_game_has_feature_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_game_has_feature_feature_id`
+    FOREIGN KEY (`feature_id`) REFERENCES `game_features` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
