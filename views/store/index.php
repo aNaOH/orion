@@ -86,7 +86,7 @@ function showPage()
         <div>
           <div class="bg-brand-900 rounded-lg p-6 shadow-sm">
             <div class="flex flex-row gap-4">
-                <div id="description container mx-auto p-6 flex-1">
+                <div id="description container mx-auto p-6">
                     <?php
                     $Parsedown = new TailwindParsedown();
                     echo $Parsedown->text(

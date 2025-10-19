@@ -28,6 +28,6 @@ INSERT INTO `game_features` (`id`, `icon`, `name`, `tint`) VALUES
     (7, 'cGFWbmc5SzdwajJQNTJYRkpleTZxOUhBZG9Id014ZklreWRQWW5BNTE1UT0=', 'Juego Cruzado (Multiplataforma)', '#9F403C'),
     (8, 'aDZSdXFrb0JNLy9xbFJLdVl1WTNValVlUmhuVmlUUkNWWmRRY3hoL3FDTT0=', 'Soporte de mods', '#143778'),
     (9, 'aDZSdXFrb0JNLy9xbFJLdVl1WTNVaEVEQUhXSC9mZGZ3dTR1OEZ0Z2p0UT0=', 'Soporte de mods (mod.io)', '#07C1D8'),
-    (10, 'cGFWbmc5SzdwajJQNTJYRkpleTZxK3JnSlhQY3NOc0NhcitOdmlZSGV3Zz0=', 'Guardado en la nube', '#9F403C'),
-    (11, 'cGFWbmc5SzdwajJQNTJYRkpleTZxd1JNNXdOTFpsSFNpYmN3STAyNmN6WT0=', 'Guardado Multiplataforma', '#38912A'),
+    (10, 'cGFWbmc5SzdwajJQNTJYRkpleTZxK3JnSlhQY3NOc0NhcitOdmlZSGV3Zz0=', 'Guardado en la nube', '#38912A'),
+    (11, 'cGFWbmc5SzdwajJQNTJYRkpleTZxd1JNNXdOTFpsSFNpYmN3STAyNmN6WT0=', 'Guardado Multiplataforma', '#29D640'),
     (12, 'Z1RMVnBnaVBWUXcwMkpQandVMDdVU3ZaWU1GRy94TUQyNXFlTlRKcURHZz0=', 'Soporte de Mando', '#5A8A71');
