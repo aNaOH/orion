@@ -4,252 +4,341 @@ $title = "Editar tienda para " . $game->title . " | Orion Dev Panel";
 
 function showPage()
 {
-    global $game; ?>
+    global $game;
+    global $features;
+    global $genres;
+    ?>
 
-<link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.min.css">
+<link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.orion.css">
 <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
 
+<script src="/assets/js/components/gradientChip.js"></script>
 <script src="/assets/js/components/fileUpload.js"></script>
 
-<div class="app-content-header"> <!--begin::Container-->
-                <div class="container-fluid"> <!--begin::Row-->
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h3 class="mb-0">Editar tienda para <?= $game->title ?></h3>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-end">
-                                <li class="breadcrumb-item">Inicio</li>
-                                <li class="breadcrumb-item">Juegos</li>
-                                <li class="breadcrumb-item"><?= $game->title ?></li>
-                                <li class="breadcrumb-item active" aria-current="page">Tienda</li>
-                            </ol>
-                        </div>
-                    </div> <!--end::Row-->
-                </div> <!--end::Container-->
-            </div> <!--end::App Content Header--> <!--begin::App Content-->
-            <div class="app-content"> <!--begin::Container-->
-                <div class="container-fluid"> <!--begin::Row-->
-                    <div class="container mt-4">
-                        <!-- Tabs -->
-                        <ul class="nav nav-tabs" id="myTab" role="tablist">
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="store-tab" data-bs-toggle="tab" data-bs-target="#store" type="button" role="tab" aria-controls="store" aria-selected="true">
-                                    Página de la tienda
-                                </button>
-                            </li>
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="builds-tab" data-bs-toggle="tab" data-bs-target="#builds" type="button" role="tab" aria-controls="builds" aria-selected="false">
-                                    Compilaciones
-                                </button>
-                            </li>
-                        </ul>
+<div class="container mx-auto px-6 mt-6 max-w-full">
+    <div class="flex justify-between items-center">
+        <h1 class="text-xl font-semibold text-alt">Editar tienda para <?= $game->title ?></h1>
+        <a href="/dev/panel/games/" class="text-gray-400 hover:text-alt transition">Volver</a>
+    </div>
+  <!-- Tabs -->
+  <div class="border-b border-gray-700">
+    <nav class="flex space-x-6" id="tabButtons">
+      <button
+        data-tab="store"
+        class="tab-button text-alt border-b-2 border-alt py-2 font-medium transition"
+      >
+        Página de la tienda
+      </button>
+      <button
+        data-tab="builds"
+        class="tab-button text-gray-400 hover:text-alt border-b-2 border-transparent py-2 font-medium transition"
+      >
+        Compilaciones
+      </button>
+    </nav>
+  </div>
 
-                        <!-- Tab Content -->
-                        <div class="tab-content mt-3" id="myTabContent">
-                            <div class="tab-pane fade show active" id="store" role="tabpanel" aria-labelledby="store-tab">
-                                <h3>Página de la tienda</h3>
-                                <form id="editGameForm">
-                                    <div class="form-floating mb-3">
-                                        <input class="form-control" id="title" name="title" type="text" placeholder="Título" value="<?= $game->title ?>" />
-                                        <label for="title">Título</label>
-                                        <div class="invalid-feedback" id="titleError"></div>
-                                    </div>
-                                    <div class="form-floating mb-3">
-                                        <input class="form-control" id="shortDescription" name="shortDescription" type="text" placeholder="Descripción corta" value="<?= $game->short_description ?>" />
-                                        <label for="shortDescription">Descripción corta</label>
-                                        <div class="invalid-feedback" id="shortDescriptionError"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label d-block"></label>
-                                        <div class="form-check form-check-inline">
-                                            <input class="form-check-input" id="asEditor" type="checkbox" name="asEditor" <?= $game->as_editor
-                                                ? "checked"
-                                                : "" ?> />
-                                            <label class="form-check-label" for="asEditor">¿Eres la editora?</label>
-                                        </div>
-                                    </div>
-                                    <div class="d-none form-floating mb-3" id="developerNameContainer">
-                                        <input class="form-control" id="developerName" name="developerName" type="text" placeholder="Desarrollador" value="<?= $game->developer_name ?>"/>
-                                        <label for="developerName">Desarrollador</label>
-                                        <div class="invalid-feedback" id="developerNameError"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label d-block" for="price">Precio</label>
-                                        <select class="form-control" id="price" name="price">
-                                            <option value="0" <?= is_null(
-                                                $game->base_price,
-                                            ) || $game->base_price == 0
-                                                ? "selected"
-                                                : "" ?>>Gratis</option>
-                                            <option value="1.99" <?= $game->base_price ==
-                                            1.99
-                                                ? "selected"
-                                                : "" ?>>1,99 €</option>
-                                            <option value="2.99" <?= $game->base_price ==
-                                            2.99
-                                                ? "selected"
-                                                : "" ?>>2,99 €</option>
-                                            <option value="3.99" <?= $game->base_price ==
-                                            3.99
-                                                ? "selected"
-                                                : "" ?>>3,99 €</option>
-                                            <option value="4.99" <?= $game->base_price ==
-                                            4.99
-                                                ? "selected"
-                                                : "" ?>>4,99 €</option>
-                                            <option value="5.99" <?= $game->base_price ==
-                                            5.99
-                                                ? "selected"
-                                                : "" ?>>5,99 €</option>
-                                            <option value="6.99" <?= $game->base_price ==
-                                            6.99
-                                                ? "selected"
-                                                : "" ?>>6,99 €</option>
-                                            <option value="7.99" <?= $game->base_price ==
-                                            7.99
-                                                ? "selected"
-                                                : "" ?>>7,99 €</option>
-                                            <option value="8.99" <?= $game->base_price ==
-                                            8.99
-                                                ? "selected"
-                                                : "" ?>>8,99 €</option>
-                                            <option value="9.99" <?= $game->base_price ==
-                                            9.99
-                                                ? "selected"
-                                                : "" ?>>9,99 €</option>
-                                            <option value="14.99" <?= $game->base_price ==
-                                            14.99
-                                                ? "selected"
-                                                : "" ?>>14,99 €</option>
-                                            <option value="19.99" <?= $game->base_price ==
-                                            19.99
-                                                ? "selected"
-                                                : "" ?>>19,99 €</option>
-                                            <option value="24.99" <?= $game->base_price ==
-                                            24.99
-                                                ? "selected"
-                                                : "" ?>>24,99 €</option>
-                                            <option value="29.99" <?= $game->base_price ==
-                                            29.99
-                                                ? "selected"
-                                                : "" ?>>29,99 €</option>
-                                            <option value="39.99" <?= $game->base_price ==
-                                            39.99
-                                                ? "selected"
-                                                : "" ?>>39,99 €</option>
-                                            <option value="49.99" <?= $game->base_price ==
-                                            49.99
-                                                ? "selected"
-                                                : "" ?>>49,99 €</option>
-                                            <option value="59.99" <?= $game->base_price ==
-                                            59.99
-                                                ? "selected"
-                                                : "" ?>>59,99 €</option>
-                                            <option value="69.99" <?= $game->base_price ==
-                                            69.99
-                                                ? "selected"
-                                                : "" ?>>69,99 €</option>
-                                            <option value="79.99" <?= $game->base_price ==
-                                            79.99
-                                                ? "selected"
-                                                : "" ?>>79,99 €</option>
-                                        </select>
-                                        <div class="invalid-feedback" id="priceError"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label d-block" for="discount">Descuento</label>
-                                        <div class="input-group">
-                                            <input
-                                                class="form-control"
-                                                id="discount"
-                                                name="discount"
-                                                type="number"
-                                                min="0"
-                                                max="100"
-                                                step="1"
-                                                placeholder="Introduce un porcentaje"
-                                                value="<?= $game->discount *
-                                                    100 ?>"
-                                            />
-                                            <span class="input-group-text">%</span>
-                                        </div>
-                                        <div class="invalid-feedback" id="discountError"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label d-block" for="description">Descripción</label>
-                                        <textarea name="description" id="description" rows="8" placeholder="Escribe el contenido aquí..." required><?= $game->description ?></textarea>
-                                        <div class="invalid-feedback" id="descriptionError"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label d-block" for="coverFile">Portada (Una imagen de 600x900)</label>
-                                        <file-upload id="coverFile" min-image-width="600" max-image-width="600" min-image-height="900" max-image-height="900"></file-upload>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label d-block" for="thumbFile">Miniatura (Una imagen de 920x430)</label>
-                                        <file-upload id="thumbFile" min-image-width="920" max-image-width="920" min-image-height="430" max-image-height="430"></file-upload>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label class="form-label d-block" for="iconFile">Icono del juego (Imagen, mínimo 32x32, máximo 512x512, cuadrada)</label>
-                                        <file-upload id="iconFile" min-image-width="32" max-image-width="512" min-image-height="32" max-image-height="512" image-aspect-ratio="1:1"></file-upload>
-                                    </div>
-                                    <div class="d-grid">
-                                        <button class="btn btn-primary btn-lg" id="submitButtonEdit" type="submit">Cambiar</button>
-                                        <button class="btn btn-warning btn-lg" data-status="<?= $game->is_public
-                                            ? "public"
-                                            : "hidden" ?>" id="changeVisibility"><?= $game->is_public
-    ? "Ocultar"
-    : "Publicar" ?></button>
-                                    </div>
-                                </form>
-                            </div>
-                            <div class="tab-pane fade" id="builds" role="tabpanel" aria-labelledby="builds-tab">
-                                <h3>Compilaciones</h3>
-                                <form id="buildForm">
-                                    <div class="form-floating mb-3">
-                                        <input class="form-control" id="version" name="version" type="text" placeholder="Versión" />
-                                        <label for="version">Versión</label>
-                                        <div class="invalid-feedback" id="versionError"></div>
-                                    </div>
-                                    <div class="mb-3">
-                                        <label for="file">Compilación</label>
-                                        <input class="form-control" id="file" name="file" type="file" accept="application/zip" />
-                                        <div class="invalid-feedback" id="versionError"></div>
-                                    </div>
-                                    <div class="d-grid">
-                                        <button class="btn btn-primary btn-lg" id="submitButtonBuild" type="submit">Subir</button>
-                                    </div>
-                                </form>
-                            </div>
-                        </div>
-                    </div>
-                </div> <!--end::Container-->
-            </div> <!--end::App Content-->
+  <!-- Contenido de las pestañas -->
+  <div id="tabContent" class="mt-6">
+    <!-- Pestaña Tienda -->
+    <div id="store" class="tab-pane block">
+      <form id="editGameForm" class="space-y-6">
+        <!-- Título -->
+        <div class="relative">
+          <input
+            type="text"
+            id="title"
+            name="title"
+            placeholder=" "
+            value="<?= $game->title ?>"
+            class="peer w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2 focus:ring-2 focus:ring-alt focus:border-alt outline-none placeholder-transparent"
+          />
+          <label
+            for="title"
+            class="absolute left-4 top-3 text-gray-400 text-sm transition-all
+                   peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                   peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+          >
+            Título
+          </label>
+        </div>
 
-            <script>
-                var simplemde = new SimpleMDE({
-                    element: document.getElementById("description"),
-                    autosave: {
-                        enabled: true,
-                        uniqueId: "Orion_StoreGame_<?= $game->id ?>_Description",
-                        delay: 1000,
-                    },
-                    insertTexts: {
-                        horizontalRule: ["", "\n\n-----\n\n"],
-                        image: ["![](http://", ")"],
-                        link: ["[", "](http://)"],
-                        table: ["", "\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text      | Text     |\n\n"],
-                    },
-                    placeholder: "Type here...",
-                    hideIcons: ["side-by-side", "fullscreen"],
-                });
-            </script>
+        <!-- Descripción corta -->
+        <div class="relative">
+          <input
+            type="text"
+            id="shortDescription"
+            name="shortDescription"
+            placeholder=" "
+            value="<?= $game->short_description ?>"
+            class="peer w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2 focus:ring-2 focus:ring-alt focus:border-alt outline-none placeholder-transparent"
+          />
+          <label
+            for="shortDescription"
+            class="absolute left-4 top-3 text-gray-400 text-sm transition-all
+                   peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                   peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+          >
+            Descripción corta
+          </label>
+        </div>
+
+        <!-- Género -->
+        <div>
+          <label for="genre" class="block mb-2 text-gray-300 font-medium">Género</label>
+          <select
+            id="genre"
+            name="genre"
+            class="w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-alt focus:border-alt outline-none"
+          >
+            <?php foreach ($genres as $genre): ?>
+              <option value="<?= $genre->id ?>" <?= $game->genre_id ==
+$genre->id
+    ? "selected"
+    : "" ?>>
+                <?= $genre->name ?>
+              </option>
+            <?php endforeach; ?>
+          </select>
+        </div>
+
+        <!-- Características -->
+        <div class="flex flex-col gap-2">
+          <p class="block mb-2 text-gray-300 font-medium">Características</p>
+
+          <div class="flex flex-row gap-2">
+              <select
+                id="featureSelector"
+                class="w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-alt focus:border-alt outline-none"
+              >
+                <option value="">Seleccionar característica</option>
+                <?php foreach ($features as $feature): ?>
+                  <option value="<?= $feature->id ?>">
+                    <?= $feature->name ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+              <button type="button" id="addFeatureButton" class="flex justify-center items-center bg-alt text-[#1B2A49] font-medium px-6 py-3 rounded-lg hover:opacity-90 transition w-[25%]">Agregar característica</button>
+          </div>
+          <div id="featuresContainer" class="flex flex-col gap-2">
+              <?php foreach ($game->getFeatures() as $gameFeature): ?>
+                <div class="flex items-center gap-2" data-feature-id="<?= $gameFeature->id ?>">
+                  <gradient-chip
+                        base-color="<?= $gameFeature->tint ?>"
+                        size="24"
+                        icon-path="/media/game/feature/<?= $gameFeature->icon ?>"
+                        text="<?= $gameFeature->name ?>"
+                        border-radius="8"
+                        class="w-full">
+                  </gradient-chip>
+                  <button type="button" class="bg-red-500 text-white rounded-full px-2 py-1 hover:bg-red-600" data-feature-id="<?= $gameFeature->id ?>" onclick="deleteFeature(<?= $gameFeature->id ?>)">Eliminar</button>
+                </div>
+              <?php endforeach; ?>
+          </div>
+        </div>
+
+        <!-- Checkbox -->
+        <div class="flex items-center gap-2">
+          <input
+            id="asEditor"
+            name="asEditor"
+            type="checkbox"
+            <?= $game->as_editor ? "checked" : "" ?>
+            class="w-4 h-4 accent-alt focus:ring-alt"
+          />
+          <label for="asEditor" class="text-gray-300 font-medium">¿Eres la editora?</label>
+        </div>
+
+        <!-- Desarrollador -->
+        <div id="developerNameContainer" class="<?= $game->as_editor
+            ? ""
+            : "hidden" ?> relative">
+          <input
+            type="text"
+            id="developerName"
+            name="developerName"
+            placeholder=" "
+            value="<?= $game->developer_name ?>"
+            class="peer w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2 focus:ring-2 focus:ring-alt focus:border-alt outline-none placeholder-transparent"
+          />
+          <label
+            for="developerName"
+            class="absolute left-4 top-3 text-gray-400 text-sm transition-all
+                   peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                   peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+          >
+            Desarrollador
+          </label>
+        </div>
+
+        <!-- Precio -->
+        <div>
+          <label for="price" class="block mb-2 text-gray-300 font-medium">Precio</label>
+          <select
+            id="price"
+            name="price"
+            class="w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-alt focus:border-alt outline-none"
+          >
+            <option value="0" <?= is_null($game->base_price) ||
+            $game->base_price == 0
+                ? "selected"
+                : "" ?>>Gratis</option>
+            <?php
+            $prices = [
+                1.99,
+                2.99,
+                3.99,
+                4.99,
+                5.99,
+                6.99,
+                7.99,
+                8.99,
+                9.99,
+                14.99,
+                19.99,
+                24.99,
+                29.99,
+                39.99,
+                49.99,
+                59.99,
+                69.99,
+                79.99,
+            ];
+            foreach ($prices as $price) {
+                echo "<option value='{$price}' " .
+                    ($game->base_price == $price ? "selected" : "") .
+                    ">" .
+                    str_replace(".", ",", $price) .
+                    " €</option>";
+            }
+            ?>
+          </select>
+        </div>
+
+        <!-- Descuento -->
+        <div>
+          <label for="discount" class="block mb-2 text-gray-300 font-medium">Descuento</label>
+          <div class="flex items-center gap-2">
+            <input
+              id="discount"
+              name="discount"
+              type="number"
+              min="0"
+              max="100"
+              step="1"
+              value="<?= $game->discount * 100 ?>"
+              class="w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-alt focus:border-alt outline-none"
+            />
+            <span class="text-gray-400 font-medium">%</span>
+          </div>
+        </div>
+
+        <!-- Descripción -->
+        <div>
+          <label for="description" class="block mb-2 text-gray-300 font-medium">Descripción</label>
+          <textarea
+            id="description"
+            name="description"
+            rows="8"
+            class="w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 py-3 focus:ring-2 focus:ring-alt focus:border-alt outline-none"
+          ><?= $game->description ?></textarea>
+        </div>
+
+        <!-- Archivos -->
+        <div class="space-y-6">
+          <div>
+            <label for="coverFile" class="block mb-2 text-gray-300 font-medium">Portada (600x900)</label>
+            <file-upload id="coverFile" min-image-width="600" max-image-width="600" min-image-height="900" max-image-height="900"></file-upload>
+          </div>
+
+          <div>
+            <label for="thumbFile" class="block mb-2 text-gray-300 font-medium">Miniatura (920x430)</label>
+            <file-upload id="thumbFile" min-image-width="920" max-image-width="920" min-image-height="430" max-image-height="430"></file-upload>
+          </div>
+
+          <div>
+            <label for="iconFile" class="block mb-2 text-gray-300 font-medium">Icono (32x32–512x512, cuadrado)</label>
+            <file-upload id="iconFile" min-image-width="32" max-image-width="512" min-image-height="32" max-image-height="512" image-aspect-ratio="1:1"></file-upload>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="flex flex-col gap-3 mt-6">
+          <button
+            id="submitButtonEdit"
+            type="submit"
+            class="flex justify-center items-center gap-2 bg-alt text-[#1B2A49] font-medium px-6 py-3 rounded-lg hover:opacity-90 transition w-full"
+          >
+            <i class="bi bi-arrow-repeat hidden animate-spin" id="spinnerEdit"></i>
+            <span>Cambiar</span>
+          </button>
+          <button
+            id="changeVisibility"
+            data-status="<?= $game->is_public ? "public" : "hidden" ?>"
+            class="<?= $game->is_public
+                ? "bg-yellow-500 hover:bg-yellow-400"
+                : "bg-green-500 hover:bg-green-400" ?> text-[#1B2A49] font-medium px-6 py-3 rounded-lg transition w-full"
+          >
+            <?= $game->is_public ? "Ocultar" : "Publicar" ?>
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Pestaña Builds -->
+    <div id="builds" class="tab-pane hidden">
+      <form id="buildForm" class="space-y-6" enctype="multipart/form-data">
+        <div class="relative">
+          <input
+            type="text"
+            id="version"
+            name="version"
+            placeholder=" "
+            class="peer w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2 focus:ring-2 focus:ring-alt focus:border-alt outline-none placeholder-transparent"
+          />
+          <label
+            for="version"
+            class="absolute left-4 top-3 text-gray-400 text-sm transition-all
+                   peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                   peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+          >
+            Versión
+          </label>
+        </div>
+
+        <div>
+          <label for="file" class="block mb-2 text-gray-300 font-medium">Compilación</label>
+          <input
+            id="file"
+            name="file"
+            type="file"
+            accept="application/zip"
+            class="w-full text-gray-300 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:bg-alt file:text-[#1B2A49] hover:file:opacity-90 transition"
+          />
+        </div>
+
+        <!-- Barra de progreso -->
+        <div class="hidden w-full bg-gray-800 rounded-full h-2.5 overflow-hidden" id="uploadProgressContainer">
+          <div id="uploadProgress" class="bg-alt h-2.5 w-0 transition-all duration-300"></div>
+        </div>
+
+        <button
+          id="submitButtonBuild"
+          type="submit"
+          class="flex justify-center items-center gap-2 bg-alt text-[#1B2A49] font-medium px-6 py-3 rounded-lg hover:opacity-90 transition w-full"
+        >
+          <i class="bi bi-arrow-repeat hidden animate-spin" id="spinnerBuild"></i>
+          <span>Subir</span>
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
 
             <script src="/assets/js/forms/dev/getStoreID.js"></script>
             <script src="/assets/js/forms/validator.js"></script>
-            <script src="/assets/js/forms/dev/editStore.js"></script>
-            <script src="/assets/js/forms/dev/buildStore.js"></script>
 
+            <script src="/assets/js/orion-panel/dev/store.js"></script>
             <?php
 }
 

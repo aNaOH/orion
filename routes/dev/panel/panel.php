@@ -25,7 +25,13 @@ $router->mount("/panel", function () use ($router) {
         ) {
             $router->trigger404();
         }
+
+        $features = GameFeature::getAll();
+        $genres = GameGenre::getAll();
+
         $GLOBALS["game"] = $game;
+        $GLOBALS["features"] = $features;
+        $GLOBALS["genres"] = $genres;
         include "views/dev/panel/games/store/store.php";
     });
 

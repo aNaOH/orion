@@ -242,6 +242,62 @@ class Game
         return Leaderboard::getAllByGame($this);
     }
 
+    public function setFeatures(array $featureIds)
+    {
+        $currentFeatures = $this->getFeatures();
+        $features = array_map(
+            fn($id) => GameFeature::getById($id),
+            $featureIds,
+        );
+
+        foreach ($currentFeatures as $feature) {
+            if (!in_array($feature, $features, true)) {
+                $this->removeFeature($feature);
+            }
+        }
+
+        foreach ($features as $feature) {
+            if (!$this->hasFeature($feature)) {
+                $this->addFeature($feature);
+            }
+        }
+    }
+
+    public function addFeature(GameFeature|int $feature)
+    {
+        $featureID = $feature instanceof GameFeature ? $feature->id : $feature;
+
+        //Insert feature into game_has_features table
+        Connection::doInsert(ORION_DB, "game_has_feature", [
+            "game_id" => $this->id,
+            "feature_id" => $featureID,
+        ]);
+    }
+
+    public function removeFeature(GameFeature|int $feature)
+    {
+        $featureID = $feature instanceof GameFeature ? $feature->id : $feature;
+
+        //Delete feature from game_has_features table
+        Connection::doDelete(ORION_DB, "game_has_feature", [
+            "game_id" => $this->id,
+            "feature_id" => $featureID,
+        ]);
+    }
+
+    public function hasFeature(GameFeature|int $feature)
+    {
+        $featureID = $feature instanceof GameFeature ? $feature->id : $feature;
+
+        $result = Connection::doSelect(ORION_DB, "game_has_feature", [
+            "game_id" => $this->id,
+            "feature_id" => $featureID,
+        ]);
+
+        //Check if feature exists in game_has_features table
+        return $result !== null && count($result) > 0;
+    }
+
     public function getFeatures()
     {
         return GameFeature::getAllByGame($this);

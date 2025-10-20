@@ -35,7 +35,9 @@ class GameController
         string $title,
         string $shortDescription,
         bool $asEditor,
+        int $developerAccountId,
         ?string $developerName,
+        int $genreId = 0,
     ) {
         FormHelper::ValidateRequiredField($title, "title");
         FormHelper::ValidateRequiredField(
@@ -55,10 +57,12 @@ class GameController
             null,
             null,
             $asEditor,
-            true,
+            false,
             $developerName,
-            1,
+            $developerAccountId,
+            $genreId,
         );
+
         $game->save();
 
         header("HTTP/1.1 200 OK");

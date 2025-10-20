@@ -15,37 +15,73 @@ $router->mount("/dev", function () use ($router) {
         $shortDescription = $json["shortDescription"];
         $asEditor = $json["asEditor"];
         $developerName = $json["developerName"];
+        $genre = $json["genre"] ?? 1;
+
+        $user = User::getById($_SESSION["user"]["id"]);
+        $developer = $user->getDeveloperInfo();
 
         GameController::newGame(
             $title,
             $shortDescription,
             $asEditor,
+            $developer->id,
             $developerName,
+            $genre,
         );
     });
 
+    $router->get("/features", function () {
+        $features = GameFeature::getAll();
+
+        $featuresArray = [];
+        foreach ($features as $feature) {
+            $featuresArray[] = [
+                "id" => $feature->id,
+                "name" => $feature->name,
+                "icon" => $feature->icon,
+                "tint" => $feature->tint,
+            ];
+        }
+
+        $response["status"] = 200;
+        $response["data"] = $featuresArray;
+
+        echo json_encode($response);
+    });
+
     $router->post("/game/store", function () {
-        $gameID = $_POST["game"];
+        $rawData = json_decode($_POST["data"] ?? "{}", true);
+
+        $gameID = $rawData["game"] ?? null;
+        if (is_null($gameID)) {
+            header("HTTP/1.1 400 Bad Request");
+            echo json_encode([
+                "status" => 400,
+                "message" => "Falta el ID del juego",
+            ]);
+            exit();
+        }
 
         $game = Game::getById($gameID);
         if (is_null($game)) {
             header("HTTP/1.1 400 Bad Request");
-            $response["status"] = 400;
-            $response[
-                "message"
-            ] = "No existe ningún juego con ese ID. ($gameID)";
-
-            echo json_encode($response);
+            echo json_encode([
+                "status" => 400,
+                "message" => "No existe ningún juego con ese ID. ($gameID)",
+            ]);
             exit();
         }
 
-        $title = $_POST["title"];
-        $shortDescription = $_POST["shortDescription"];
-        $asEditor = $_POST["asEditor"] == "false" ? false : true;
-        $developerName = $_POST["developerName"];
-        $description = $_POST["description"];
-        $price = $_POST["price"];
-        $discount = $_POST["discount"];
+        // Asignar valores desde $rawData
+        $title = $rawData["title"] ?? "";
+        $shortDescription = $rawData["shortDescription"] ?? "";
+        $asEditor = $rawData["asEditor"] ?? false;
+        $developerName = $rawData["developerName"] ?? "";
+        $description = $rawData["description"] ?? "";
+        $price = $rawData["price"] ?? 0;
+        $discount = $rawData["discount"] ?? 0;
+        $genre = $rawData["genre"] ?? 1;
+        $features = $rawData["features"] ?? [];
 
         $cover = $_FILES["coverFile"] ?? null;
         $thumb = $_FILES["thumbFile"] ?? null;
@@ -58,6 +94,9 @@ $router->mount("/dev", function () use ($router) {
         $game->description = $description;
         $game->base_price = $price;
         $game->discount = $discount / 100;
+        $game->genre_id = $genre;
+
+        $game->setFeatures($features);
 
         $game->save();
 
