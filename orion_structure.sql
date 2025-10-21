@@ -135,13 +135,13 @@ CREATE TABLE IF NOT EXISTS `stat` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `achievements` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `game_id` INT DEFAULT NULL,
+  `id` INT NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   `description` VARCHAR(255) NOT NULL,
   `icon` VARCHAR(255) NOT NULL,
   `locked_icon` VARCHAR(255) DEFAULT NULL,
   `secret` TINYINT(1) DEFAULT '0',
-  `game_id` INT DEFAULT NULL,
   `type` INT NOT NULL,
   `stat_id` INT DEFAULT NULL,
   `stat_value` INT DEFAULT NULL,

@@ -81,6 +81,30 @@ $router->mount("/panel", function () use ($router) {
 
         include "views/dev/panel/games/community/achievements/create.php";
     });
+
+    $router->get(
+        "/games/{gameId}/community/achievements/{achievementId}/edit",
+        function ($gameId, $achievementId) use ($router) {
+            $user = User::getById($_SESSION["user"]["id"]);
+            $game = Game::getById($gameId);
+            if (
+                is_null($game) ||
+                $game->getDeveloper() != $user->getDeveloperInfo()
+            ) {
+                $router->trigger404();
+            }
+            $achievement = Achievement::getById($gameId, $achievementId);
+            if (is_null($achievement)) {
+                $router->trigger404();
+            }
+
+            $GLOBALS["game"] = $game;
+            $GLOBALS["stats"] = $game->getStats();
+            $GLOBALS["achievement"] = $achievement;
+
+            include "views/dev/panel/games/community/achievements/edit.php";
+        },
+    );
 });
 
 $router->set404("/dev/panel(/.*)?", function () {

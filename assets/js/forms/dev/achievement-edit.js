@@ -1,4 +1,4 @@
-let formAchievement = document.getElementById("newAchievementForm");
+let formAchievement = document.getElementById("editAchievementForm");
 let submitAchievement = document.getElementById("submitButton");
 let typeSelect = document.getElementById("type");
 let statContainer = document.getElementById("statContainer");
@@ -34,6 +34,8 @@ formAchievement.onsubmit = (e) => {
   resetField("lockedIcon");
 
   let formData = new FormData();
+
+  formData.append("achievement", fields["achievement"].value);
   formData.append("game", fields["game"].value);
   formData.append("name", fields["name"].value);
   formData.append("description", fields["description"].value);
@@ -54,7 +56,7 @@ formAchievement.onsubmit = (e) => {
   submitAchievement.classList.add("disabled");
 
   $.ajax({
-    url: "/api/dev/achievement",
+    url: "/api/dev/achievement-edit",
     type: "POST",
     data: formData,
     processData: false,

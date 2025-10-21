@@ -102,37 +102,7 @@ function showPage()
 
     <div id="table-tooltip" class="hidden absolute bg-[#1B2A49] text-[#FFD700] text-sm px-2 py-1 rounded-md shadow-lg pointer-events-none z-50"></div>
 
-    <script>
-      const tableTooltip = document.getElementById("table-tooltip");
-
-      document.querySelectorAll(".tooltip-btn").forEach((btn) => {
-        btn.addEventListener("mouseenter", (e) => {
-          const text = btn.getAttribute("data-tooltip");
-          tableTooltip.textContent = text;
-          tableTooltip.classList.remove("hidden");
-          const rect = btn.getBoundingClientRect();
-          tableTooltip.style.left = `${rect.left + rect.width / 2}px`;
-          tableTooltip.style.top = `${rect.top - 30}px`;
-          tableTooltip.style.transform = "translateX(-50%)";
-        });
-
-        btn.addEventListener("mouseleave", () => {
-          tableTooltip.classList.add("hidden");
-        });
-
-        // Para móviles (tocar muestra el tooltip un instante)
-        btn.addEventListener("touchstart", (e) => {
-          const text = btn.getAttribute("data-tooltip");
-          tableTooltip.textContent = text;
-          tableTooltip.classList.remove("hidden");
-          const rect = btn.getBoundingClientRect();
-          tableTooltip.style.left = `${rect.left + rect.width / 2}px`;
-          tableTooltip.style.top = `${rect.top - 30}px`;
-          tableTooltip.style.transform = "translateX(-50%)";
-          setTimeout(() => tableTooltip.classList.add("hidden"), 1500);
-        });
-      });
-    </script>
+    <script src="/assets/js/orion-panel/table-tooltip.js"></script>
 
     <?php
 }

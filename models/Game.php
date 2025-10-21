@@ -232,6 +232,53 @@ class Game
         return Achievement::getAllByGame($this);
     }
 
+    public function addAchievement(
+        $name,
+        $description,
+        $icon,
+        $locked_icon,
+        $secret,
+        $type,
+        $stat,
+        $stat_value,
+    ) {
+        $gameAchievements = $this->getAchievements();
+
+        // Ordenamos por ID
+        usort($gameAchievements, fn($a, $b) => $a->id <=> $b->id);
+
+        // Valor por defecto: siguiente al último ID
+        $achId =
+            count($gameAchievements) > 0
+                ? $gameAchievements[array_key_last($gameAchievements)]->id + 1
+                : 1;
+
+        // Buscamos huecos en los IDs
+        $expectedId = 1;
+        foreach ($gameAchievements as $achievement) {
+            if ($achievement->id > $expectedId) {
+                // Encontramos un salto (por ejemplo, del 2 al 4 → falta el 3)
+                $achId = $expectedId;
+                break;
+            }
+            $expectedId++;
+        }
+
+        $achievement = new Achievement(
+            $achId,
+            $name,
+            $description,
+            $icon,
+            $locked_icon,
+            $secret,
+            $this->id,
+            $type,
+            $stat,
+            $stat_value,
+        );
+        return $achievement->save();
+    }
+
     public function getStats()
     {
         return Stat::getAllByGame($this);

@@ -247,6 +247,9 @@ $router->mount("/dev", function () use ($router) {
             exit();
         }
         $stat = $_POST["stat"] ?? null;
+        if ($stat < 1) {
+            $stat = null;
+        }
 
         $icon = $_FILES["icon"] ?? null;
         $lockedIcon = $_FILES["lockedIcon"] ?? null;
@@ -294,20 +297,18 @@ $router->mount("/dev", function () use ($router) {
             );
         }
 
-        $achievement = new Achievement(
-            null,
+        $done = $game->addAchievement(
             $name,
             $description,
             $iconPath,
             $lockedIconPath,
             false,
-            $game->id,
             $type,
             $stat,
-            null,
+            0,
         );
 
-        if ($achievement->save()) {
+        if ($done) {
             header("HTTP/1.1 201 Created");
             $response["status"] = 201;
             $response["message"] = "Logro creado exitosamente.";
@@ -316,6 +317,118 @@ $router->mount("/dev", function () use ($router) {
             header("HTTP/1.1 500 Internal Server Error");
             $response["status"] = 500;
             $response["message"] = "Error al crear el logro.";
+            echo json_encode($response);
+        }
+        exit();
+    });
+
+    $router->post("/achievement-edit", function () {
+        $gameID = $_POST["game"];
+        $game = Game::getById($gameID);
+        $achievementID = $_POST["achievement"];
+
+        if (is_null($game)) {
+            header("HTTP/1.1 400 Bad Request");
+            $response["status"] = 400;
+            $response["field"] = "submit";
+            $response[
+                "message"
+            ] = "No existe ningún juego con ese ID. ($gameID)";
+
+            echo json_encode($response);
+            exit();
+        }
+
+        $achievement = Achievement::getById($gameID, $achievementID);
+
+        if (is_null($achievement)) {
+            header("HTTP/1.1 400 Bad Request");
+            $response["status"] = 400;
+            $response["field"] = "submit";
+            $response[
+                "message"
+            ] = "No existe ningún logro con ese ID. ($achievementID)";
+
+            echo json_encode($response);
+            exit();
+        }
+
+        $name = $_POST["name"];
+        $description = $_POST["description"];
+        $type = EACHIEVEMENT_TYPE::tryFrom($_POST["type"]);
+        if (!$type) {
+            header("HTTP/1.1 400 Bad Request");
+            $response["status"] = 400;
+            $response["field"] = "type";
+            $response["message"] = "Tipo de logro inválido.";
+            echo json_encode($response);
+            exit();
+        }
+        $stat = $_POST["stat"] ?? null;
+        if ($stat < 1) {
+            $stat = null;
+        }
+
+        $icon = $_FILES["icon"] ?? null;
+        $lockedIcon = $_FILES["lockedIcon"] ?? null;
+
+        if ($type == EACHIEVEMENT_TYPE::STAT && !$stat) {
+            header("HTTP/1.1 400 Bad Request");
+            $response["status"] = 400;
+            $response["field"] = "stat";
+            $response["message"] = "La estadística es obligatoria.";
+            echo json_encode($response);
+            exit();
+        }
+
+        if ($icon) {
+            S3Helper::upload(
+                EBUCKET_LOCATION::GAME_ACHIEVEMENT,
+                $achievement->icon,
+                null,
+                $icon["type"],
+                $icon["tmp_name"],
+            );
+        }
+
+        $lockedIconPath = null;
+
+        if ($lockedIcon) {
+            if (!$achievement->lockedIcon) {
+                $lockedIconPath = Tript::encryptString(
+                    "orionach_" .
+                        strval(count($game->getAchievements())) .
+                        "_lock",
+                );
+            } else {
+                $lockedIconPath = $achievement->lockedIcon;
+            }
+
+            S3Helper::upload(
+                EBUCKET_LOCATION::GAME_ACHIEVEMENT,
+                $lockedIconPath,
+                null,
+                $lockedIcon["type"],
+                $lockedIcon["tmp_name"],
+            );
+        }
+
+        $achievement->name = $name;
+        $achievement->description = $description;
+        $achievement->type = $type;
+        $achievement->stat_id = $stat;
+
+        $done = $achievement->save();
+
+        if ($done) {
+            header("HTTP/1.1 201 Created");
+            $response["status"] = 201;
+            $response["message"] = "Logro editado exitosamente.";
+            echo json_encode($response);
+        } else {
+            header("HTTP/1.1 500 Internal Server Error");
+            $response["status"] = 500;
+            $response["message"] = "Error al editar el logro.";
             echo json_encode($response);
         }
         exit();
