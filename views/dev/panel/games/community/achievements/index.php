@@ -2,8 +2,6 @@
 
 $title = "Logros para " . $game->title . " | Orion Dev Panel";
 
-$hasTable = "/admin/js/tables/dev/achievements.js";
-
 function showPage()
 {
     global $game;

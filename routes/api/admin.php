@@ -4,11 +4,6 @@ require_once "controllers/GameController.php";
 require_once "models/GuideType.php";
 
 $router->mount("/admin", function () use ($router) {
-    $router->post("/quickgame", function () {
-        $title = $_POST["title"];
-        GameController::addGameQuick($title);
-    });
-
     $router->post("/guidetype", function () {
         $type = $_POST["type"];
         $tint = $_POST["tintColor"];

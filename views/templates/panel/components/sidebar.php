@@ -17,15 +17,15 @@
       <span class="menu-text text-sm font-medium">Inicio</span>
     </a>
     <hr class="my-2 border-branddark-500">
-    <a href="/admin/guidetype" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
+    <a href="/admin/guidetypes" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
       data-tooltip="Tipos de guía">
       <i class="bi bi-book-fill text-alt-400 text-lg"></i>
       <span class="menu-text text-sm font-medium">Tipos de guía</span>
     </a>
-    <a href="/admin/newstype" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
-      data-tooltip="Tipos de noticia">
+    <a href="/admin/newscategories" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
+      data-tooltip="Categorías de noticias">
       <i class="bi bi-newspaper text-alt-400 text-lg"></i>
-      <span class="menu-text text-sm font-medium">Tipos de noticia</span>
+      <span class="menu-text text-sm font-medium">Categorías de noticias</span>
     </a>
     <a href="/admin/reports" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
       data-tooltip="Reportes">
