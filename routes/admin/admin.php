@@ -11,6 +11,16 @@ $router->mount("/admin", function () use ($router) {
         include "views/admin/guidetypes/index.php";
     });
 
+    $router->get("/guidetypes/new", function () {
+        include "views/admin/guidetypes/new.php";
+    });
+
+    $router->get("/guidetypes/{id}/edit/", function ($id) {
+        $guidetype = GuideType::getById($id);
+        $GLOBALS["guidetype"] = $guidetype;
+        include "views/admin/guidetypes/edit.php";
+    });
+
     $router->get("/newscategories", function () {
         $newscategories = GameNewsCategory::getAll();
         $GLOBALS["newscategories"] = $newscategories;

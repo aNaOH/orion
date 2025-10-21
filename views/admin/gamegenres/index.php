@@ -1,6 +1,6 @@
 <?php
 
-$title = "Géneros | Orion Dev Panel";
+$title = "Géneros | Orion Admin Panel";
 
 function showPage()
 {
@@ -28,7 +28,7 @@ function showPage()
           <tr class="bg-[#1B2A49] text-left">
             <th class="px-4 py-3 font-semibold">Nombre</th>
             <th class="px-4 py-3 font-semibold">Color distintivo (en hexadecimal)</th>
-            <th class="px-4 py-3 font-semibold">Previsualización (Chip)</th>
+            <th class="px-4 py-3 font-semibold">Previsualización</th>
             <th class="px-4 py-3 font-semibold text-right">Acciones</th>
           </tr>
         </thead>

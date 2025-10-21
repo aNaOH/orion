@@ -320,11 +320,15 @@ CREATE TABLE IF NOT EXISTS `has_stat` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `unlocks` (
+  `game_id` INT NOT NULL,
   `achievement_id` INT NOT NULL,
   `user_id` INT NOT NULL,
   `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `fk_unlocks_achievement_id` (`achievement_id`),
   KEY `fk_unlocks_user_id` (`user_id`),
+  CONSTRAINT `fk_unlocks_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `games` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_unlocks_achievement_id`
     FOREIGN KEY (`achievement_id`) REFERENCES `achievements` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE,

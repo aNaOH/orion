@@ -16,7 +16,7 @@ form.onsubmit = (e) => {
 
   // Realizar la solicitud AJAX con FormData
   $.ajax({
-    url: "/api/admin/guidetype", // La URL del endpoint
+    url: "/api/admin/guidetype-edit", // La URL del endpoint
     type: "POST", // Método HTTP
     data: formData, // FormData con los datos del formulario
     processData: false, // Evitar que jQuery procese los datos

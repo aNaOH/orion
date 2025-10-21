@@ -1,6 +1,6 @@
 <?php
 
-$title = "Características | Orion Dev Panel";
+$title = "Características | Orion Admin Panel";
 
 function showPage()
 {

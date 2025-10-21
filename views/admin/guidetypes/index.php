@@ -1,16 +1,18 @@
 <?php
 
-$title = "Tipos de guía | Orion Dev Panel";
+$title = "Tipos de guía | Orion Admin Panel";
 
 function showPage()
 {
     global $guidetypes; ?>
 
+    <link rel="stylesheet" href="/assets/vendor/animate.css/animate.min.css">
+
     <script src="/assets/js/components/gradientSquare.js"></script>
     <script src="/assets/js/components/gradientChip.js"></script>
 
     <div class="flex justify-between items-center mb-6">
-        <h1 class="text-xl font-semibold text-alt">Tipos de guía</h1>
+      <h1 class="text-xl font-semibold text-alt">Tipos de guía</h1>
       <a
         href="/admin/guidetypes/new"
         id="add-entry"
@@ -27,7 +29,7 @@ function showPage()
         <thead>
           <tr class="bg-[#1B2A49] text-left">
             <th class="px-4 py-3 font-semibold">Nombre</th>
-            <th class="px-4 py-3 font-semibold">Color distintivo (en hexadecimal)</th>
+            <th class="px-4 py-3 font-semibold">Color distintivo</th>
             <th class="px-4 py-3 font-semibold">Previsualización (Cuadrado)</th>
             <th class="px-4 py-3 font-semibold">Previsualización (Chip)</th>
             <th class="px-4 py-3 font-semibold text-right">Acciones</th>
@@ -36,32 +38,40 @@ function showPage()
         <tbody>
           <?php foreach ($guidetypes as $guidetype) { ?>
           <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+            <td class="px-4 py-3"><?= $guidetype->type ?></td>
+            <td class="px-4 py-3"><?= $guidetype->tint ?></td>
             <td class="px-4 py-3">
-              <?= $guidetype->type ?>
+              <gradient-square
+                icon-path="/media/guidetype/<?= $guidetype->icon ?>"
+                base-color="<?= $guidetype->tint ?>"
+                size="50"
+              ></gradient-square>
             </td>
             <td class="px-4 py-3">
-                <?= $guidetype->tint ?>
-            </td>
-            <td class="px-4 py-3">
-                <gradient-square icon-path="/media/guidetype/<?= $guidetype->icon ?>" base-color="<?= $guidetype->tint ?>" size="50"></gradient-square>
-            </td>
-            <td class="px-4 py-3">
-                <gradient-chip icon-path="/media/guidetype/<?= $guidetype->icon ?>" base-color="<?= $guidetype->tint ?>" size="25" text="<?= $guidetype->type ?>"></gradient-chip>
+              <gradient-chip
+                icon-path="/media/guidetype/<?= $guidetype->icon ?>"
+                base-color="<?= $guidetype->tint ?>"
+                size="25"
+                text="<?= $guidetype->type ?>"
+              ></gradient-chip>
             </td>
             <td class="px-4 py-3 text-right">
-                <a
-                  href="/dev/panel/guidetypes/<?= $guidetype->id ?>/edit/"
-                  class="text-alt hover:opacity-80 mx-1 tooltip-btn"
-                  data-tooltip="Editar"
-                >
-                  <i class="bi bi-pencil-square"></i>
-                </a>
-                <button
-                  class="text-red-500 hover:opacity-80 mx-1 tooltip-btn bg-transparent border-none"
-                  data-tooltip="Eliminar"
-                >
-                  <i class="bi bi-trash-fill"></i>
-                </button>
+              <a
+                href="/admin/guidetypes/<?= $guidetype->id ?>/edit/"
+                class="text-alt hover:opacity-80 mx-1 tooltip-btn"
+                data-tooltip="Editar"
+              >
+                <i class="bi bi-pencil-square"></i>
+              </a>
+              <button
+                type="button"
+                class="text-red-500 hover:opacity-80 mx-1 tooltip-btn bg-transparent border-none delete-btn"
+                data-tooltip="Eliminar"
+                data-id="<?= $guidetype->id ?>"
+                data-name="<?= htmlspecialchars($guidetype->type) ?>"
+              >
+                <i class="bi bi-trash-fill"></i>
+              </button>
             </td>
           </tr>
           <?php } ?>
@@ -71,8 +81,31 @@ function showPage()
 
     <div id="table-tooltip" class="hidden absolute bg-[#1B2A49] text-[#FFD700] text-sm px-2 py-1 rounded-md shadow-lg pointer-events-none z-50"></div>
 
+    <script src="/assets/js/orion-panel/table-tooltip.js"></script>
 
-            <?php
+    <script src="/assets/js/orion-panel/delete-popup.js"></script>
+    <script>
+      // invoca después de que el DOM esté listo (al final del body o DOMContentLoaded)
+      setupDeletePopup({
+        selector: ".delete-btn",
+        getName: (btn) => btn.dataset.name,
+        getDeleteUrl: (btn) => `/api/admin/guidetype/${btn.dataset.id}/delete/`,
+        title: "¿Eliminar tipo de guía?",
+        onConfirm: (url) => {
+          fetch(url, { method: 'DELETE' })
+            .then(response => {
+              if (response.ok) {
+                window.location.href = '/admin/guidetypes/';
+              } else {
+                console.error('Error al eliminar el tipo de guía');
+              }
+            })
+            .catch(error => console.error('Error al eliminar el tipo de guía:', error));
+        }
+      });
+    </script>
+
+    <?php
 }
 
 include "views/templates/panel/admin.php";

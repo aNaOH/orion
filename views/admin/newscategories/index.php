@@ -1,6 +1,6 @@
 <?php
 
-$title = "Categorías de noticias | Orion Dev Panel";
+$title = "Categorías de noticias | Orion Admin Panel";
 
 function showPage()
 {
@@ -28,7 +28,7 @@ function showPage()
           <tr class="bg-[#1B2A49] text-left">
             <th class="px-4 py-3 font-semibold">Nombre</th>
             <th class="px-4 py-3 font-semibold">Color distintivo (en hexadecimal)</th>
-            <th class="px-4 py-3 font-semibold">Previsualización (Chip)</th>
+            <th class="px-4 py-3 font-semibold">Previsualización</th>
             <th class="px-4 py-3 font-semibold text-right">Acciones</th>
           </tr>
         </thead>
@@ -46,7 +46,7 @@ function showPage()
             </td>
             <td class="px-4 py-3 text-right">
                 <a
-                  href="/dev/panel/newscategories/<?= $newscategory->id ?>/edit/"
+                  href="/admin/newscategories/<?= $newscategory->id ?>/edit/"
                   class="text-alt hover:opacity-80 mx-1 tooltip-btn"
                   data-tooltip="Editar"
                 >
