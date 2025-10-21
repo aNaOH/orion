@@ -36,6 +36,29 @@ $router->mount("/admin", function () use ($router) {
         exit();
     });
 
+    $router->post("/guidetype/edit", function () {
+        $id = $_POST["id"];
+        $type = $_POST["type"];
+        $tint = $_POST["tint"];
+
+        $guideType = GuideType::getById($id);
+        if ($guideType) {
+            $guideType->type = $type;
+            $guideType->tint = $tint;
+            $guideType->save();
+
+            header("HTTP/1.1 200 OK");
+            $response["status"] = 200;
+            $response["message"] = "Tipo de guía actualizado";
+            echo json_encode($response);
+        } else {
+            header("HTTP/1.1 404 Not Found");
+            $response["status"] = 404;
+            $response["message"] = "Tipo de guía no encontrado";
+            echo json_encode($response);
+        }
+    });
+
     $router->delete("/guidetype/{id}/delete/", function ($id) {
         $guideType = GuideType::getById($id);
         if ($guideType) {

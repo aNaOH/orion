@@ -9,6 +9,7 @@ function showPage()
 <script src="/assets/js/components/gradientSquare.js"></script>
 
 <form id="guideTypeForm" class="space-y-6">
+    <input type="hidden" name="id" value="<?= $guidetype->id ?>">
   <!-- Nombre -->
   <div class="relative">
     <input
@@ -27,18 +28,6 @@ function showPage()
     >
       Nombre
     </label>
-  </div>
-
-  <!-- Icono -->
-  <div>
-    <label for="icon" class="block mb-2 text-gray-300 font-medium">Icono (SVG)</label>
-    <input
-      type="file"
-      id="icon"
-      name="icon"
-      accept="image/svg+xml"
-      class="block w-full text-gray-200 bg-[#0f172a] border border-gray-600 rounded-lg cursor-pointer focus:ring-2 focus:ring-alt focus:border-alt outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-alt file:text-[#1B2A49] hover:file:opacity-90"
-    />
   </div>
 
   <!-- Color -->
@@ -73,13 +62,13 @@ function showPage()
       class="flex justify-center items-center gap-2 bg-alt text-[#1B2A49] font-medium px-6 py-3 rounded-lg hover:opacity-90 transition"
     >
       <i class="bi bi-plus-circle"></i>
-      <span>Crear tipo de guía</span>
+      <span>Actualizar tipo de guía</span>
     </button>
   </div>
 </form>
 
 <script src="/assets/js/forms/validator.js"></script>
-<script src="/assets/js/forms/admin/guidetype.js"></script>
+<script src="/assets/js/forms/admin/guidetype-edit.js"></script>
             <?php
 }
 

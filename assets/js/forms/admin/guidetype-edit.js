@@ -11,12 +11,11 @@ form.onsubmit = (e) => {
   // Crear un objeto FormData
   let formData = new FormData();
   formData.append("type", fields["type"].value); // Agregar el título
-  formData.append("icon", fields["icon"].files[0]); // Agregar la imagen
   formData.append("tintColor", fields["tintColor"].value); // Agregar el color
 
   // Realizar la solicitud AJAX con FormData
   $.ajax({
-    url: "/api/admin/guidetype-edit", // La URL del endpoint
+    url: "/api/admin/guidetype/edit", // La URL del endpoint
     type: "POST", // Método HTTP
     data: formData, // FormData con los datos del formulario
     processData: false, // Evitar que jQuery procese los datos
