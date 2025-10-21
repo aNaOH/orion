@@ -12,7 +12,7 @@
   <!-- Menú -->
   <nav class="flex-1 p-4 space-y-1 overflow-y-auto overflow-x-hidden">
     <a href="/dev/panel" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
-      data-tooltip="Dashboard">
+      data-tooltip="Inicio">
       <i class="bi bi-speedometer2 text-alt-400 text-lg"></i>
       <span class="menu-text text-sm font-medium">Inicio</span>
     </a>

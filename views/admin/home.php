@@ -1,30 +1,21 @@
 <?php
 
-$title = "Bienvenido a Orion";
+$title = "Inicio | Orion Admin Panel";
 
-function showPage() {
+function showPage()
+{
     ?>
-
-<div class="app-content-header"> <!--begin::Container-->
-                <div class="container-fluid"> <!--begin::Row-->
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h3 class="mb-0">Inicio</h3>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-end">
-                                <li class="breadcrumb-item active" aria-current="page">Inicio</li>
-                            </ol>
-                        </div>
-                    </div> <!--end::Row-->
-                </div> <!--end::Container-->
-            </div> <!--end::App Content Header--> <!--begin::App Content-->
-            <div class="app-content"> <!--begin::Container-->
-                <div class="container-fluid"> <!--begin::Row-->
-                    <h4>Bienvenido al panel de administración de Orion</h4>
-                </div> <!--end::Container-->
-            </div> <!--end::App Content-->
-            <?php
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+              <div class="bg-brand-800 rounded-2xl p-5 shadow-lg border border-branddark-500 hover:border-alt-500 transition">
+                <h4 class="text-sm text-gray-300 mb-2">Ingresos (últimos 30 días)</h4>
+                <p class="text-4xl font-bold text-alt-400">0 €</p>
+              </div>
+              <div class="bg-brand-800 rounded-2xl p-5 shadow-lg border border-branddark-500 hover:border-alt-500 transition">
+                <h4 class="text-sm text-gray-300 mb-2">Reportes</h4>
+                <p class="text-4xl font-bold text-alt-400">0</p>
+              </div>
+            </div>
+    <?php
 }
 
-include("views/admin/template/main.php");
+include "views/templates/panel/admin.php";

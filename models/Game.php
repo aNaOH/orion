@@ -253,17 +253,6 @@ class Game
                 ? $gameAchievements[array_key_last($gameAchievements)]->id + 1
                 : 1;
 
-        // Buscamos huecos en los IDs
-        $expectedId = 1;
-        foreach ($gameAchievements as $achievement) {
-            if ($achievement->id > $expectedId) {
-                // Encontramos un salto (por ejemplo, del 2 al 4 → falta el 3)
-                $achId = $expectedId;
-                break;
-            }
-            $expectedId++;
-        }
-
         $achievement = new Achievement(
             $achId,
             $name,
