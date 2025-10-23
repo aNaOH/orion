@@ -1,0 +1,83 @@
+<?php
+
+$title = "Noticias para " . $game->title . " | Orion Dev Panel";
+
+function showPage()
+{
+    global $game;
+    global $news;
+    global $newsCategories;
+    ?>
+
+    <div class="flex justify-between items-center mb-6">
+        <div class="flex items-center gap-2">
+            <a href="/dev/panel/games/<?= $game->id ?>/community/" class="text-alt font-medium hover:opacity-90 transition">
+                <i class="bi bi-arrow-left me-1"></i>
+            </a>
+          <h1 class="text-xl font-semibold text-alt">Noticias para <?= $game->title ?></h1>
+        </div>
+      <a
+        href="/dev/panel/games/<?= $game->id ?>/community/news/new"
+        id="add-entry"
+        class="bg-alt text-[#1B2A49] px-4 py-2 rounded-lg font-medium hover:opacity-90 transition"
+      >
+        <i class="bi bi-plus-lg me-1"></i> Nueva noticia
+      </a>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table
+        class="min-w-full border-separate border-spacing-0 rounded-lg overflow-hidden bg-[#111827] text-gray-200"
+      >
+        <thead>
+          <tr class="bg-[#1B2A49] text-left">
+            <th class="px-4 py-3 font-semibold">Título</th>
+            <th class="px-4 py-3 font-semibold">Categoría</th>
+            <th class="px-4 py-3 font-semibold">Fecha de publicación</th>
+            <th class="px-4 py-3 font-semibold">Fecha de última edición</th>
+            <th class="px-4 py-3 font-semibold text-right">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <?php foreach ($news as $new) { ?>
+          <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+            <td class="px-4 py-3">
+                <?= $new->title ?>
+            </td>
+            <td class="px-4 py-3">
+                <?= $new->getCategory()->name ?>
+            </td>
+            <td class="px-4 py-3">
+                <?= $new->published_at->format("Y-m-d H:i:s") ?>
+            </td>
+            <td class="px-4 py-3">
+                <?= $new->updated_at->format("Y-m-d H:i:s") ?>
+            </td>
+            <td class="px-4 py-3 text-right">
+                <a
+                  href="/dev/panel/games/<?= $game->id ?>/community/news/<?= $new->id ?>/edit/"
+                  class="text-alt hover:opacity-80 mx-1 tooltip-btn"
+                  data-tooltip="Editar"
+                >
+                  <i class="bi bi-pencil-square"></i>
+                </a>
+                <button
+                  class="text-red-500 hover:opacity-80 mx-1 tooltip-btn bg-transparent border-none"
+                  data-tooltip="Eliminar"
+                >
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+            </td>
+          </tr>
+          <?php } ?>
+        </tbody>
+      </table>
+    </div>
+
+    <div id="table-tooltip" class="hidden absolute bg-[#1B2A49] text-[#FFD700] text-sm px-2 py-1 rounded-md shadow-lg pointer-events-none z-50"></div>
+
+
+            <?php
+}
+
+include "views/templates/panel/dev.php";

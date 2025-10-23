@@ -105,6 +105,8 @@ $router->mount("/panel", function () use ($router) {
             include "views/dev/panel/games/community/achievements/edit.php";
         },
     );
+
+    include_once "routes/dev/panel/news.php";
 });
 
 $router->set404("/dev/panel(/.*)?", function () {
