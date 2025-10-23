@@ -52,8 +52,10 @@ function showPage()
 
     <script src="/assets/js/components/gradientChip.js"></script>
 
+    <div class="relative py-20 flex justify-center">
+
     <!-- Store Page -->
-    <section id="store" class="pt-20 pb-10">
+    <section id="store" class="max-w-4xl w-full px-6">
         <h1 class="text-2xl font-bold text-gray-200 mx-auto max-w-4xl mb-3"><?= $game->title ?></h1>
       <div class="container mx-auto max-w-4xl bg-branddark shadow-lg rounded-lg p-8">
         <!-- Header -->
@@ -150,9 +152,57 @@ function showPage()
     </section>
 
     <?php if (sizeof($news) > 0) { ?>
-        <section id="news-section" class="pt-10 pb-20">
-            <h3 class="text-2xl font-semibold text-gray-200 mb-4">Noticias</h3>
-            <div class="space-y-4">
+            <!-- Noticias pegadas al borde derecho -->
+            <aside id="news-section"
+                class="hidden lg:block absolute right-[-50px] top-20 w-80 mr-6">
+                <div class="rounded-lg p-6">
+                    <h3 class="text-2xl font-semibold text-gray-200 mb-4">Noticias</h3>
+                    <div class="space-y-4">
+                        <?php foreach ($news as $post) {
+
+                            if (!$post->is_public) {
+                                continue;
+                            }
+                            $info = $post->getPostInfo();
+                            if (!($info instanceof GameNews)) {
+                                continue;
+                            }
+                            $category = $info->getCategory();
+                            ?>
+                        <!-- Post Item -->
+                        <a href="/communities/<?= $game->id ?>/news/<?= $post->id ?>"
+                            class="block bg-branddark rounded-lg shadow-sm p-4 hover:bg-branddark-600 transition-colors duration-300">
+                            <div class="flex justify-between items-center">
+                                <div class="flex flex-col gap-2">
+                                    <h6 class="text-md font-semibold text-gray-200 mb-1"><?= $post->title ?></h6>
+                                    <gradient-chip
+                                        base-color="<?= $category->tint ?>"
+                                        text="<?= $category->name ?>"
+                                        border-radius="8">
+                                    </gradient-chip>
+                                </div>
+                                <small class="text-gray-400 text-sm text-right"
+                                    data-createdate="<?= $post->created_at->format(
+                                        "Y-m-d H:i:s",
+                                    ) ?>">
+                                    <?= $post->created_at->format("d/m/Y") ?>
+                                </small>
+                            </div>
+                        </a>
+                        <?php
+                        } ?>
+                    </div>
+                </div>
+            </aside>
+        <?php } ?>
+
+    </div>
+
+    <!-- Noticias debajo en móvil -->
+    <?php if (sizeof($news) > 0) { ?>
+    <section id="news-section-mobile" class="lg:hidden mt-10 px-6 pb-20">
+        <h3 class="text-2xl font-semibold text-gray-200 mb-4">Noticias</h3>
+        <div class="space-y-4">
             <?php foreach ($news as $post) {
 
                 if (!$post->is_public) {
@@ -164,8 +214,8 @@ function showPage()
                 }
                 $category = $info->getCategory();
                 ?>
-                <!-- Post Item -->
-                <a href="/communities/<?= $game->id ?>/news/<?= $post->id ?>" class="block bg-branddark shadow-lg rounded-lg p-6 hover:bg-branddark-600 transition-colors duration-300">
+            <a href="/communities/<?= $game->id ?>/news/<?= $post->id ?>"
+                class="block bg-branddark shadow-lg rounded-lg p-6 hover:bg-branddark-600 transition-colors duration-300">
                 <div class="flex justify-between items-center">
                     <div class="flex flex-col gap-2">
                         <h6 class="text-lg font-semibold text-gray-200 mb-1"><?= $post->title ?></h6>
@@ -175,19 +225,21 @@ function showPage()
                             border-radius="8">
                         </gradient-chip>
                     </div>
-                    <small class="text-gray-400 text-sm" data-createdate="<?= $post->created_at->format(
-                        "Y-m-d H:i:s",
-                    ) ?>">
-                    <?= $post->created_at->format("d/m/Y") ?>
+                    <small class="text-gray-400 text-sm text-right"
+                        data-createdate="<?= $post->created_at->format(
+                            "Y-m-d H:i:s",
+                        ) ?>">
+                        <?= $post->created_at->format("d/m/Y") ?>
                     </small>
                 </div>
-                </a>
+            </a>
             <?php
             } ?>
-            </div>
-        </section>
+        </div>
+    </section>
     <?php } ?>
 
+    <script src="/assets/js/addDatesCommunity.js"></script>
 
     <?php
 }
