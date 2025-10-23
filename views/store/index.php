@@ -45,12 +45,15 @@ function showPage()
 {
     global $game;
     $gameFeatures = $game->getFeatures();
+
+    global $news;
+    $news ??= [];
     ?>
 
     <script src="/assets/js/components/gradientChip.js"></script>
 
     <!-- Store Page -->
-    <section id="store" class="py-20">
+    <section id="store" class="pt-20 pb-10">
         <h1 class="text-2xl font-bold text-gray-200 mx-auto max-w-4xl mb-3"><?= $game->title ?></h1>
       <div class="container mx-auto max-w-4xl bg-branddark shadow-lg rounded-lg p-8">
         <!-- Header -->
@@ -145,6 +148,45 @@ function showPage()
         </div>
       </div>
     </section>
+
+    <?php if (sizeof($news) > 0) { ?>
+        <section id="news-section" class="pt-10 pb-20">
+            <h3 class="text-2xl font-semibold text-gray-200 mb-4">Noticias</h3>
+            <div class="space-y-4">
+            <?php foreach ($news as $post) {
+
+                if (!$post->is_public) {
+                    continue;
+                }
+                $info = $post->getPostInfo();
+                if (!($info instanceof GameNews)) {
+                    continue;
+                }
+                $category = $info->getCategory();
+                ?>
+                <!-- Post Item -->
+                <a href="/communities/<?= $game->id ?>/news/<?= $post->id ?>" class="block bg-branddark shadow-lg rounded-lg p-6 hover:bg-branddark-600 transition-colors duration-300">
+                <div class="flex justify-between items-center">
+                    <div class="flex flex-col gap-2">
+                        <h6 class="text-lg font-semibold text-gray-200 mb-1"><?= $post->title ?></h6>
+                        <gradient-chip
+                            base-color="<?= $category->tint ?>"
+                            text="<?= $category->name ?>"
+                            border-radius="8">
+                        </gradient-chip>
+                    </div>
+                    <small class="text-gray-400 text-sm" data-createdate="<?= $post->created_at->format(
+                        "Y-m-d H:i:s",
+                    ) ?>">
+                    <?= $post->created_at->format("d/m/Y") ?>
+                    </small>
+                </div>
+                </a>
+            <?php
+            } ?>
+            </div>
+        </section>
+    <?php } ?>
 
 
     <?php
