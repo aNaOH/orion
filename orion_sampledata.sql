@@ -2,8 +2,8 @@ INSERT INTO `developers` (`id`, `name`, `profile_pic`, `motd`, `owner_id`) VALUE
 	(1, 'Orion', NULL, 'Experience it united', 1);
 
 INSERT INTO `game` (`id`, `title`, `short_description`, `description`, `launch_date`, `original_launch_date`, `base_price`, `discount`, `as_editor`, `is_public`, `developer_name`, `developer_id`, `genre_id`) VALUES
-	(1, 'Minecraft', 'Crea. Explora. Sobrevive.', '                                                                                        Experimenta las distintas formas de explorar, sobrevivir y crear en Minecraft con Minecraft: Deluxe Collection para PC con Java y Bedrock y el iniciador de Minecraft incluidos. Juega Bedrock Edition en un PC para examinar contenido ilimitado creado por la comunidad en el Mercado de Minecraft, descubre nuevos estilos de juego a través de diferentes mapas y exprésate con emoticonos y elementos del Creador de personajes.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion                                                                                                                        ', '2024-12-02 23:00:00', '2011-11-18', 29.99, 0, 1, 1, 'Mojang', 1, 1),
-	(2, 'The Elder Scrolls V: Skyrim', 'Un RPG épico de mundo abierto', '**The Elder Scrolls V: Skyrim** ofrece un vasto mundo abierto lleno de misiones y aventuras.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '2011-11-11', 29.99, 20, 1, 1, 'Bethesda', 1, 2),
+	(1, 'Minecraft', 'Crea. Explora. Sobrevive.', 'Experimenta las distintas formas de explorar, sobrevivir y crear en Minecraft con Minecraft: Deluxe Collection para PC con Java y Bedrock y el iniciador de Minecraft incluidos. Juega Bedrock Edition en un PC para examinar contenido ilimitado creado por la comunidad en el Mercado de Minecraft, descubre nuevos estilos de juego a través de diferentes mapas y exprésate con emoticonos y elementos del Creador de personajes.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion                                                                                                                        ', '2024-12-02 23:00:00', '2011-11-18', 29.99, 0, 1, 1, 'Mojang', 1, 1),
+	(2, 'The Elder Scrolls V: Skyrim', 'Un RPG épico de mundo abierto', '**The Elder Scrolls V: Skyrim** ofrece un vasto mundo abierto lleno de misiones y aventuras.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '2011-11-11', 29.99, 0.20, 1, 1, 'Bethesda', 1, 2),
 	(3, 'Resident Evil', 'Terror y supervivencia', '**Resident Evil** introdujo el género de terror de supervivencia con un enfoque en la narrativa y los recursos limitados.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '1997-12-10', 9.99, 0, 1, 1, 'Capcom', 1, 3),
 	(4, 'Super Mario Bros.', 'Un clásico de plataformas', '**Super Mario Bros.** es un videojuego de plataformas desarrollado por Nintendo. Ayuda a Mario a rescatar a la princesa Peach en el Reino Champiñón.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion                                                                                                                        ', '2024-12-02 23:00:00', '1985-09-13', 9.99, 0, 1, 0, 'Nintendo', 1, 4),
 	(5, 'The Legend of Zelda', 'Aventura épica en Hyrule', '**The Legend of Zelda** es un juego de aventura y acción donde Link debe rescatar a la princesa Zelda y derrotar a Ganon.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '1986-02-21', 14.99, 0.1, 1, 1, 'Nintendo', 1, 5),
@@ -22,6 +22,24 @@ INSERT INTO `game` (`id`, `title`, `short_description`, `description`, `launch_d
 	(18, 'Mega Man 2', 'Acción de plataformas desafiante', '**Mega Man 2** es un juego de plataformas con acción intensa y batallas memorables contra jefes.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '1988-12-24', 9.99, 0, 1, 1, 'Capcom', 1, 4),
 	(19, 'Portal', 'Innovación en puzzles y física', '**Portal** es un juego de rompecabezas en primera persona que introduce mecánicas únicas con portales.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '2007-10-10', 19.99, 0.1, 1, 1, 'Valve', 1, 7),
 	(20, 'Grand Theft Auto: San Andreas', 'Mundo abierto revolucionario', '**Grand Theft Auto: San Andreas** redefine el género de mundo abierto con una historia rica y libertad de exploración.\r\n\r\n### Sobre Orion Classic Collection\r\n\r\nPara conmemorar el lanzamiento de Orion, hemos colaborado con referentes en la industria para lanzar una colección de 20 juegos icónicos y puedas empezar a crear tu biblioteca en Orion', '2024-12-02 23:00:00', '2004-10-26', 19.99, 0.15, 1, 1, 'Rockstar Games', 1, 5);
+
+INSERT INTO `game_has_feature` (`game_id`, `feature_id`) VALUES
+    (1, 1),
+    (1, 2),
+    (1, 3),
+    (1, 4),
+    (1, 5),
+    (1, 6),
+    (1, 7),
+    (1, 8),
+    (1, 10),
+    (1, 11),
+    (1, 12),
+    (2, 1),
+    (2, 8),
+    (2, 12),
+    (3, 1),
+    (3, 12);
 
 INSERT INTO `builds` (`game_id`, `file`, `version`, `release_date`) VALUES
 	(1, 'UjNPM3lXQ1RoMkR6YUUxMENQOXZ2dHpZR1dOc1BoVHRHSzFpUFJUcEVvUT0=', '3.4.50-2.1.3', '2024-12-03 22:02:13');

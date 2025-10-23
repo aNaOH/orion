@@ -2,56 +2,94 @@
 
 $title = "Nuevo juego | Orion Dev Panel";
 
-function showPage() {
+function showPage()
+{
     ?>
 
-<div class="app-content-header"> <!--begin::Container-->
-                <div class="container-fluid"> <!--begin::Row-->
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <h3 class="mb-0">Nuevo juego</h3>
-                        </div>
-                        <div class="col-sm-6">
-                            <ol class="breadcrumb float-sm-end">
-                                <li class="breadcrumb-item">Inicio</li>
-                                <li class="breadcrumb-item">Juegos</li>
-                                <li class="breadcrumb-item active" aria-current="page">Nuevo juego</li>
-                            </ol>
-                        </div>
-                    </div> <!--end::Row-->
-                </div> <!--end::Container-->
-            </div> <!--end::App Content Header--> <!--begin::App Content-->
-            <div class="app-content"> <!--begin::Container-->
-                <div class="container-fluid"> <!--begin::Row-->
-                    <form id="newGameForm">
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="title" id="name" type="text" placeholder="Título" />
-                            <label for="title">Título</label>
-                            <div class="invalid-feedback" id="titleError"></div>
-                        </div>
-                        <div class="form-floating mb-3">
-                            <input class="form-control" id="shortDescription" name="shortDescription" type="text" placeholder="Descripción corta" />
-                            <label for="shortDescription">Descripción corta</label>
-                            <div class="invalid-feedback" id="shortDescriptionError"></div>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label d-block"></label>
-                            <div class="form-check form-check-inline">
-                                <input class="form-check-input" id="asEditor" type="checkbox" name="asEditor" />
-                                <label class="form-check-label" for="asEditor">¿Eres la editora?</label>
-                            </div>
-                        </div>
-                        <div class="d-none form-floating mb-3" id="developerNameContainer">
-                            <input class="form-control" id="developerName" name="developerName" type="text" placeholder="Desarrollador"/>
-                            <label for="developerName">Desarrollador</label>
-                            <div class="invalid-feedback" id="developerNameError"></div>
-                        </div>
-                        <div class="d-grid">
-                            <button class="btn btn-primary btn-lg" id="submitButton" type="submit">Crear</button>
-                        </div>
-                    </form>
-                </div> <!--end::Container-->
-            </div> <!--end::App Content-->
+    <div class="container mx-auto px-4">
+        <form id="newGameForm" class="max-w-lg mx-auto space-y-6">
+          <!-- Título -->
+          <div class="relative">
+            <input
+              type="text"
+              id="title"
+              name="title"
+              placeholder=" "
+              class="peer w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2 focus:ring-2 focus:ring-alt focus:border-alt outline-none placeholder-transparent"
+            />
+            <label
+              for="title"
+              class="absolute left-4 top-3 text-gray-400 text-sm transition-all
+                     peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                     peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+            >
+              Título
+            </label>
+            <div id="titleError" class="hidden text-red-500 text-sm mt-1"></div>
+          </div>
+
+          <!-- Descripción corta -->
+          <div class="relative">
+            <input
+              type="text"
+              id="shortDescription"
+              name="shortDescription"
+              placeholder=" "
+              class="peer w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2 focus:ring-2 focus:ring-alt focus:border-alt outline-none placeholder-transparent"
+            />
+            <label
+              for="shortDescription"
+              class="absolute left-4 top-3 text-gray-400 text-sm transition-all
+                     peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                     peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+            >
+              Descripción corta
+            </label>
+            <div id="shortDescriptionError" class="hidden text-red-500 text-sm mt-1"></div>
+          </div>
+
+          <!-- Checkbox -->
+          <div class="flex items-center gap-2">
+            <input
+              id="asEditor"
+              name="asEditor"
+              type="checkbox"
+              class="w-4 h-4 accent-alt focus:ring-alt"
+            />
+            <label for="asEditor" class="text-gray-300 font-medium">¿Eres la editora?</label>
+          </div>
+
+          <!-- Desarrollador -->
+          <div id="developerNameContainer" class="hidden relative">
+            <input
+              type="text"
+              id="developerName"
+              name="developerName"
+              placeholder=" "
+              class="peer w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2 focus:ring-2 focus:ring-alt focus:border-alt outline-none placeholder-transparent"
+            />
+            <label
+              for="developerName"
+              class="absolute left-4 top-3 text-gray-400 text-sm transition-all
+                     peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+                     peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+            >
+              Desarrollador
+            </label>
+            <div id="developerNameError" class="hidden text-red-500 text-sm mt-1"></div>
+          </div>
+
+          <!-- Botón con spinner -->
+          <button
+            id="submitButton"
+            type="submit"
+            class="flex items-center justify-center gap-2 bg-alt text-[#1B2A49] font-medium px-6 py-3 rounded-lg hover:opacity-90 transition disabled:opacity-50 disabled:cursor-not-allowed w-full"
+          >
+            <span>Crear</span>
+            <i id="spinner" class="bi bi-arrow-repeat animate-spin hidden"></i>
+          </button>
+        </form>
+    </div>
 
             <script src="/assets/js/forms/validator.js"></script>
             <script src="/assets/js/forms/dev/game.js"></script>
@@ -59,4 +97,4 @@ function showPage() {
             <?php
 }
 
-include("views/dev/panel/template/main.php");
+include "views/templates/panel/dev.php";

@@ -1,6 +1,6 @@
 <?php
 
-require 'vendor/autoload.php';
+require_once "vendor/autoload.php";
 
 class TailwindParsedown extends Parsedown
 {
@@ -9,20 +9,22 @@ class TailwindParsedown extends Parsedown
     {
         $block = parent::blockHeader($Line);
         if ($block) {
-            $level = $block['element']['name']; // Obtiene el nivel del encabezado (h1, h2, etc.)
-            $textSize = '4xl';
+            $level = $block["element"]["name"]; // Obtiene el nivel del encabezado (h1, h2, etc.)
+            $textSize = "4xl";
             switch ($level) {
-                case 'h2':
-                    $textSize = '2xl';
+                case "h2":
+                    $textSize = "2xl";
                     break;
-                case 'h3':
-                    $textSize = 'xl';
+                case "h3":
+                    $textSize = "xl";
                     break;
-                case 'h4':
-                    $textSize = 'lg';
+                case "h4":
+                    $textSize = "lg";
                     break;
             }
-            $block['element']['attributes']['class'] = "text-$textSize font-bold my-4";
+            $block["element"]["attributes"][
+                "class"
+            ] = "text-$textSize font-bold my-4";
         }
         return $block;
     }
@@ -32,7 +34,8 @@ class TailwindParsedown extends Parsedown
     {
         $block = parent::blockParagraph($Line);
         if ($block) {
-            $block['element']['attributes']['class'] = 'text-base leading-relaxed my-2';
+            $block["element"]["attributes"]["class"] =
+                "text-base leading-relaxed my-2";
         }
         return $block;
     }
@@ -42,7 +45,7 @@ class TailwindParsedown extends Parsedown
     {
         $block = parent::blockList($Line);
         if ($block) {
-            $block['element']['attributes']['class'] = 'list-disc pl-5 my-2'; // o 'list-decimal' para listas ordenadas
+            $block["element"]["attributes"]["class"] = "list-disc pl-5 my-2"; // o 'list-decimal' para listas ordenadas
         }
         return $block;
     }
@@ -52,7 +55,8 @@ class TailwindParsedown extends Parsedown
     {
         $link = parent::inlineLink($Excerpt);
         if ($link) {
-            $link['element']['attributes']['class'] = 'text-blue-500 hover:underline';
+            $link["element"]["attributes"]["class"] =
+                "text-blue-500 hover:underline";
         }
         return $link;
     }
@@ -62,7 +66,8 @@ class TailwindParsedown extends Parsedown
     {
         $image = parent::inlineImage($Excerpt);
         if ($image) {
-            $image['element']['attributes']['class'] = 'max-w-full h-auto rounded';
+            $image["element"]["attributes"]["class"] =
+                "max-w-full h-auto rounded";
         }
         return $image;
     }

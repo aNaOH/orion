@@ -1,18 +1,18 @@
 <?php
 
-require_once 'models/User.php';
-
 $title = "Orion para Desarrolladores";
 
-function showPage() {
-    if(isset($_SESSION['user'])) $user = User::getById($_SESSION['user']['id']);
-    ?>
+function showPage()
+{
+    if (isset($_SESSION["user"])) {
+        $user = User::getById($_SESSION["user"]["id"]);
+    } ?>
 
     <!-- Hero Section -->
     <section id="hero" class="relative bg-brand-500 text-white min-h-screen flex items-center justify-center overflow-hidden">
         <!-- Fondo con imagen y degradado -->
         <div class="absolute inset-0">
-            <div class="h-full w-full bg-cover bg-center" 
+            <div class="h-full w-full bg-cover bg-center"
                 style="background-image: url('/assets/img/hero-bg-transparent.png'); mask-image: linear-gradient(to bottom, rgba(0,0,0,0.05) 0.25%, rgba(0,0,0,0)); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.05) 0.25%, rgba(0,0,0,0));">
             </div>
         </div>
@@ -36,7 +36,7 @@ function showPage() {
             <h2 class="text-3xl sm:text-4xl font-bold text-gray-200 mb-12 text-center">Por qué es la opción de distribución para <span id="userCount">N</span> desarrolladores y editoras</h2>
             <div class="flex flex-col gap-10">
                 <!-- Comunidad Activa -->
-                <div data-aos="fade-left" 
+                <div data-aos="fade-left"
                     class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6">
                     <img src="https://placehold.co/300x200" alt="Comunidad Activa" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-right">
@@ -45,7 +45,7 @@ function showPage() {
                     </div>
                 </div>
                 <!-- Herramientas para Creadores -->
-                <div data-aos="fade-right" 
+                <div data-aos="fade-right"
                     class="bg-gradient-to-r from-branddark to-transparent rounded-xl p-6 flex flex-col lg:flex-row items-center gap-6">
                     <img src="https://placehold.co/300x200" alt="Herramientas para Creadores" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-left">
@@ -54,7 +54,7 @@ function showPage() {
                     </div>
                 </div>
                 <!-- Logros y Más -->
-                <div data-aos="fade-left" 
+                <div data-aos="fade-left"
                     class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6">
                     <img src="https://placehold.co/300x200" alt="Logros y Más" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-right">
@@ -68,7 +68,7 @@ function showPage() {
 
     <!-- Call to Action Section -->
     <section data-aos="fade-up" class="text-white py-20">
-    <?php if(!isset($user)) { ?>
+    <?php if (!isset($user)) { ?>
         <div class="container mx-auto text-center">
             <h2 class="text-4xl font-bold text-alt mb-4">Únete a Orion hoy</h2>
             <p class="text-lg mb-6">Necesitas una cuenta de Orion para poder crear tu cuenta de desarrollador.</p>
@@ -76,9 +76,8 @@ function showPage() {
                 Registrarme Ahora
             </a>
         </div>
-    <?php } else { 
-        if(is_null($user->getDeveloperInfo())) { ?>
-        
+    <?php } else {if (is_null($user->getDeveloperInfo())) { ?>
+
         <div class="container mx-auto text-center">
             <h2 class="text-4xl font-bold text-alt mb-4">Publica tus juegos en Orion</h2>
             <form action="/stripe/dev" method="get">
@@ -106,4 +105,4 @@ function showPage() {
     <?php
 }
 
-include("views/templates/nomain.php");
+include "views/templates/nomain.php";

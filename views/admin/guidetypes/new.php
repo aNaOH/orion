@@ -1,0 +1,84 @@
+<?php
+
+$title = "Nuevo Tipo de Guía | Orion Admin Panel";
+
+function showPage()
+{
+    ?>
+
+<script src="/assets/js/components/gradientSquare.js"></script>
+
+<form id="guideTypeForm" class="space-y-6">
+  <!-- Nombre -->
+  <div class="relative">
+    <input
+      type="text"
+      id="type"
+      name="type"
+      placeholder=" "
+      class="peer w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2 focus:ring-2 focus:ring-alt focus:border-alt outline-none placeholder-transparent"
+    />
+    <label
+      for="type"
+      class="absolute left-4 top-3 text-gray-400 text-sm transition-all
+             peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500
+             peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+    >
+      Nombre
+    </label>
+  </div>
+
+  <!-- Icono -->
+  <div>
+    <label for="icon" class="block mb-2 text-gray-300 font-medium">Icono (SVG)</label>
+    <input
+      type="file"
+      id="icon"
+      name="icon"
+      accept="image/svg+xml"
+      class="block w-full text-gray-200 bg-[#0f172a] border border-gray-600 rounded-lg cursor-pointer focus:ring-2 focus:ring-alt focus:border-alt outline-none file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-alt file:text-[#1B2A49] hover:file:opacity-90"
+    />
+  </div>
+
+  <!-- Color -->
+  <div>
+    <label for="tintColor" class="block mb-2 text-gray-300 font-medium">Color</label>
+    <input
+      type="color"
+      id="tintColor"
+      name="tintColor"
+      value="#DEAB18"
+      class="w-full h-12 p-1 bg-[#0f172a] border border-gray-600 rounded-lg cursor-pointer focus:ring-2 focus:ring-alt focus:border-alt outline-none"
+    />
+  </div>
+
+  <!-- Previsualización -->
+  <div id="previewContainer" class="hidden">
+    <label for="preview" class="block mb-2 text-gray-300 font-medium">Previsualización</label>
+    <gradient-square
+      id="preview"
+      base-color="#DEAB18"
+      size="50"
+      class="block"
+    ></gradient-square>
+  </div>
+
+  <!-- Botón -->
+  <div class="flex justify-end">
+    <button
+      type="submit"
+      id="submitButton"
+      class="flex justify-center items-center gap-2 bg-alt text-[#1B2A49] font-medium px-6 py-3 rounded-lg hover:opacity-90 transition"
+    >
+      <i class="bi bi-plus-circle"></i>
+      <span>Crear tipo de guía</span>
+    </button>
+  </div>
+</form>
+
+<script src="/assets/js/forms/validator.js"></script>
+<script src="/assets/js/forms/admin/guidetype.js"></script>
+            <?php
+}
+
+include "views/templates/panel/admin.php";

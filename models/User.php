@@ -1,11 +1,12 @@
 <?php
 
-require_once './models/Badge.php';
-require_once './models/Developer.php';
-require_once './models/Game.php';
+require_once "./models/Badge.php";
+require_once "./models/Developer.php";
+require_once "./models/Game.php";
 
-class User {
-    public static string $table = 'users';
+class User
+{
+    public static string $table = "users";
 
     public ?int $id;
     public string $email;
@@ -21,17 +22,17 @@ class User {
 
     // Constructor
     public function __construct(
-        string $email, 
-        string $username, 
+        string $email,
+        string $username,
         string $password,
-        string $birthdate, 
-        EUSER_TYPE|int $role, 
-        ?string $profile_pic = null, 
-        ?string $motd = null, 
-        ?int $badge = null, 
+        string $birthdate,
+        EUSER_TYPE|int $role,
+        ?string $profile_pic = null,
+        ?string $motd = null,
+        ?int $badge = null,
         ?int $id = null,
         ?string $created_at = null,
-        bool $is_archived = false
+        bool $is_archived = false,
     ) {
         $this->role = is_numeric($role) ? EUSER_TYPE::from($role) : $role;
         $this->email = $email;
@@ -47,79 +48,91 @@ class User {
     }
 
     // Get by ID
-    public static function getById(int $id): ?User {
+    public static function getById(int $id): ?User
+    {
         $user = Connection::doSelect(ORION_DB, self::$table, ["id" => $id]);
 
         if (count($user) === 1) {
             return new User(
-                $user[0]['email'], 
-                $user[0]['username'], 
-                $user[0]['password'], 
-                $user[0]['birthdate'], 
-                $user[0]['role'], 
-                $user[0]['profile_pic'], 
-                $user[0]['motd'], 
-                $user[0]['badge_id'], 
-                $user[0]['id'],
-                $user[0]['created_at'],
-                (bool)$user[0]['is_archived']
+                $user[0]["email"],
+                $user[0]["username"],
+                $user[0]["password"],
+                $user[0]["birthdate"],
+                $user[0]["role"],
+                $user[0]["profile_pic"],
+                $user[0]["motd"],
+                $user[0]["badge_id"],
+                $user[0]["id"],
+                $user[0]["created_at"],
+                (bool) $user[0]["is_archived"],
             );
         }
         return null;
     }
 
-    public static function getByEmail(string $email): ?User {
-        $user = Connection::doSelect(ORION_DB, self::$table, ["email" => $email]);
+    public static function getByEmail(string $email): ?User
+    {
+        $user = Connection::doSelect(ORION_DB, self::$table, [
+            "email" => $email,
+        ]);
 
         if (count($user) === 1) {
             return new User(
-                $user[0]['email'], 
-                $user[0]['username'], 
-                $user[0]['password'],
-                $user[0]['birthdate'], 
-                $user[0]['role'], 
-                $user[0]['profile_pic'], 
-                $user[0]['motd'], 
-                $user[0]['badge_id'], 
-                $user[0]['id'],
-                $user[0]['created_at'],
-                (bool)$user[0]['is_archived']
+                $user[0]["email"],
+                $user[0]["username"],
+                $user[0]["password"],
+                $user[0]["birthdate"],
+                $user[0]["role"],
+                $user[0]["profile_pic"],
+                $user[0]["motd"],
+                $user[0]["badge_id"],
+                $user[0]["id"],
+                $user[0]["created_at"],
+                (bool) $user[0]["is_archived"],
             );
         }
         return null;
     }
 
-    public function getPassword() {
+    public function getPassword()
+    {
         return $this->password;
     }
 
-    public function setPassword($password) {
+    public function setPassword($password)
+    {
         $this->password = password_hash($password, PASSWORD_BCRYPT);
     }
 
     // Handle methods
-    public function getHandle(): string {
-        return strtolower(str_replace(" ", "_", $this->username)) . "#" . strval($this->id);
+    public function getHandle(): string
+    {
+        return strtolower(str_replace(" ", "_", $this->username)) .
+            "#" .
+            strval($this->id);
     }
 
-    public static function getByHandle(string $handle): ?User {
+    public static function getByHandle(string $handle): ?User
+    {
         $id = explode("#", $handle)[1] ?? null;
-        if (!$id) return null;
+        if (!$id) {
+            return null;
+        }
 
         $user = Connection::doSelect(ORION_DB, self::$table, ["id" => $id]);
         if (count($user) === 1) {
             $userObj = new User(
-                $user[0]['email'], 
-                $user[0]['username'], 
-                $user[0]['password'],
-                $user[0]['birthdate'], 
-                $user[0]['role'], 
-                $user[0]['profile_pic'], 
-                $user[0]['motd'], 
-                $user[0]['badge_id'], 
-                $user[0]['id'],
-                $user[0]['created_at'],
-                $user[0]['is_archived']
+                $user[0]["email"],
+                $user[0]["username"],
+                $user[0]["password"],
+                $user[0]["birthdate"],
+                $user[0]["role"],
+                $user[0]["profile_pic"],
+                $user[0]["motd"],
+                $user[0]["badge_id"],
+                $user[0]["id"],
+                $user[0]["created_at"],
+                $user[0]["is_archived"],
             );
             return $userObj->getHandle() === $handle ? $userObj : null;
         }
@@ -127,57 +140,72 @@ class User {
     }
 
     // DB functions
-    public function save(): bool {
+    public function save(): bool
+    {
         $data = [
-            'email' => $this->email,
-            'username' => $this->username,
-            'birthdate' => $this->birthdate,
-            'role' => $this->role->value,
-            'profile_pic' => $this->profile_pic,
-            'motd' => $this->motd,
-            'badge_id' => $this->badge,
-            'is_archived' => (int)$this->is_archived,
+            "email" => $this->email,
+            "username" => $this->username,
+            "birthdate" => $this->birthdate,
+            "role" => $this->role->value,
+            "profile_pic" => $this->profile_pic,
+            "motd" => $this->motd,
+            "badge_id" => $this->badge,
+            "is_archived" => (int) $this->is_archived,
         ];
 
         if (!isset($this->id) || !self::getById($this->id)) {
             $this->setPassword($this->password);
-            $data['password'] = $this->password;
+            $data["password"] = $this->password;
             $result = Connection::doInsert(ORION_DB, self::$table, $data);
             $this->id = ORION_DB->lastInsertId();
-            return (bool)$result;
+            return (bool) $result;
         } else {
-            return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
+            return (bool) Connection::doUpdate(ORION_DB, self::$table, $data, [
+                "id" => $this->id,
+            ]);
         }
     }
 
-    public function savePassword(): bool {
-
-        if(!isset($this->id)) return false;
+    public function savePassword(): bool
+    {
+        if (!isset($this->id)) {
+            return false;
+        }
 
         $data = [
-            'password' => $this->password,
+            "password" => $this->password,
         ];
 
-        return (bool)Connection::doUpdate(ORION_DB, self::$table, $data, ['id' => $this->id]);
+        return (bool) Connection::doUpdate(ORION_DB, self::$table, $data, [
+            "id" => $this->id,
+        ]);
     }
 
-    public function delete(): ?bool {
-        if (!isset($this->id)) return null;
-        return (bool)Connection::doDelete(ORION_DB, self::$table, ['id' => $this->id]);
+    public function delete(): ?bool
+    {
+        if (!isset($this->id)) {
+            return null;
+        }
+        return (bool) Connection::doDelete(ORION_DB, self::$table, [
+            "id" => $this->id,
+        ]);
     }
 
     // Profile picture URL getter
-    public function getProfilePicURL(): string {
+    public function getProfilePicURL(): string
+    {
         return "/media/profile/" . ($this->profile_pic ?? "default");
     }
 
     // Relationship with Developer
-    public function getDeveloperInfo() : ?Developer {
+    public function getDeveloperInfo(): ?Developer
+    {
         return Developer::getByUser($this);
     }
 
-    public function addDeveloperInfo($name) : bool {
-        if(is_null($this->getDeveloperInfo())){
+    public function addDeveloperInfo($name): bool
+    {
+        if (is_null($this->getDeveloperInfo())) {
             $dev = new Developer($name, null, null, $this->id);
             return $dev->save();
         }
@@ -185,90 +213,129 @@ class User {
         return false;
     }
 
-    public function adquireGame(Game|int $game, $checkoutID, &$errorReason = ""): bool {
-        if($this->hasAdquiredGame($game)){
+    public function adquireGame(
+        Game|int $game,
+        $checkoutID,
+        &$errorReason = "",
+    ): bool {
+        if ($this->hasAdquiredGame($game)) {
             $errorReason = "Juego ya adquirido";
             return false;
         }
         $gameId = $game instanceof Game ? $game->id : $game;
-        
-        if(!Connection::doInsert(ORION_DB, "owns", ["game_id" => $gameId, "user_id" => $this->id, "checkout_id" => $checkoutID])) {
+
+        if (
+            !Connection::doInsert(ORION_DB, "owns", [
+                "game_id" => $gameId,
+                "user_id" => $this->id,
+                "checkout_id" => $checkoutID,
+            ])
+        ) {
             $errorReason = "Fallo en la inserción en la base de datos";
             return false;
         }
         return true;
     }
 
-    public function hasAdquiredGame(Game|int $game, $addDev = true, &$checkoutID = null): bool {
-        if(!($game instanceof Game)){
+    public function hasAdquiredGame(
+        Game|int $game,
+        $addDev = true,
+        &$checkoutID = null,
+    ): bool {
+        if (!($game instanceof Game)) {
             $game = Game::getById($game);
         }
 
-        if($game->getDeveloper() == $this->getDeveloperInfo() && $addDev) return true;
-        $select = Connection::doSelect(ORION_DB, "owns", ["game_id" => $game->id, "user_id" => $this->id]);
-        
+        if ($game->getDeveloper() == $this->getDeveloperInfo() && $addDev) {
+            return true;
+        }
+        $select = Connection::doSelect(ORION_DB, "owns", [
+            "game_id" => $game->id,
+            "user_id" => $this->id,
+        ]);
+
         if (count($select) === 1) {
-            $checkoutID = $select[0]['checkout_id'];
+            $checkoutID = $select[0]["checkout_id"];
             return true;
         }
         return false;
     }
 
-    public function getAdquiredGames($addDev = true): array {
-        if($addDev && !is_null($this->getDeveloperInfo())){
+    public function getAdquiredGames($addDev = true): array
+    {
+        if ($addDev && !is_null($this->getDeveloperInfo())) {
             $games = $this->getDeveloperInfo()->getGames();
         } else {
             $games = [];
         }
 
-        $select = Connection::doSelect(ORION_DB, "owns", ["user_id" => $this->id]);
-        
+        $select = Connection::doSelect(ORION_DB, "owns", [
+            "user_id" => $this->id,
+        ]);
+
         foreach ($select as $gameRow) {
-            $games[] = Game::getById($gameRow['game_id']);
+            $games[] = Game::getById($gameRow["game_id"]);
         }
 
         return $games;
     }
 
     // Relationship with Badge
-    public function getBadge(): ?Badge {
-        return isset($this->badge) && is_numeric($this->badge) ? Badge::getById($this->badge) : null;
+    public function getBadge(): ?Badge
+    {
+        return isset($this->badge) && is_numeric($this->badge)
+            ? Badge::getById($this->badge)
+            : null;
     }
 
-    public function hasUnlockedBadge(Badge|int $badge, ?string &$dateUnlocked = null): bool {
+    public function hasUnlockedBadge(
+        Badge|int $badge,
+        ?string &$dateUnlocked = null,
+    ): bool {
         $badgeId = $badge instanceof Badge ? $badge->id : $badge;
-        $select = Connection::doSelect(ORION_DB, "badge_unlocked", ["badge_id" => $badgeId, "user_id" => $this->id]);
-        
+        $select = Connection::doSelect(ORION_DB, "badge_unlocked", [
+            "badge_id" => $badgeId,
+            "user_id" => $this->id,
+        ]);
+
         if (count($select) === 1) {
-            $dateUnlocked = $select[0]['date'];
+            $dateUnlocked = $select[0]["date"];
             return true;
         }
         return false;
     }
 
-    public function getUnlockedBadges(): array {
+    public function getUnlockedBadges(): array
+    {
         $badges = [];
-        $select = Connection::doSelect(ORION_DB, "badge_unlocked", ["user_id" => $this->id]);
-        
+        $select = Connection::doSelect(ORION_DB, "badge_unlocked", [
+            "user_id" => $this->id,
+        ]);
+
         foreach ($select as $badgeRow) {
-            $badges[] = Badge::getById($badgeRow['id']);
+            $badges[] = Badge::getById($badgeRow["id"]);
         }
         return $badges;
     }
 
-    public function getUnlockedBadgeDate(Badge|int $badge): ?string {
+    public function getUnlockedBadgeDate(Badge|int $badge): ?string
+    {
         $badgeId = $badge instanceof Badge ? $badge->id : $badge;
-        $select = Connection::doSelect(ORION_DB, "badge_unlocked", ["badge_id" => $badgeId, "user_id" => $this->id]);
+        $select = Connection::doSelect(ORION_DB, "badge_unlocked", [
+            "badge_id" => $badgeId,
+            "user_id" => $this->id,
+        ]);
 
-        return count($select) === 1 ? $select[0]['date'] : null;
+        return count($select) === 1 ? $select[0]["date"] : null;
     }
 
-    public function unlockBadge(Badge|int $badge) : bool {
-        if(!$this->hasUnlockedBadge($badge)){
+    public function unlockBadge(Badge|int $badge): bool
+    {
+        if (!$this->hasUnlockedBadge($badge)) {
             $badgeId = $badge instanceof Badge ? $badge->id : $badge;
-            return Connection::doInsert(ORION_DB, 'badge_unlocked', [
+            return Connection::doInsert(ORION_DB, "badge_unlocked", [
                 "badge_id" => $badgeId,
-                "user_id" => $this->id
+                "user_id" => $this->id,
             ]);
         }
 
@@ -276,24 +343,35 @@ class User {
     }
 
     // Relationship with Achievement
-    public function unlockAchievement(Achievement|int $achievement): bool {
-        $achievementId = $achievement instanceof Achievement ? $achievement->id : $achievement;
-        if (!$this->hasUnlockedAchievement($achievementId)) {
-            if (Connection::doInsert(ORION_DB, 'unlocks', [
-                "achievement_id" => $achievementId,
-                "user_id" => $this->id
-            ])) {
-                $this->checkForAllAchievementsUnlocked();
+    public function unlockAchievement(
+        Game|int $game,
+        Achievement|int $achievement,
+    ): bool {
+        $gameId = $game instanceof Game ? $game->id : $game;
+        $achievementId =
+            $achievement instanceof Achievement
+                ? $achievement->id
+                : $achievement;
+        if (!$this->hasUnlockedAchievement($gameId, $achievementId)) {
+            if (
+                Connection::doInsert(ORION_DB, "unlocks", [
+                    "game_id" => $gameId,
+                    "achievement_id" => $achievementId,
+                    "user_id" => $this->id,
+                ])
+            ) {
+                $this->checkForAllAchievementsUnlocked($game);
                 return true;
             }
         }
         return false;
     }
 
-    private function checkForAllAchievementsUnlocked(): void {
-        $gameId = $this->getUnlockedAchievements()[0]->game_id;
+    private function checkForAllAchievementsUnlocked(Game|int $game): void
+    {
+        $gameId = $game instanceof Game ? $game->id : $game;
         $allAchievements = Achievement::getAllByGame($gameId);
-        $unlockedAchievements = $this->getUnlockedAchievements();
+        $unlockedAchievements = $this->getUnlockedAchievementsForGame($game);
 
         if (count($allAchievements) === count($unlockedAchievements)) {
             $badge = Badge::getByGame($gameId);
@@ -303,36 +381,83 @@ class User {
         }
     }
 
-    public function hasUnlockedAchievement(Achievement|int $achievement, ?string &$dateUnlocked = null): bool {
-        $achievementId = $achievement instanceof Achievement ? $achievement->id : $achievement;
-        $select = Connection::doSelect(ORION_DB, "unlocks", ["achievement_id" => $achievementId, "user_id" => $this->id]);
+    public function hasUnlockedAchievement(
+        Game|int $game,
+        Achievement|int $achievement,
+        ?string &$dateUnlocked = null,
+    ): bool {
+        $gameId = $game instanceof Game ? $game->id : $game;
+        $achievementId =
+            $achievement instanceof Achievement
+                ? $achievement->id
+                : $achievement;
+        $select = Connection::doSelect(ORION_DB, "unlocks", [
+            "achievement_id" => $achievementId,
+            "user_id" => $this->id,
+        ]);
 
         if (count($select) === 1) {
-            $dateUnlocked = $select[0]['date'];
+            $dateUnlocked = $select[0]["date"];
             return true;
         }
         return false;
     }
 
-    public function getUnlockedAchievements(): array {
+    public function getUnlockedAchievements(): array
+    {
         $achievements = [];
-        $select = Connection::doSelect(ORION_DB, "unlocks", ["user_id" => $this->id]);
+        $select = Connection::doSelect(ORION_DB, "unlocks", [
+            "user_id" => $this->id,
+        ]);
 
         foreach ($select as $achievementRow) {
-            $achievements[] = Achievement::getById($achievementRow['achievement_id']);
+            $achievements[] = Achievement::getById(
+                $achievementRow["game_id"],
+                $achievementRow["achievement_id"],
+            );
         }
         return $achievements;
     }
 
-    public function getUnlockedAchievementDate(Achievement|int $achievement): ?string {
-        $achievementId = $achievement instanceof Achievement ? $achievement->id : $achievement;
-        $select = Connection::doSelect(ORION_DB, "unlocks", ["achievement_id" => $achievementId, "user_id" => $this->id]);
+    public function getUnlockedAchievementsForGame(Game|int $game): array
+    {
+        $gameId = $game instanceof Game ? $game->id : $game;
+        $achievements = [];
+        $select = Connection::doSelect(ORION_DB, "unlocks", [
+            "user_id" => $this->id,
+            "game_id" => $gameId,
+        ]);
 
-        return count($select) === 1 ? $select[0]['date'] : null;
+        foreach ($select as $achievementRow) {
+            $achievements[] = Achievement::getById(
+                $gameId,
+                $achievementRow["achievement_id"],
+            );
+        }
+        return $achievements;
+    }
+
+    public function getUnlockedAchievementDate(
+        Game|int $game,
+        Achievement|int $achievement,
+    ): ?string {
+        $gameId = $game instanceof Game ? $game->id : $game;
+        $achievementId =
+            $achievement instanceof Achievement
+                ? $achievement->id
+                : $achievement;
+        $select = Connection::doSelect(ORION_DB, "unlocks", [
+            "achievement_id" => $achievementId,
+            "user_id" => $this->id,
+            "game_id" => $gameId,
+        ]);
+
+        return count($select) === 1 ? $select[0]["date"] : null;
     }
 
     // Relationship with Stat
-    public function updateStat(Stat|int $stat, int $value): bool {
+    public function updateStat(Stat|int $stat, int $value): bool
+    {
         $statId = $stat instanceof Stat ? $stat->id : $stat;
         $currentValue = $this->getStatValue($statId);
 
@@ -343,57 +468,82 @@ class User {
         }
 
         if ($this->hasStat($statId)) {
-            return (bool)Connection::doUpdate(ORION_DB, 'has_stat', ['value' => $value], ['user_id' => $this->id, 'stat_id' => $statId]);
+            return (bool) Connection::doUpdate(
+                ORION_DB,
+                "has_stat",
+                ["value" => $value],
+                ["user_id" => $this->id, "stat_id" => $statId],
+            );
         } else {
-            return (bool)Connection::doInsert(ORION_DB, 'has_stat', ['user_id' => $this->id, 'stat_id' => $statId, 'value' => $value]);
+            return (bool) Connection::doInsert(ORION_DB, "has_stat", [
+                "user_id" => $this->id,
+                "stat_id" => $statId,
+                "value" => $value,
+            ]);
         }
     }
 
-    public function hasStat(Stat|int $stat): bool {
+    public function hasStat(Stat|int $stat): bool
+    {
         $statId = $stat instanceof Stat ? $stat->id : $stat;
-        $select = Connection::doSelect(ORION_DB, "has_stat", ["stat_id" => $statId, "user_id" => $this->id]);
+        $select = Connection::doSelect(ORION_DB, "has_stat", [
+            "stat_id" => $statId,
+            "user_id" => $this->id,
+        ]);
 
         return count($select) === 1;
     }
 
-    public function getStatValue(Stat|int $stat): ?int {
+    public function getStatValue(Stat|int $stat): ?int
+    {
         $statId = $stat instanceof Stat ? $stat->id : $stat;
-        $select = Connection::doSelect(ORION_DB, "has_stat", ["stat_id" => $statId, "user_id" => $this->id]);
+        $select = Connection::doSelect(ORION_DB, "has_stat", [
+            "stat_id" => $statId,
+            "user_id" => $this->id,
+        ]);
 
-        return count($select) === 1 ? $select[0]['value'] : null;
+        return count($select) === 1 ? $select[0]["value"] : null;
     }
-    
+
     // Auth related
-    public function toSessionArray(): array {
-        return isset($this->id) ? [
-            "id" => $this->id,
-            "username" => $this->username,
-            "profile_pic" => $this->profile_pic
-        ] : [];
+    public function toSessionArray(): array
+    {
+        return isset($this->id)
+            ? [
+                "id" => $this->id,
+                "username" => $this->username,
+                "profile_pic" => $this->profile_pic,
+            ]
+            : [];
     }
 
-    public static function getCount(){
-        $count = Connection::customQuery(ORION_DB, "SELECT COUNT(id) FROM ".self::$table)->fetch(PDO::FETCH_BOTH);
+    public static function getCount()
+    {
+        $count = Connection::customQuery(
+            ORION_DB,
+            "SELECT COUNT(id) FROM " . self::$table,
+        )->fetch(PDO::FETCH_BOTH);
 
         return $count[0];
     }
 
-    public static function all(): array {
+    public static function all(): array
+    {
         $select = Connection::doSelect(ORION_DB, self::$table);
         $users = [];
         foreach ($select as $user) {
             $users[] = new User(
-                $user['email'],
-                $user['username'],
-                $user['password'],
-                $user['birthdate'],
-                $user['role'],
-                $user['profile_pic'],
-                $user['motd'],
-                $user['badge_id'],
-                $user['id'],
-                $user['created_at'],
-                $user['is_archived']
+                $user["email"],
+                $user["username"],
+                $user["password"],
+                $user["birthdate"],
+                $user["role"],
+                $user["profile_pic"],
+                $user["motd"],
+                $user["badge_id"],
+                $user["id"],
+                $user["created_at"],
+                $user["is_archived"],
             );
         }
         return $users;

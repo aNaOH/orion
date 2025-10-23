@@ -2,85 +2,99 @@ let form = document.getElementById("guideTypeForm");
 let submit = document.getElementById("submitButton");
 
 form.onsubmit = (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    let fields = e.target.elements;
+  let fields = e.target.elements;
 
-    submit.classList.add("disabled");
+  submit.classList.add("disabled");
 
-    // Crear un objeto FormData
-    let formData = new FormData();
-    formData.append("type", fields["type"].value); // Agregar el título
-    formData.append("icon", fields["icon"].files[0]); // Agregar la imagen
-    formData.append("tintColor", fields["tintColor"].value); // Agregar el color
+  // Crear un objeto FormData
+  let formData = new FormData();
+  formData.append("type", fields["type"].value); // Agregar el título
+  formData.append("icon", fields["icon"].files[0]); // Agregar la imagen
+  formData.append("tintColor", fields["tintColor"].value); // Agregar el color
 
-    // Realizar la solicitud AJAX con FormData
-    $.ajax({
-        url: '/api/admin/guidetype', // La URL del endpoint
-        type: 'POST', // Método HTTP
-        data: formData, // FormData con los datos del formulario
-        processData: false, // Evitar que jQuery procese los datos
-        contentType: false, // Evitar que jQuery establezca el encabezado Content-Type
-        success: function(response) {
-            location.href = "/communities";
-        },
-        error: function(xhr, status, error) {
-            const info = xhr.responseJSON;
-            console.log(info);
-            //showError(info);
-            submit.classList.remove("disabled");
-        }
-    });
+  // Realizar la solicitud AJAX con FormData
+  $.ajax({
+    url: "/api/admin/guidetype", // La URL del endpoint
+    type: "POST", // Método HTTP
+    data: formData, // FormData con los datos del formulario
+    processData: false, // Evitar que jQuery procese los datos
+    contentType: false, // Evitar que jQuery establezca el encabezado Content-Type
+    success: function (response) {
+      location.href = "/admin/guidetypes";
+    },
+    error: function (xhr, status, error) {
+      const info = xhr.responseJSON;
+      console.log(info);
+      //showError(info);
+      submit.classList.remove("disabled");
+    },
+  });
 };
 
-// Previsualización
-const svgUploadInput = document.getElementById('icon');
-const tintColorInput = document.getElementById('tintColor');
-const svgPreview = document.getElementById('preview');
-const previewLabel = document.getElementById('previewLabel');
+//Previsualización
+const svgUploadInput = document.getElementById("icon");
+const tintColorInput = document.getElementById("tintColor");
+const svgPreview = document.getElementById("preview");
+const previewContainer = document.getElementById("previewContainer");
 
-  // Manejar cambios en el color
-  tintColorInput.addEventListener('input', (event) => {
-    const color = event.target.value;
-    svgPreview.setAttribute('base-color', color);
-  });
+// Inicialmente deshabilitar el color hasta que haya un SVG
+tintColorInput.disabled = true;
 
-  // Manejar la subida de archivos SVG
-  svgUploadInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
+// Manejar cambios en el color
+tintColorInput.addEventListener("input", (event) => {
+  const color = event.target.value;
+  svgPreview.setAttribute("base-color", color);
+});
 
-    // Si no hay archivo, ocultar la previsualización
-    if (!file) {
-      svgPreview.style.display = 'none';
-      previewLabel.style.display = 'none';
-      tintColorInput.disabled = true;
-      return;
-    }
+// Manejar la subida de archivos SVG
+svgUploadInput.addEventListener("change", async (event) => {
+  const file = event.target.files[0];
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const svgContent = reader.result;
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(svgContent, 'image/svg+xml');
-      const svg = doc.querySelector('svg');
+  // Si no hay archivo, ocultar la previsualización
+  if (!file) {
+    previewContainer.classList.add("hidden");
+    tintColorInput.disabled = true;
+    return;
+  }
 
-      if (svg) {
-        // Mostrar la previsualización y habilitar color
-        svgPreview.style.display = 'block';
-        previewLabel.style.display = 'block';
-        tintColorInput.disabled = false;
+  const reader = new FileReader();
+  reader.onload = () => {
+    const svgContent = reader.result;
+    const parser = new DOMParser();
+    const doc = parser.parseFromString(svgContent, "image/svg+xml");
+    const svg = doc.querySelector("svg");
 
-        // Inserta el SVG como contenido del componente
-        svgPreview.innerHTML = '';
-        svgPreview.svgContainer.innerHTML = new XMLSerializer().serializeToString(svg);
+    if (svg) {
+      // Mostrar la previsualización y habilitar el color
+      previewContainer.classList.remove("hidden");
+      tintColorInput.disabled = false;
+
+      // Reemplaza el contenido del componente con el SVG cargado
+      svgPreview.innerHTML = "";
+      if (svgPreview.svgContainer) {
+        svgPreview.svgContainer.innerHTML =
+          new XMLSerializer().serializeToString(svg);
       } else {
-        console.error('El archivo cargado no contiene un SVG válido.');
+        // Compatibilidad por si no existe svgContainer internamente
+        svgPreview.innerHTML = new XMLSerializer().serializeToString(svg);
       }
-    };
 
-    reader.onerror = () => {
-      console.error('Error leyendo el archivo SVG.');
-    };
+      // Aplica el color actual
+      svgPreview.setAttribute("base-color", tintColorInput.value);
+    } else {
+      console.error("El archivo cargado no contiene un SVG válido.");
+      previewContainer.classList.add("hidden");
+      tintColorInput.disabled = true;
+    }
+  };
 
-    reader.readAsText(file);
-  });
+  reader.onerror = () => {
+    console.error("Error leyendo el archivo SVG.");
+    previewContainer.classList.add("hidden");
+    tintColorInput.disabled = true;
+  };
+
+  reader.readAsText(file);
+});

@@ -2,7 +2,8 @@
 
 $title = "Tu biblioteca en Orion";
 
-function showPage() {
+function showPage()
+{
     ?>
 
     <script src="/assets/js/library.js"></script>
@@ -39,7 +40,7 @@ function showPage() {
                             <div id="game-actions" class="flex flex-row gap-2 mb-5 items-center py-2">
                                 <div id="game-download" class="flex flex-row gap-2">
                                     <span id="download" class="text-lg bg-alt hover:bg-alt-600 rounded-md transition-all duration-[50ms] p-2 cursor-pointer" onclick="downloadGame()">Descargar</span>
-                                    <select name="version" id="version" class="text-lg p-2 bg-branddark text-white rounded-md cursor-pointer hover:bg-branddark-600 transition-all duration-[50ms]"> 
+                                    <select name="version" id="version" class="text-lg p-2 bg-branddark text-white rounded-md cursor-pointer hover:bg-branddark-600 transition-all duration-[50ms]">
                                         <option value="latest">Última versión</option>
                                     </select>
                                 </div>
@@ -93,6 +94,6 @@ function showPage() {
     <?php
 }
 
-include("views/templates/main.php");
+include "views/templates/main.php";
 
-unset($GLOBALS['games']);
+unset($GLOBALS["games"]);

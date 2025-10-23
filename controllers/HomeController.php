@@ -1,14 +1,10 @@
 <?php
 
-require_once 'models/Game.php';
-require_once 'models/User.php';
-require_once 'models/Developer.php';
-
-class HomeController {
-
+class HomeController
+{
     //Esta función existe con el proposito de tener una alternativa para añadir juegos mientras la tienda y los desarrolladores no estén implementados
-    public static function do(){
-
+    public static function do()
+    {
         $games = Game::pickRandom(10);
         $users = User::getCount();
 
@@ -17,29 +13,28 @@ class HomeController {
         foreach ($games as $game) {
             $entry = [];
 
-            $entry['id'] = $game->id;
-            $entry['title'] = $game->title;
+            $entry["id"] = $game->id;
+            $entry["title"] = $game->title;
 
             $gameList[] = $entry;
         }
 
-        header('HTTP/1.1 200 OK');
-        $response['showcaseGames'] = $gameList;
-        $response['users'] = $users;
+        header("HTTP/1.1 200 OK");
+        $response["showcaseGames"] = $gameList;
+        $response["users"] = $users;
 
         echo json_encode($response);
         exit();
     }
 
-    public static function devDo(){
-
+    public static function devDo()
+    {
         $developers = Developer::getCount();
 
-        header('HTTP/1.1 200 OK');
-        $response['developers'] = $developers;
+        header("HTTP/1.1 200 OK");
+        $response["developers"] = $developers;
 
         echo json_encode($response);
         exit();
     }
-
 }

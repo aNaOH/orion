@@ -38,6 +38,14 @@ CREATE TABLE IF NOT EXISTS `guide_types` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB;
 
+CREATE TABLE IF NOT EXISTS `game_features` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `icon` VARCHAR(255) NOT NULL,
+  `name` VARCHAR(100) NOT NULL,
+  `tint` VARCHAR(7) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB;
+
 CREATE TABLE IF NOT EXISTS `game_news_categories` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(255) NOT NULL,
@@ -85,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `game` (
   KEY `fk_game_genre_id` (`genre_id`),
   CONSTRAINT `fk_game_developer_id`
     FOREIGN KEY (`developer_id`) REFERENCES `developers` (`id`)
-    ON DELETE SET NULL ON UPDATE CASCADE,
+    ON DELETE SET CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_game_genre_id`
     FOREIGN KEY (`genre_id`) REFERENCES `game_genres` (`id`)
     ON DELETE SET NULL ON UPDATE CASCADE
@@ -127,13 +135,13 @@ CREATE TABLE IF NOT EXISTS `stat` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `achievements` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `game_id` INT DEFAULT NULL,
+  `id` INT NOT NULL,
   `name` VARCHAR(100) NOT NULL,
   `description` VARCHAR(255) NOT NULL,
   `icon` VARCHAR(255) NOT NULL,
   `locked_icon` VARCHAR(255) DEFAULT NULL,
   `secret` TINYINT(1) DEFAULT '0',
-  `game_id` INT DEFAULT NULL,
   `type` INT NOT NULL,
   `stat_id` INT DEFAULT NULL,
   `stat_value` INT DEFAULT NULL,
@@ -187,6 +195,19 @@ CREATE TABLE IF NOT EXISTS `owns` (
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_owns_game_id`
     FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `game_has_feature` (
+  `game_id` INT NOT NULL,
+  `feature_id` INT NOT NULL,
+  KEY `fk_game_has_feature_game_id` (`game_id`),
+  KEY `fk_game_has_feature_feature_id` (`feature_id`),
+  CONSTRAINT `fk_game_has_feature_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_game_has_feature_feature_id`
+    FOREIGN KEY (`feature_id`) REFERENCES `game_features` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
 
@@ -299,11 +320,15 @@ CREATE TABLE IF NOT EXISTS `has_stat` (
 ) ENGINE=InnoDB;
 
 CREATE TABLE IF NOT EXISTS `unlocks` (
+  `game_id` INT NOT NULL,
   `achievement_id` INT NOT NULL,
   `user_id` INT NOT NULL,
   `date` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   KEY `fk_unlocks_achievement_id` (`achievement_id`),
   KEY `fk_unlocks_user_id` (`user_id`),
+  CONSTRAINT `fk_unlocks_game_id`
+    FOREIGN KEY (`game_id`) REFERENCES `games` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_unlocks_achievement_id`
     FOREIGN KEY (`achievement_id`) REFERENCES `achievements` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE,

@@ -1,61 +1,74 @@
-let form = document.getElementById("newAchievementForm");
-let typeSelector = document.getElementById("type");
+let formAchievement = document.getElementById("newAchievementForm");
+let submitAchievement = document.getElementById("submitButton");
+let typeSelect = document.getElementById("type");
 let statContainer = document.getElementById("statContainer");
-let submit = document.getElementById("submitButton");
-let iconUpload = document.getElementById("icon");
-let lockedIconUpload = document.getElementById("lockedIcon");
 
-typeSelector.onchange = (e) => {
-    if(typeSelector.value == 1) {
-        statContainer.classList.remove("d-none");
-    } else {
-        statContainer.classList.add("d-none");
-    }
-}
+typeSelect.onchange = () => {
+  if (typeSelect.value === "1") {
+    statContainer.classList.remove("hidden");
+  } else {
+    statContainer.classList.add("hidden");
+  }
+};
 
-form.onsubmit = (e) => {
-    e.preventDefault();
+const toggleSpinner = (button, show, text = "Procesando...") => {
+  button.disabled = show;
+  button.innerHTML = show
+    ? `<div class="flex items-center justify-center gap-2">
+         <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>${text}
+       </div>`
+    : button.dataset.defaultText || "Enviar";
+};
 
-    let fields = e.target.elements;
+formAchievement.onsubmit = (e) => {
+  e.preventDefault();
+  toggleSpinner("submitButton", "spinnerAchievement", true);
 
-    resetField('name');
-    resetField('description');
+  const fields = e.target.elements;
 
-    submit.classList.add("disabled");
+  resetField("name");
+  resetField("description");
+  resetField("type");
+  resetField("stat");
+  resetField("icon");
+  resetField("lockedIcon");
 
-    let formData = new FormData();
-    formData.append('token', fields['tript_token'].value);
-    formData.append('game', fields['game'].value);
-    formData.append('name', fields['name'].value);
-    formData.append('description', fields['description'].value);
-    formData.append('type', fields['type'].value);
-    if (fields['type'].value == 1) {
-        formData.append('stat', fields['stat'].value);
-    }
-    if (!iconUpload.getFileInput()) {
-        showError({field: 'icon', message: "Icon is required."});
-        submit.classList.remove("disabled");
-        return;
-    }
-    formData.append('icon', iconUpload.getFileInput()[0]);
-    if (lockedIconUpload.getFileInput()) {
-        formData.append('lockedIcon', lockedIconUpload.getFileInput()[0]);
-    }
+  let formData = new FormData();
+  formData.append("game", fields["game"].value);
+  formData.append("name", fields["name"].value);
+  formData.append("description", fields["description"].value);
+  formData.append("type", fields["type"].value);
+  formData.append("stat", fields["stat"].value);
 
-    $.ajax({
-        url: '/api/dev/achievement', // The URL to which the request is sent
-        type: 'POST', // The HTTP method to use for the request (GET, POST, etc.)
-        data: formData, // Data to be sent to the server
-        processData: false,
-        contentType: false,
-        success: function(response) {
-            location.href = "/dev/panel/games/" + gameID + "/community/achievements";
-        },
-        error: function(xhr, status, error) {
-            const info = xhr.responseJSON;
-            console.log(info);
-            showError(info);
-            submit.classList.remove("disabled");
-        }
-    });
+  if (document.getElementById("icon").getFileInput()) {
+    formData.append("icon", document.getElementById("icon").getFileInput()[0]);
+  }
+
+  if (document.getElementById("lockedIcon").getFileInput()) {
+    formData.append(
+      "lockedIcon",
+      document.getElementById("lockedIcon").getFileInput()[0],
+    );
+  }
+
+  submitAchievement.classList.add("disabled");
+
+  $.ajax({
+    url: "/api/dev/achievement",
+    type: "POST",
+    data: formData,
+    processData: false,
+    contentType: false,
+    success: function () {
+      location.href =
+        "/dev/panel/games/" + fields["game"].value + "/community/achievements";
+    },
+    error: function (xhr) {
+      const info = xhr.responseJSON;
+      console.log(info);
+      showError(info);
+      toggleSpinner("submitButton", "spinnerAchievement", false);
+      submitAchievement.classList.remove("disabled");
+    },
+  });
 };
