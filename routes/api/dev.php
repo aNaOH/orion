@@ -433,4 +433,116 @@ $router->mount("/dev", function () use ($router) {
         }
         exit();
     });
+
+    $router->delete("/achievement/{game}/{id}/delete/", function (
+        $gameId,
+        $id,
+    ) {
+        $achievement = Achievement::getById($gameId, $id);
+        if ($achievement) {
+            $achievement->delete();
+            header("HTTP/1.1 200 OK");
+            $response["status"] = 200;
+            $response["message"] = "Tipo de guía eliminado";
+            echo json_encode($response);
+        } else {
+            header("HTTP/1.1 404 Not Found");
+            $response["status"] = 404;
+            $response["message"] = "Tipo de guía no encontrado";
+            echo json_encode($response);
+        }
+    });
+
+    $router->post("/news", function () {
+        $gameId = $_POST["game"];
+        $game = Game::getById($gameId);
+
+        if (!$game) {
+            header("HTTP/1.1 404 Not Found");
+            $response["status"] = 404;
+            $response["message"] = "Juego no encontrado.";
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($_SESSION["user"]["id"]);
+
+        if (!$user) {
+            header("HTTP/1.1 401 Unauthorized");
+            $response["status"] = 401;
+            $response["message"] = "Usuario no autenticado.";
+            echo json_encode($response);
+            exit();
+        }
+
+        if ($user->getDeveloperInfo()->id != $game->developer_id) {
+            header("HTTP/1.1 403 Forbidden");
+            $response["status"] = 403;
+            $response["message"] = "No tienes permiso para crear noticias.";
+            echo json_encode($response);
+            exit();
+        }
+
+        $title = $_POST["title"];
+        $content = $_POST["body"];
+        $category = intval($_POST["category"]);
+
+        FormHelper::ValidateRequiredField($title, "title");
+        FormHelper::ValidateRequiredField($content, "body");
+        FormHelper::ValidateRequiredField($category, "category");
+
+        if ($category < 1) {
+            header("HTTP/1.1 400 Bad Request");
+            $response["status"] = 400;
+            $response["message"] = "La categoría no existe.";
+            echo json_encode($response);
+            exit();
+        }
+
+        $categoryObj = GameNewsCategory::getById($category);
+
+        if (!$categoryObj) {
+            header("HTTP/1.1 400 Bad Request");
+            $response["status"] = 400;
+            $response["message"] = "La categoría no existe.";
+            echo json_encode($response);
+            exit();
+        }
+
+        $news = new Post(
+            $title,
+            $content,
+            true,
+            EPOST_TYPE::GAME_NEWS,
+            $gameId,
+            $user->id,
+        );
+
+        $done = $news->save();
+
+        if (!$done) {
+            header("HTTP/1.1 500 Internal Server Error");
+            $response["status"] = 500;
+            $response["message"] = "Error al crear la noticia.";
+            echo json_encode($response);
+            exit();
+        }
+
+        $gameNews = new GameNews($news->id, $category);
+
+        $done = $gameNews->save();
+
+        if ($done) {
+            header("HTTP/1.1 201 Created");
+            $response["status"] = 201;
+            $response["message"] = "Noticia creada exitosamente.";
+            echo json_encode($response);
+        } else {
+            header("HTTP/1.1 500 Internal Server Error");
+            $response["status"] = 500;
+            $response["message"] = "Error al crear la noticia.";
+            echo json_encode($response);
+        }
+        exit();
+    });
 });

@@ -19,6 +19,13 @@ function showPage()
     ]); ?>
     <input type="hidden" name="game" value="<?= $game->id ?>">
 
+    <div class="flex items-center gap-2">
+        <a href="/dev/panel/games/<?= $game->id ?>/community/news" class="text-alt font-medium hover:opacity-90 transition">
+            <i class="bi bi-arrow-left me-1"></i>
+        </a>
+      <h1 class="text-xl font-semibold text-alt">Crear noticia para <?= $game->title ?></h1>
+    </div>
+
     <!-- Nombre -->
     <div class="relative">
       <input
@@ -90,6 +97,30 @@ function showPage()
             const simplemde = setupMarkdownEditor({
               selector: "#body",
               uniqueId: "OrionDev_New_GameNew_" + gameID.toString()
+            });
+
+            const form = document.getElementById("editNewForm");
+            const submitButton = document.getElementById("submitButton");
+            const spinner = document.getElementById("spinnerNews");
+            const bodyError = document.getElementById("bodyError");
+
+            form.addEventListener("submit", async (event) => {
+              event.preventDefault();
+              spinner.classList.remove("hidden");
+              submitButton.disabled = true;
+              const formData = new FormData(form);
+              const response = await fetch("/api/dev/news", {
+                method: "POST",
+                body: formData
+              });
+              const data = await response.json();
+              if (data.status == 201) {
+                window.location.href = "/dev/games/" + gameID.toString() + "/community/news";
+              } else {
+                bodyError.textContent = data.error;
+              }
+              spinner.classList.add("hidden");
+              submitButton.disabled = false;
             });
 
             </script>

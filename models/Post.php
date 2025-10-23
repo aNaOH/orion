@@ -146,7 +146,7 @@ class Post
         return User::getById($this->author_id);
     }
 
-    public function getPostInfo(): null|GalleryEntry|Guide
+    public function getPostInfo(): null|GalleryEntry|Guide|GameNews
     {
         if (is_null($this->id)) {
             return null;

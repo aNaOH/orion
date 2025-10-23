@@ -6,7 +6,6 @@ function showPage()
 {
     global $game;
     global $news;
-    global $newsCategories;
     ?>
 
     <div class="flex justify-between items-center mb-6">
@@ -45,13 +44,13 @@ function showPage()
                 <?= $new->title ?>
             </td>
             <td class="px-4 py-3">
-                <?= $new->getCategory()->name ?>
+                <?= $new->getPostInfo()->getCategory()->name ?>
             </td>
             <td class="px-4 py-3">
-                <?= $new->published_at->format("Y-m-d H:i:s") ?>
+                <?= $new->created_at->format("Y-m-d H:i:s") ?>
             </td>
             <td class="px-4 py-3">
-                <?= $new->updated_at->format("Y-m-d H:i:s") ?>
+                <?= $new->last_updated_at->format("Y-m-d H:i:s") ?>
             </td>
             <td class="px-4 py-3 text-right">
                 <a
