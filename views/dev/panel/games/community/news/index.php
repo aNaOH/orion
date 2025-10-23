@@ -61,8 +61,10 @@ function showPage()
                   <i class="bi bi-pencil-square"></i>
                 </a>
                 <button
-                  class="text-red-500 hover:opacity-80 mx-1 tooltip-btn bg-transparent border-none"
+                  class="text-red-500 hover:opacity-80 mx-1 tooltip-btn bg-transparent border-none delete-btn"
                   data-tooltip="Eliminar"
+                  data-id="<?= $new->id ?>"
+                  data-name="<?= $new->title ?>"
                 >
                   <i class="bi bi-trash-fill"></i>
                 </button>
@@ -74,7 +76,28 @@ function showPage()
     </div>
 
     <div id="table-tooltip" class="hidden absolute bg-[#1B2A49] text-[#FFD700] text-sm px-2 py-1 rounded-md shadow-lg pointer-events-none z-50"></div>
+    <script src="/assets/js/orion-panel/table-tooltip.js"></script>
 
+    <script src="/assets/js/orion-panel/delete-popup.js"></script>
+    <script>
+      setupDeletePopup({
+        selector: ".delete-btn",
+        getName: (btn) => btn.dataset.name,
+        getDeleteUrl: (btn) => `/api/dev/news/${btn.dataset.id}/delete/`,
+        title: "¿Eliminar noticia?",
+        onConfirm: (url) => {
+          fetch(url, { method: 'DELETE' })
+            .then(response => {
+              if (response.ok) {
+                window.location.href = '/dev/panel/games/<?= $game->id ?>/community/news/';
+              } else {
+                console.error('Error al eliminar la noticia');
+              }
+            })
+            .catch(error => console.error('Error al eliminar la noticia:', error));
+        }
+      });
+    </script>
 
             <?php
 }

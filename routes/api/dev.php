@@ -545,4 +545,26 @@ $router->mount("/dev", function () use ($router) {
         }
         exit();
     });
+
+    $router->post("/news-edit", function () {});
+
+    $router->delete("/news/{id}/delete/", function ($id) {
+        $news = Post::getById($id);
+        if (
+            $news &&
+            $news->author_id == $_SESSION["user"]["id"] &&
+            $news->type == EPOST_TYPE::GAME_NEWS
+        ) {
+            $news->delete();
+            header("HTTP/1.1 200 OK");
+            $response["status"] = 200;
+            $response["message"] = "Noticia eliminada";
+            echo json_encode($response);
+        } else {
+            header("HTTP/1.1 404 Not Found");
+            $response["status"] = 404;
+            $response["message"] = "Noticia no encontrada";
+            echo json_encode($response);
+        }
+    });
 });

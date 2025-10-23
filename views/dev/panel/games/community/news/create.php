@@ -89,7 +89,6 @@ function showPage()
   </form>
 </div>
 
-            <script src="/assets/js/forms/dev/getStoreID.js"></script>
             <script src="/assets/js/forms/validator.js"></script>
             <script src="/assets/js/orion-panel/markdown-editor.js"></script>
             <script>
@@ -115,7 +114,7 @@ function showPage()
               });
               const data = await response.json();
               if (data.status == 201) {
-                window.location.href = "/dev/games/" + gameID.toString() + "/community/news";
+                window.location.href = "/dev/panel/games/<?= $game->id ?>/community/news";
               } else {
                 bodyError.textContent = data.error;
               }
