@@ -46,10 +46,12 @@ class Post
         $data = [
             "title" => $this->title,
             "body" => $this->body,
-            "created_at" =>
-                $this->created_at ?? $datetime->format("Y-m-d H:i:s"),
-            "last_updated_at" =>
-                $this->last_updated_at ?? $datetime->format("Y-m-d H:i:s"),
+            "created_at" => $this->created_at
+                ? $this->created_at->format("Y-m-d H:i:s")
+                : $datetime->format("Y-m-d H:i:s"),
+            "last_updated_at" => $this->last_updated_at
+                ? $this->last_updated_at->format("Y-m-d H:i:s")
+                : $datetime->format("Y-m-d H:i:s"),
             "is_public" => $this->is_public,
             "type" => $this->type->value,
             "game_id" => $this->game_id,
@@ -71,7 +73,7 @@ class Post
     {
         $post = Connection::doSelect(ORION_DB, self::$table, ["id" => $id]);
         if (count($post) === 1) {
-            return new Post(
+            $postObj = new Post(
                 $post[0]["title"],
                 $post[0]["body"],
                 (bool) $post[0]["is_public"],
@@ -80,6 +82,12 @@ class Post
                 $post[0]["author_id"],
                 $post[0]["id"],
             );
+
+            $postObj->created_at = new DateTime($post[0]["created_at"]);
+            $postObj->last_updated_at = new DateTime(
+                $post[0]["last_updated_at"],
+            );
+            return $postObj;
         }
         return null;
     }

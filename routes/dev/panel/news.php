@@ -40,22 +40,23 @@ $router->get("/games/{gameId}/community/news/{newsId}/edit", function (
     if (is_null($game) || $game->getDeveloper() != $user->getDeveloperInfo()) {
         $router->trigger404();
     }
-    $news = Post::getById($newsId);
-    if (is_null($news)) {
+    $new = Post::getById($newsId);
+    if (is_null($new)) {
         $router->trigger404();
     }
-    if ($news->game_id != $gameId) {
+    if ($new->game_id != $gameId) {
         $router->trigger404();
     }
-    if ($news->author_id != $user->id) {
+    if ($new->author_id != $user->id) {
         $router->trigger404();
     }
-    if ($news->type != EPOST_TYPE::GAME_NEWS) {
+    if ($new->type != EPOST_TYPE::GAME_NEWS) {
         $router->trigger404();
     }
 
     $GLOBALS["game"] = $game;
-    $GLOBALS["news"] = $news;
+    $GLOBALS["new"] = $new;
+    $GLOBALS["newscategories"] = GameNewsCategory::getAll();
 
     include "views/dev/panel/games/community/news/edit.php";
 });
