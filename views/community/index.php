@@ -2,9 +2,9 @@
 
 $title = "Comunidad de $game->title en Orion";
 
-function showPage() {
-    global $game;
-    ?>
+function showPage()
+{
+    global $game; ?>
 
     <!-- Hero Section -->
     <section id="hero" class="bg-brand-500 text-white py-20">
@@ -21,6 +21,9 @@ function showPage() {
         <a href="/communities/<?= $game->id ?>/guides" class="px-6 py-3 bg-alt text-white font-semibold rounded-lg shadow-md hover:bg-alt-400 transition animate__animated animate__fadeInUp">
             Guías
         </a>
+        <a href="/communities/<?= $game->id ?>/news" class="px-6 py-3 bg-alt text-white font-semibold rounded-lg shadow-md hover:bg-alt-400 transition animate__animated animate__fadeInUp">
+            Noticias
+        </a>
         </div>
     </div>
     </section><!-- /Hero Section -->
@@ -28,6 +31,6 @@ function showPage() {
     <?php
 }
 
-include("views/templates/main.php");
+include "views/templates/main.php";
 
-unset($GLOBALS['game']);
+unset($GLOBALS["game"]);

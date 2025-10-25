@@ -132,6 +132,7 @@ class Achievement
         } else {
             return (bool) Connection::doUpdate(ORION_DB, self::$table, $data, [
                 "id" => $this->id,
+                "game_id" => $this->game_id,
             ]);
         }
     }
@@ -144,6 +145,7 @@ class Achievement
 
         return (bool) Connection::doDelete(ORION_DB, self::$table, [
             "id" => $this->id,
+            "game_id" => $this->game_id,
         ]);
     }
 

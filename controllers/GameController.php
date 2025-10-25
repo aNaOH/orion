@@ -113,6 +113,10 @@ class GameController
         }
 
         $GLOBALS["game"] = $game;
+        $GLOBALS["news"] = Post::getAllByTypeAndGame(
+            EPOST_TYPE::GAME_NEWS,
+            $game->id,
+        );
 
         include "views/store/index.php";
     }

@@ -74,6 +74,10 @@ class PostController
             case EPOST_TYPE::GUIDE:
                 $typeString = "guides";
                 break;
+
+            case EPOST_TYPE::GAME_NEWS:
+                $typeString = "news";
+                break;
         }
 
         include "views/community/" . $typeString . "/index.php";
@@ -109,6 +113,10 @@ class PostController
 
             case EPOST_TYPE::GUIDE:
                 $typeString = "guides";
+                break;
+
+            case EPOST_TYPE::GAME_NEWS:
+                $typeString = "news";
                 break;
         }
 
