@@ -1,14 +1,15 @@
 body {
-    font-family: 'Lexend', sans-serif;
-    background-color: #1B2A49;
+    font-family: "Lexend", sans-serif;
     color: #ffffff;
     margin: 0;
     padding: 0;
 }
 
 .container {
+    background-color: #1b2a49;
     padding: 20px;
     text-align: center;
+    border-radius: 10px;
 }
 
 .title {
@@ -25,7 +26,7 @@ body {
 .button {
     display: inline-block;
     padding: 10px 20px;
-    background-color: #DEAB18;
+    background-color: #deab18;
     color: #ffffff;
     text-decoration: none;
     border-radius: 5px;
@@ -33,5 +34,5 @@ body {
 }
 
 .button:hover {
-    background-color: #C88A15;
+    background-color: #c88a15;
 }
