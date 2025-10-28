@@ -43,6 +43,12 @@
       <i class="bi bi-controller text-alt-400 text-lg"></i>
       <span class="menu-text text-sm font-medium">Características</span>
     </a>
+    <hr class="my-2 border-branddark-500">
+    <a href="/admin/tools" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
+      data-tooltip="Herramientas">
+      <i class="bi bi-tools text-alt-400 text-lg"></i>
+      <span class="menu-text text-sm font-medium">Herramientas</span>
+    </a>
   </nav>
 
   <!-- Volver -->

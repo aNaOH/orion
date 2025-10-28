@@ -2,7 +2,7 @@
 
 require_once __DIR__ . "/Email.php";
 
-class TestEmail extends Email
+class NoAssetMail extends Email
 {
     protected function getSubject(): string
     {
@@ -11,7 +11,7 @@ class TestEmail extends Email
 
     protected function getTemplatePath(): string
     {
-        return __DIR__ . "/templates/test_email.dmail";
+        return __DIR__ . "/templates/noasset_email.dmail";
     }
 
     protected function getVariables(): array
