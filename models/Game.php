@@ -170,20 +170,76 @@ class Game
         return $games;
     }
 
-    /**
-     * Busca juegos por título usando un patrón LIKE.
-     * @param string $query El texto a buscar en el título.
-     * @return array Lista de instancias Game que coinciden.
-     */
-    public static function search(string $query): array
-    {
-        $results = Connection::searchInTable(
+    public static function search(
+        string $query = "",
+        string $genre = "",
+        array $features = [],
+        int $page = 1,
+        int &$totalPages = 1,
+        int $quantity = 12,
+    ): array {
+        $baseSql = "FROM game g";
+        $params = [];
+
+        // Si buscamos por features -> JOIN
+        if (!empty($features)) {
+            $baseSql .= " JOIN game_has_feature ghf ON g.id = ghf.game_id";
+        }
+
+        $conditions = [];
+
+        // Filtro por título
+        if (!empty($query)) {
+            $conditions[] = "g.title LIKE ?";
+            $params[] = "%$query%";
+        }
+
+        // Filtro por género
+        if (!empty($genre) && $genre !== "all") {
+            $conditions[] = "g.genre_id = ?";
+            $params[] = $genre;
+        }
+
+        if (!empty($conditions)) {
+            $baseSql .= " WHERE " . implode(" AND ", $conditions);
+        }
+
+        $havingSql = "";
+        if (!empty($features)) {
+            $placeholders = implode(",", array_fill(0, count($features), "?"));
+            $baseSql .= " AND ghf.feature_id IN ($placeholders)";
+            $params = array_merge($params, $features);
+            $havingSql =
+                " GROUP BY g.id HAVING COUNT(DISTINCT ghf.feature_id) = " .
+                count($features);
+        }
+
+        // -------- TOTAL PAGES --------
+        $countSql = "SELECT COUNT(*) AS total FROM (
+            SELECT g.id $baseSql $havingSql
+        ) AS temp";
+
+        $countResult = Connection::customQuery(
             ORION_DB,
-            self::$table,
-            $query,
-            "title",
-            Connection::DBSEARCH_BOTH,
-        );
+            $countSql,
+            $params,
+        )->fetch();
+        $total = $countResult["total"] ?? 0;
+        $totalPages = max(1, ceil($total / $quantity));
+
+        if ($page > $totalPages) {
+            $page = $totalPages;
+        }
+
+        // -------- QUERY FINAL --------
+        $sql =
+            "SELECT g.* $baseSql $havingSql LIMIT " .
+            ($quantity + 1) .
+            " OFFSET " .
+            ($page - 1) * $quantity;
+
+        $results = Connection::customQuery(ORION_DB, $sql, $params);
+
         $games = [];
         foreach ($results as $game) {
             $games[] = new Game(
@@ -201,6 +257,7 @@ class Game
                 $game["id"],
             );
         }
+
         return $games;
     }
 
