@@ -5,13 +5,18 @@ require_once "controllers/PostController.php";
 
 $router->mount("/store", function () use ($router) {
     $router->get("/", function () {
-        // Check if there's a search query
-        if (isset($_GET["search"]) && !empty(trim($_GET["search"]))) {
-            $searchQuery = $_GET["search"];
-            GameController::showSearch($searchQuery);
-        } else {
-            GameController::showStore();
-        }
+        GameController::showStore();
+    });
+
+    $router->get("/games", function () {
+        $searchQuery = $_GET["search"] ?? "";
+        $genre = $_GET["genre"] ?? "";
+        $features =
+            isset($_GET["features"]) && $_GET["features"] !== ""
+                ? explode(",", $_GET["features"])
+                : [];
+        $page = $_GET["page"] ?? 1;
+        GameController::showSearch($searchQuery, $genre, $features, $page);
     });
 
     $router->get("/(\d+)/", function ($gameId) use ($router) {

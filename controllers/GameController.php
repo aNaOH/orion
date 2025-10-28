@@ -83,10 +83,24 @@ class GameController
         include "views/store/hub.php";
     }
 
-    public static function showSearch(string $query)
-    {
+    public static function showSearch(
+        string $query,
+        string $genre,
+        array $features,
+        int $page = 1,
+    ) {
+        $totalPages = 0;
         $GLOBALS["searchQuery"] = $query;
-        $GLOBALS["games"] = Game::search($query);
+        $GLOBALS["games"] = Game::search(
+            $query,
+            $genre,
+            $features,
+            $page,
+            $totalPages,
+        );
+        $GLOBALS["totalPages"] = $totalPages;
+        $GLOBALS["filteredGender"] = $genre;
+        $GLOBALS["filteredFeatures"] = $features;
 
         include "views/store/search.php";
     }

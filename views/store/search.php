@@ -6,6 +6,11 @@ function showPage()
 {
     global $games;
     global $searchQuery;
+    global $filteredGender;
+    global $filteredFeatures;
+    global $totalPages;
+
+    $page = isset($_GET["page"]) ? intval($_GET["page"]) : 1;
 
     $genres = GameGenre::getAll();
     $features = GameFeature::getAll();
@@ -47,7 +52,10 @@ function showPage()
                     <select name="genre" class="w-full rounded-full bg-branddark bg-opacity-75 shadow-md text-gray-200 px-4 py-2">
                         <option value="all">Todos</option>
                         <?php foreach ($genres as $genre): ?>
-                            <option value="<?= $genre->id ?>"><?= $genre->name ?></option>
+                            <option value="<?= $genre->id ?>" <?= $genre->id ==
+$filteredGender
+    ? "selected"
+    : "" ?>><?= $genre->name ?></option>
                         <?php endforeach; ?>
                     </select>
                 </div>
@@ -55,7 +63,12 @@ function showPage()
                     <h3 class="text-lg font-semibold mb-2">Características</h3>
                     <?php foreach ($features as $feature): ?>
                         <div class="flex items-center">
-                            <input type="checkbox" name="feature[]" value="<?= $feature->id ?>" id="feature-<?= $feature->id ?>" class="mr-2">
+                            <input type="checkbox" name="features[]" value="<?= $feature->id ?>" id="feature-<?= $feature->id ?>" <?= in_array(
+    $feature->id,
+    $filteredFeatures,
+)
+    ? "checked"
+    : "" ?> class="mr-2">
                             <gradient-chip
                                 base-color="<?= $feature->tint ?>"
                                 size="12"
@@ -69,28 +82,59 @@ function showPage()
             </div>
             <button type="submit" class="bg-alt text-white px-4 py-2 rounded-md mt-8 w-full hover:bg-alt-600 transition-colors duration-300">Filtrar</button>
         </form>
-        <!-- Features Section -->
-        <section id="features" class="py-5">
+        <div>
+            <!-- Features Section -->
+            <section id="features" class="py-5">
 
-        <?php if (!isset($games) || count($games) == 0) { ?>
-            <div class="container mx-auto text-center py-16 ">
-            <h1 class="text-3xl md:text-4xl font-bold text-brand-800">No hay juegos...</h1>
-            <p class="text-lg text-gray-600 mt-4">¡Vuelve pronto para descubrir nuevos títulos increíbles!</p>
-            </div>
-        <?php } else { ?>
-            <div class="container mx-auto mt-6">
-                <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
-                    <?php foreach ($games as $game) {
-                        if (!$game->is_public) {
-                            continue;
-                        }
-                        OrionComponents::GameStore($game);
-                    } ?>
+            <?php if (!isset($games) || count($games) == 0) { ?>
+                <div class="w-full text-center py-16 ">
+                <h1 class="text-3xl md:text-4xl font-bold text-brand-800">No hay juegos...</h1>
+                <p class="text-lg text-gray-600 mt-4">¡Vuelve pronto para descubrir nuevos títulos increíbles!</p>
+                </div>
+            <?php } else { ?>
+                <div class="container mx-auto mt-6">
+                    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-8">
+                        <?php foreach ($games as $game) {
+                            if (!$game->is_public) {
+                                continue;
+                            }
+                            OrionComponents::GameStore($game);
+                        } ?>
+                    </div>
+                </div>
+            <?php } ?>
+            </section>
+            <div class="py-4">
+                <div class="container mx-auto text-center">
+                    <nav class="flex justify-between">
+                        <?php if ($page > 1) { ?>
+                            <button id="prevPage" class="text-alt hover:text-alt-800 text-2xl transition-colors duration-300">
+                                <i class="bi bi-caret-left-fill"></i>
+                            </button>
+                        <?php } else { ?>
+                            <span class="text-alt-800 text-2xl">
+                                <i class="bi bi-caret-left-fill"></i>
+                            </span>
+                        <?php } ?>
+                        <p class="text-center text-alt font-bold text-lg">
+                            Página <?= $page ?> de <?= $totalPages ?>
+                        </p>
+                        <?php if ($page < $totalPages) { ?>
+                            <button id="nextPage" class="text-alt hover:text-alt-800 text-2xl transition-colors duration-300">
+                                <i class="bi bi-caret-right-fill"></i>
+                            </button>
+                        <?php } else { ?>
+                            <span class="text-alt-800 text-2xl">
+                                <i class="bi bi-caret-right-fill"></i>
+                            </span>
+                        <?php } ?>
+                    </nav>
                 </div>
             </div>
-        <?php } ?>
-        </section>
+        </div>
     </div>
+
+    <script src="/assets/js/storeFiltering.js"></script>
 
     <?php
 }
