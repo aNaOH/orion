@@ -1,87 +1,208 @@
 <?php
 
-require_once './models/User.php';
-require_once './models/Game.php';
-require_once './models/GameGenre.php';
-
-class Recommender {
-    private static function getTopCounts(User $user, string $property, int $limit = 3): array {
-        $ownedGames = $user->getAdquiredGames();
+class Recommender
+{
+    private static function getFrequencyMap(User $user, string $property): array
+    {
         $counts = [];
-        foreach ($ownedGames as $game) {
-            $id = $game->{$property} ?? null;
-            if ($id) {
-                $counts[$id] = ($counts[$id] ?? 0) + 1;
+        foreach ($user->getAdquiredGames() as $game) {
+            $value = $game->{$property} ?? null;
+            if ($value === null) {
+                continue;
+            }
+            $counts[$value] = ($counts[$value] ?? 0) + 1;
+        }
+        return $counts;
+    }
+
+    /**
+     * Frecuencias de features: [feature_id => count]
+     */
+    private static function getFeatureFrequency(User $user): array
+    {
+        $counts = [];
+        foreach ($user->getAdquiredGames() as $game) {
+            foreach ($game->getFeatures() as $feature) {
+                $counts[$feature->id] = ($counts[$feature->id] ?? 0) + 1;
             }
         }
-        arsort($counts);
-        return array_slice(array_keys($counts), 0, $limit);
+        return $counts;
     }
 
-    public static function getUserGenres(User $user): array {
-        return self::getTopCounts($user, 'genre_id');
-    }
-
-    public static function getUserDevelopers(User $user): array {
-        return self::getTopCounts($user, 'developer_id');
-    }
-
-    private static function getGamesByProperty(User $user, string $property, callable $filter = null, int $limit = 4): array {
-        $ownedGames = $user->getAdquiredGames();
-        $ownedGameIds = array_map(fn($game) => $game->id, $ownedGames);
-        $preferred = self::getTopCounts($user, $property);
-    if (!$preferred) return [];
-    $games = Connection::doSelect(ORION_DB, Game::$table, [$property => ['value' => $preferred, 'modifier' => Connection::DBMODIFIER_IN]]);
-        $result = [];
-        foreach ($games as $gameRow) {
-            if (!in_array($gameRow['id'], $ownedGameIds) && (!$filter || $filter($gameRow))) {
-                $result[] = Game::getById($gameRow['id']);
-                if (count($result) >= $limit) break;
-            }
+    /**
+     * Obtiene features de todos los juegos candidatos en un solo query.
+     * Retorna: [game_id => [feature_id, feature_id...]]
+     */
+    private static function loadGameFeatures(array $gameRows): array
+    {
+        if (empty($gameRows)) {
+            return [];
         }
-        return $result;
+
+        $ids = array_column($gameRows, "id");
+        $placeholders = implode(",", array_fill(0, count($ids), "?"));
+
+        $rows = Connection::customQuery(
+            ORION_DB,
+            "SELECT game_id, feature_id FROM game_has_feature WHERE game_id IN ($placeholders)",
+            $ids,
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        $map = [];
+        foreach ($rows as $row) {
+            $map[$row["game_id"]][] = (int) $row["feature_id"];
+        }
+        return $map;
     }
 
-    public static function getGamesByPreferredGenres(User $user): array {
-        return self::getGamesByProperty($user, 'genre_id');
-    }
+    private static function getScoreForGame(
+        array $row,
+        array $genreFreq,
+        array $devFreq,
+        array $featureFreq,
+        array $gameFeatures,
+        int $genreWeight,
+        int $developerWeight,
+        int $featureWeight,
+    ): int {
+        $score = 0;
 
-    public static function getGamesByPreferredDevelopers(User $user): array {
-        return self::getGamesByProperty($user, 'developer_id');
-    }
+        if (isset($row["genre_id"], $genreFreq[$row["genre_id"]])) {
+            $score += $genreFreq[$row["genre_id"]] * $genreWeight;
+        }
 
-    public static function getRecommendations(User $user, bool $allowOwned = false): array {
-        $ownedGames = $user->getAdquiredGames();
-        $ownedGameIds = array_map(fn($game) => $game->id, $ownedGames);
-    $preferredGenres = self::getTopCounts($user, 'genre_id');
-    $preferredDevelopers = self::getTopCounts($user, 'developer_id');
-        $ids = [];
-    if ($preferredGenres) $ids['genre_id'] = ['value' => $preferredGenres, 'modifier' => Connection::DBMODIFIER_IN];
-    if ($preferredDevelopers) $ids['developer_id'] = ['value' => $preferredDevelopers, 'modifier' => Connection::DBMODIFIER_IN];
-        $games = [];
-        if ($ids) {
-            $genreGames = $ids['genre_id'] ? Connection::doSelect(ORION_DB, Game::$table, ['genre_id' => $ids['genre_id']]) : [];
-            $developerGames = $ids['developer_id'] ? Connection::doSelect(ORION_DB, Game::$table, ['developer_id' => $ids['developer_id']]) : [];
-            $temp_array = array_merge($genreGames, $developerGames);
-            $unique = [];
-            foreach ($temp_array as $gameRow) {
-                if (!isset($unique[$gameRow['id']])) {
-                    $unique[$gameRow['id']] = $gameRow;
+        if (isset($row["developer_id"], $devFreq[$row["developer_id"]])) {
+            $score += $devFreq[$row["developer_id"]] * $developerWeight;
+        }
+
+        if (isset($gameFeatures[$row["id"]])) {
+            foreach ($gameFeatures[$row["id"]] as $featureId) {
+                if (isset($featureFreq[$featureId])) {
+                    $score += $featureFreq[$featureId] * $featureWeight;
                 }
             }
-            $games = array_values($unique);
         }
-        shuffle($games);
-        $recommendedGames = [];
-        foreach ($games as $gameRow) {
-            if ($allowOwned || !in_array($gameRow['id'], $ownedGameIds)) {
-                $gameObj = Game::getById($gameRow['id']);
-                if ($gameObj !== null) {
-                    $recommendedGames[] = $gameObj;
-                }
-                if (count($recommendedGames) >= 4) break;
-            }
+
+        return $score;
+    }
+
+    public static function getRecommendations(
+        User $user,
+        bool $allowOwned = false,
+    ): array {
+        $owned = $user->getAdquiredGames();
+        $ownedIds = array_map(fn($g) => $g->id, $owned);
+
+        $cacheKey =
+            "recommendations:user:{$user->id}:allowOwned:" .
+            (int) $allowOwned .
+            ":lib:" .
+            md5(json_encode($ownedIds));
+
+        if ($cached = FileCache::get($cacheKey)) {
+            return array_map(
+                fn($row) => self::createGameFromRow($row),
+                $cached,
+            );
         }
-        return $recommendedGames;
+
+        $genreFreq = self::getFrequencyMap($user, "genre_id");
+        $devFreq = self::getFrequencyMap($user, "developer_id");
+        $featureFreq = self::getFeatureFrequency($user);
+
+        if (empty($genreFreq) && empty($devFreq) && empty($featureFreq)) {
+            return []; // Sin datos para recomendar
+        }
+
+        $sql = "SELECT * FROM `" . Game::$table . "` WHERE is_public = 1";
+        $filters = [];
+
+        if (!empty($genreFreq)) {
+            $filters[] =
+                "genre_id IN (" . implode(",", array_keys($genreFreq)) . ")";
+        }
+        if (!empty($devFreq)) {
+            $filters[] =
+                "developer_id IN (" . implode(",", array_keys($devFreq)) . ")";
+        }
+
+        if (!empty($filters)) {
+            $sql .= " AND (" . implode(" OR ", $filters) . ")";
+        }
+
+        if (!$allowOwned && !empty($ownedIds)) {
+            $sql .=
+                " AND id NOT IN (" .
+                implode(",", array_fill(0, count($ownedIds), "?")) .
+                ")";
+        }
+
+        $rows = Connection::customQuery(
+            ORION_DB,
+            $sql,
+            $allowOwned ? [] : $ownedIds,
+        )->fetchAll(PDO::FETCH_ASSOC);
+
+        // 🔹 Cargamos features en bloque
+        $gameFeatures = self::loadGameFeatures($rows);
+
+        // 🔹 Pesos ajustables
+        $genreWeight = 2;
+        $developerWeight = 1;
+        $featureWeight = 1;
+
+        usort($rows, function ($a, $b) use (
+            $genreFreq,
+            $devFreq,
+            $featureFreq,
+            $gameFeatures,
+            $genreWeight,
+            $developerWeight,
+            $featureWeight,
+        ) {
+            return self::getScoreForGame(
+                $b,
+                $genreFreq,
+                $devFreq,
+                $featureFreq,
+                $gameFeatures,
+                $genreWeight,
+                $developerWeight,
+                $featureWeight,
+            ) <=>
+                self::getScoreForGame(
+                    $a,
+                    $genreFreq,
+                    $devFreq,
+                    $featureFreq,
+                    $gameFeatures,
+                    $genreWeight,
+                    $developerWeight,
+                    $featureWeight,
+                );
+        });
+
+        $top = array_slice($rows, 0, 4);
+        FileCache::set($cacheKey, $top);
+
+        return array_map(fn($row) => self::createGameFromRow($row), $top);
+    }
+
+    private static function createGameFromRow(array $row): Game
+    {
+        return new Game(
+            $row["title"],
+            $row["short_description"],
+            $row["description"],
+            $row["launch_date"],
+            (float) $row["base_price"],
+            (float) $row["discount"],
+            $row["as_editor"] == 1,
+            $row["is_public"] == 1,
+            $row["developer_name"],
+            $row["developer_id"],
+            $row["genre_id"],
+            $row["id"],
+        );
     }
 }
