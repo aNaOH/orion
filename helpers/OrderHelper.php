@@ -1,6 +1,6 @@
 <?php
 
-class OrderHelpers
+class OrderHelper
 {
     /**
      * Inicia un pedido en la sesión
@@ -26,9 +26,6 @@ class OrderHelpers
         if (!$order || !isset($order["items"])) {
             return null;
         }
-
-        // Actualiza la sesión si fue necesario
-        $_SESSION["order"] = $order;
 
         return $order;
     }
@@ -76,7 +73,12 @@ class OrderHelpers
         foreach ($order["items"] as $key => &$item) {
             if ($item["game_id"] == $gameId) {
                 unset($order["items"][$key]);
-                $_SESSION["order"] = $order;
+
+                if (count($order["items"]) == 0) {
+                    self::clearOrder();
+                } else {
+                    $_SESSION["order"] = $order;
+                }
                 return true;
             }
         }

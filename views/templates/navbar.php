@@ -24,8 +24,15 @@
                 <a href="/communities" class="hover:text-gray-300 link-underline">Comunidad</a>
             </li>
             <li class="relative">
-                <?php NavbarHelper::getUserNavbar($_SESSION['user'] ?? []); ?>
+                <?php NavbarHelper::getUserNavbar($_SESSION["user"] ?? []); ?>
             </li>
+            <?php if (isset($_SESSION["user"]) && OrderHelper::getOrder()) { ?>
+                <li>
+                    <a href="/store/cart">
+                        <i class="bi bi-cart-fill"></i>
+                    </a>
+                </li>
+            <?php } ?>
         </ul>
     </nav>
     </header>
