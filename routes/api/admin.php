@@ -2,6 +2,8 @@
 
 require_once "controllers/GameController.php";
 require_once "models/GuideType.php";
+require_once "emails/TestEmail.php";
+require_once "emails/NoAssetMail.php";
 
 $router->mount("/admin", function () use ($router) {
     $router->post("/guidetype", function () {
@@ -102,6 +104,52 @@ $router->mount("/admin", function () use ($router) {
         $response["status"] = 200;
         $response["message"] =
             "Característica creada ( ID: " . strval($gameFeature->id) . " )";
+
+        echo json_encode($response);
+        exit();
+    });
+
+    $router->post("/tools", function () {
+        $json = json_decode(file_get_contents("php://input"), true);
+        $tool = $json["tool"];
+
+        if ($tool === "email") {
+            $email = $json["email"];
+            $template = $json["template"];
+            FormHelper::ValidateRequiredField($email, "email");
+            FormHelper::ValidateRequiredField($template, "template");
+            FormHelper::ValidateEmailField($email, "email");
+            try {
+                switch ($template) {
+                    case "testemail":
+                        $email = new TestEmail($email);
+                        break;
+                    case "noassetmail":
+                        $email = new NoAssetMail($email);
+                        break;
+                    default:
+                        throw new Exception("Invalid template");
+                }
+                $email->send();
+                header("HTTP/1.1 200 OK");
+                $response["status"] = 200;
+                $response["message"] = "Correo enviado";
+
+                echo json_encode($response);
+                exit();
+            } catch (Exception $e) {
+                header("HTTP/1.1 400 Bad Request");
+                $response["status"] = 400;
+                $response["message"] = $e->getMessage();
+
+                echo json_encode($response);
+                exit();
+            }
+        }
+
+        header("HTTP/1.1 500 Internal Server Error");
+        $response["status"] = 500;
+        $response["message"] = "Algo salió mal";
 
         echo json_encode($response);
         exit();

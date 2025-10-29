@@ -38,6 +38,10 @@ $router->mount("/admin", function () use ($router) {
         $GLOBALS["gamefeatures"] = $gamefeatures;
         include "views/admin/gamefeatures/index.php";
     });
+
+    $router->get("/tools", function () {
+        include "views/admin/tools.php";
+    });
 });
 
 $router->set404("/admin(/.*)?", function () {
