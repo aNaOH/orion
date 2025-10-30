@@ -10,94 +10,107 @@ class StripeController
         return new \Stripe\StripeClient($_ENV["STRIPE_KEY"]);
     }
 
-    private static function getFromText($from)
+    private static function getGoToText($goTo)
     {
-        return strlen(trim($from)) == 0 ? "" : "?from=" . urlencode($from);
+        return strlen(trim($goTo)) == 0 ? "" : "?goTo=" . urlencode($goTo);
     }
 
-    public static function buy(
-        Game|string $product,
-        User $user,
-        $metadata = [],
-        $from = "",
-    ) {
-        \Stripe\Stripe::setApiKey($_ENV["STRIPE_KEY"]);
-        header("Content-Type: application/json");
+    private static function getProductWithPrice($game)
+    {
+        $productQuery = Product::search([
+            "query" => 'name:\'' . $game->title . '\'',
+        ]);
 
-        $YOUR_DOMAIN = $_ENV["STRIPE_DOMAIN"];
-
-        if ($product instanceof Game) {
-            if (
-                !is_null($product->discount) &&
-                is_float($product->discount) &&
-                $product->discount > 0
-            ) {
-                $coupon = \Stripe\Coupon::create([
-                    "percent_off" => $product->discount * 100, // Descuento
-                    "duration" => "once", // Aplicable solo una vez (puede ser 'forever' o 'repeating')
-                ]);
-            }
-
-            $priceInfo = [
-                "unit_amount" => $product->base_price * 100,
-                "currency" => "eur",
-            ];
-
-            $productQuery = Product::search([
-                "query" => 'name:\'' . $product->title . '\'',
+        if (count($productQuery->data) == 0) {
+            $product = Product::create([
+                "name" => $game->title,
+                "description" => $game->description,
+                "metadata" => [
+                    "game" => $game->id,
+                ],
             ]);
-
-            if (count($productQuery->data) > 0) {
-                $priceInfo["product"] = $productQuery->data[0]->id;
-            } else {
-                $priceInfo["product_data"] = [
-                    "name" => $product->title,
-                    "metadata" => [
-                        "id" => $product->id,
-                    ],
-                ];
-            }
-
-            $price = Price::create($priceInfo);
-
-            $price_id = $price->id;
         } else {
-            $price_id = $product;
+            $product = $productQuery->data[0];
         }
 
-        $fromText = self::getFromText($from);
+        $price = Price::create([
+            "unit_amount" => $game->base_price * 100,
+            "currency" => "eur",
+            "product" => $product->id,
+        ]);
+
+        if (
+            !is_null($game->discount) &&
+            is_float($game->discount) &&
+            $game->discount > 0
+        ) {
+            $coupon = \Stripe\Coupon::create([
+                "percent_off" => $game->discount * 100, // Descuento
+                "duration" => "once",
+                "applies_to" => [
+                    "products" => [$product->id],
+                ],
+            ]);
+        }
+
+        return [
+            "price" => $price->id,
+            "coupon" => $coupon?->id,
+        ];
+    }
+
+    public static function createOrder($user)
+    {
+        \Stripe\Stripe::setApiKey($_ENV["STRIPE_KEY"]);
+
+        $gamesOnCart = OrderHelper::getInstances();
+
+        $line_items = [];
+        $coupons = [];
+        foreach ($gamesOnCart as $game) {
+            $stripeContent = self::getProductWithPrice($game);
+            $line_items[] = [
+                "price" => $stripeContent["price"],
+                "quantity" => 1,
+            ];
+            if (isset($stripeContent["coupon"])) {
+                $coupons[] = $stripeContent["coupon"];
+            }
+        }
 
         $checkout_session_array = [
             "customer_email" => $user->email,
             "billing_address_collection" => "required",
-            "line_items" => [
-                [
-                    # Provide the exact Price ID (e.g. pr_1234) of the product you want to sell
-                    "price" => $price_id,
-                    "quantity" => 1,
-                ],
-            ],
+            "line_items" => $line_items,
             "mode" => "payment",
-            "success_url" => $YOUR_DOMAIN . "/stripe/success" . $fromText,
-            "cancel_url" => $YOUR_DOMAIN . "/stripe/cancel" . $fromText,
             "automatic_tax" => [
                 "enabled" => true,
             ],
-            "metadata" => $metadata,
+            "metadata" => [
+                "user" => $user->id,
+            ],
+            "ui_mode" => "custom",
         ];
 
-        if (isset($coupon)) {
-            $discounts = [];
-            $discounts["coupon"] = $coupon->id;
-            $checkout_session_array["discounts"] = [$discounts];
+        if (count($coupons)) {
+            $checkout_session_array["discounts"] = [
+                [
+                    "coupon" => $coupons[0],
+                ],
+            ];
         }
 
         $checkout_session = \Stripe\Checkout\Session::create(
             $checkout_session_array,
         );
 
-        header("HTTP/1.1 303 See Other");
-        header("Location: " . $checkout_session->url);
+        header("HTTP/1.1 200 OK");
+
+        $response["status"] = "200";
+        $response["message"] = "Checkout session created successfully";
+        $response["client_secret"] = $checkout_session->client_secret;
+
+        echo json_encode($response);
     }
 
     public static function success()

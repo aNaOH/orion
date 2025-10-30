@@ -4,9 +4,8 @@ class OrderHelper
 {
     /**
      * Inicia un pedido en la sesión
-     * @param string $table
      */
-    public static function beginOrder($table)
+    public static function beginOrder()
     {
         $_SESSION["order"] = [
             "items" => [],
@@ -30,7 +29,7 @@ class OrderHelper
         return $order;
     }
 
-    public static function addItemToOrder($gameId)
+    public static function addItem(Game|int $game)
     {
         if (!isset($_SESSION["order"])) {
             return false;
@@ -39,11 +38,12 @@ class OrderHelper
         if (!$order || !isset($order["items"])) {
             return false;
         }
+
+        $gameId = $game instanceof Game ? $game->id : $game;
+
         // Check if the game already exists in the order
-        foreach ($order["items"] as &$item) {
-            if ($item["game_id"] == $gameId) {
-                return false;
-            }
+        if (self::hasItem($gameId)) {
+            return false;
         }
         // If not found, add new item
         $game = Game::getById($gameId);
@@ -63,7 +63,7 @@ class OrderHelper
         return true;
     }
 
-    public static function removeItemFromOrder($gameId)
+    public static function removeItem($gameId)
     {
         $order = self::getOrder();
         if (!$order) {
@@ -92,7 +92,7 @@ class OrderHelper
         }
     }
 
-    public static function hasGameInOrder($gameId)
+    public static function hasItem($gameId)
     {
         if (!isset($_SESSION["order"]) || !isset($_SESSION["order"]["items"])) {
             return false;
@@ -103,5 +103,30 @@ class OrderHelper
             }
         }
         return false;
+    }
+
+    public static function getInstances()
+    {
+        $instances = [];
+        if (!isset($_SESSION["order"]) || !isset($_SESSION["order"]["items"])) {
+            return $instances;
+        }
+        foreach ($_SESSION["order"]["items"] as $item) {
+            $instances[] = Game::getById($item["game_id"]);
+        }
+        return $instances;
+    }
+
+    public static function getTotal()
+    {
+        $games = self::getInstances();
+        $total = 0;
+        foreach ($games as $game) {
+            $total += round(
+                $game->base_price - $game->base_price * $game->discount,
+                2,
+            );
+        }
+        return $total;
     }
 }

@@ -2,6 +2,26 @@
 
 $title = $game->title . " | Orion Store";
 
+function getPriceWidget($game)
+{
+    if ($game->discount > 0 && $game->base_price > 0) { ?>
+        <div class="flex flex-row items-center gap-2">
+            <p class="text-xs text-gray-200 line-through"><?= $game->base_price ?> €</p>
+            <p class="text-lg text-gray-200"><?= $game->getPrice() > 0
+                ? strval($game->getPrice()) . " €"
+                : "Gratis" ?> </p>
+        </div>
+
+        <span class="bg-green-500 text-white px-2 py-1 rounded-md">
+            <?= $game->getDiscountText() ?>
+        </span>
+        <?php } else { ?>
+            <p class="text-lg text-gray-200"><?= $game->getPrice() > 0
+                ? strval($game->getPrice()) . " €"
+                : "Gratis" ?> </p>
+        <?php }
+}
+
 function getBuyWidget($game)
 {
     if (isset($_SESSION["user"])) {
@@ -13,14 +33,25 @@ function getBuyWidget($game)
                 <a href="/library#game<?= $game->id ?>" class="text-lg font-bold text-gray-200 rounded-xl p-2 bg-alt hover:bg-alt-600 transition-colors duration-300">
                     Ver en la biblioteca
                 </a>
-            <?php } else { ?>
-                <p class="text-lg text-gray-200"><?= $game->base_price > 0
-                    ? strval($game->base_price) . " €"
-                    : "Gratis" ?> </p>
-                <a href="/stripe/game/<?= $game->id ?>" class="text-lg font-bold text-gray-200 rounded-xl p-2 bg-alt hover:bg-alt-600 transition-colors duration-300">
-                    <?= $game->base_price > 0 ? "COMPRAR" : "OBTENER" ?>
-                </a>
-            <?php }
+            <?php } else {if (OrderHelper::hasItem($game->id)) { ?>
+                <div class="flex flex-col items-center gap-2">
+                    <div class="flex flex-row gap-4 items-center">
+                        <?php getPriceWidget($game); ?>
+                    </div>
+                    <span class="text-lg font-bold text-gray-200 rounded-xl p-2 bg-alt-600">
+                        En el carrito
+                    </span>
+                </div>
+                <?php } else { ?>
+                    <div class="flex flex-col items-center gap-2">
+                        <div class="flex flex-row gap-4 items-center">
+                            <?php getPriceWidget($game); ?>
+                        </div>
+                        <button id="cartButton" class="text-lg font-bold text-gray-200 rounded-xl p-2 bg-alt hover:bg-alt-600 transition-colors duration-300">
+                            Añadir al carrito
+                        </button>
+                    </div>
+                <?php }}
         } else {
              ?>
             <script>
@@ -240,6 +271,24 @@ function showPage()
     <?php } ?>
 
     <script src="/assets/js/addDatesCommunity.js"></script>
+    <script>
+        document.getElementById("cartButton")?.addEventListener("click", function() {
+            $.ajax({
+                url: "/api/cart",
+                method: "POST",
+                data: {
+                    gameId: <?= $game->id ?>
+                },
+                success: function(response) {
+                    // refresh the page
+                    location.reload();
+                },
+                error: function(xhr, status, error) {
+                    console.error(error);
+                }
+            });
+        });
+    </script>
 
     <?php
 }

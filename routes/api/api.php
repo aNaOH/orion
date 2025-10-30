@@ -59,9 +59,79 @@ $router->mount("/api", function () use ($router) {
         HomeController::do();
     });
 
-    $router->post("/stripe", function () {
-        StripeController::webhook();
+    $router->post("/cart", function () {
+        $gameId = $_POST["gameId"];
+        $game = Game::getById($gameId);
+        if (!$game) {
+            $response["status"] = 404;
+            $response["error"] = "Game not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!OrderHelper::getOrder()) {
+            OrderHelper::beginOrder();
+        }
+
+        if (OrderHelper::hasItem($gameId)) {
+            $response["status"] = 400;
+            $response["error"] = "Item already in cart";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (OrderHelper::addItem($game)) {
+            $response["status"] = 200;
+            $response["message"] = "Item added to cart";
+        } else {
+            $response["status"] = 500;
+            $response["error"] = "Failed to add item to cart";
+        }
+        echo json_encode($response);
+        exit();
     });
+
+    $router->delete("/cart/{id}", function ($id) {
+        if (!OrderHelper::removeItem($id)) {
+            $response["status"] = 404;
+            $response["error"] = "Item not found in cart";
+            echo json_encode($response);
+            exit();
+        }
+
+        $response["status"] = 200;
+        $response["message"] = "Item removed from cart";
+        echo json_encode($response);
+        exit();
+    });
+
+    $router->post("/order", function () {
+        if (!isset($_SESSION["user"])) {
+            $response["status"] = 401;
+            $response["error"] = "User not logged in";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!isset($_SESSION["user"]["id"])) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($_SESSION["user"]["id"]);
+        if (!$user) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        StripeController::createOrder($user);
+    });
+
+    $router->post("/order/save", function () {});
 
     $router->post("/auth/login", function () {
         $email = $_POST["email"];

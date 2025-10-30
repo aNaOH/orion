@@ -27,12 +27,81 @@
                 <?php NavbarHelper::getUserNavbar($_SESSION["user"] ?? []); ?>
             </li>
             <?php if (isset($_SESSION["user"]) && OrderHelper::getOrder()) { ?>
-                <li>
-                    <a href="/store/cart">
-                        <i class="bi bi-cart-fill"></i>
-                    </a>
-                </li>
+            <li class="relative group">
+
+                <!-- Botón del Carrito -->
+                <a href="/store/cart" class="cursor-pointer flex items-center hover:text-gray-300">
+                    <i class="bi bi-cart-fill text-lg"></i>
+                    <span class="ml-2 block md:hidden">Ver carrito</span>
+                </a>
+
+                <!-- Dropdown carrito -->
+                <div class="absolute right-0 mt-0 w-96 bg-gray-800 text-white rounded-md shadow-lg p-4
+                            hidden md:group-hover:block md:hidden hover:block">
+
+                    <!-- Mockup de productos -->
+                    <ul class="space-y-2 text-sm">
+                        <?php foreach (
+                            OrderHelper::getInstances()
+                            as $item
+                        ) { ?>
+                            <li class="flex items-center justify-between gap-2 py-1">
+
+                                <!-- Imagen + título -->
+                                <div class="flex items-center gap-2 min-w-0 flex-1">
+                                    <img src="/media/game/icon/<?= $item->id ?>" alt="<?= $item->title ?>" class="w-6 h-6 rounded-md flex-shrink-0">
+                                    <span class="truncate"><?= $item->title ?></span>
+                                </div>
+
+                                <!-- Precios -->
+                                <div class="flex items-center gap-3 flex-shrink-0 text-right">
+                                    <?php if ($item->discount > 0) { ?>
+
+                                        <div class="flex flex-col leading-tight">
+                                            <span class="text-green-400 text-xs font-semibold">-<?= $item->discount *
+                                                100 ?>%</span>
+                                            <span class="text-gray-400 line-through text-xs"><?= $item->base_price ?> €</span>
+                                            <span class="text-gray-200 font-semibold"><?= round(
+                                                $item->base_price -
+                                                    $item->base_price *
+                                                        $item->discount,
+                                                2,
+                                            ) ?> €</span>
+                                        </div>
+
+                                    <?php } else { ?>
+
+                                        <span class="text-gray-200 font-semibold"><?= $item->base_price ?> €</span>
+
+                                    <?php } ?>
+                                </div>
+
+                                <!-- Botón eliminar -->
+                                <button data-id="<?= $item->id ?>" class="text-gray-400 hover:text-white transition duration-300 flex-shrink-0 delete-item">
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+
+                            </li>
+
+                        <?php } ?>
+                    </ul>
+
+                    <hr class="my-3 border-gray-600">
+
+                    <div class="flex justify-between">
+                        <div class="flex items-center">
+                            <span class="text-gray-400 mr-2">Total:</span>
+                            <span class="text-gray-200 font-semibold"><?= OrderHelper::getTotal() ?> €</span>
+                        </div>
+                        <a href="/store/cart" class="text-center block bg-alt text-black font-semibold rounded py-2 px-4 hover:bg-alt-800 transition duration-300">
+                            Ver carrito
+                        </a>
+                    </div>
+                </div>
+
+            </li>
             <?php } ?>
+
         </ul>
     </nav>
     </header>
@@ -83,5 +152,22 @@
             });
 
             checkScroll(navbar);
+        });
+
+        // Delete item from cart
+        document.querySelectorAll('.delete-item').forEach(button => {
+            button.addEventListener('click', function() {
+                const itemId = this.getAttribute('data-id');
+                $.ajax({
+                    url: `/api/cart/${itemId}`,
+                    method: "DELETE",
+                    success: function(response) {
+                        location.reload();
+                    },
+                    error: function(error) {
+                        console.error(error);
+                    }
+                });
+            });
         });
     </script>

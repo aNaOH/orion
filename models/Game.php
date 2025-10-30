@@ -395,4 +395,17 @@ class Game
     {
         return GameFeature::getAllByGame($this);
     }
+
+    public function getPrice()
+    {
+        return round(
+            $this->base_price - $this->base_price * $this->discount,
+            2,
+        );
+    }
+
+    public function getDiscountText()
+    {
+        return strval($this->discount * 100) . "%";
+    }
 }
