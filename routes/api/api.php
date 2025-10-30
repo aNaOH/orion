@@ -131,7 +131,66 @@ $router->mount("/api", function () use ($router) {
         StripeController::createOrder($user);
     });
 
-    $router->post("/order/save", function () {});
+    $router->post("/order/save", function () {
+        if (!isset($_SESSION["user"])) {
+            $response["status"] = 401;
+            $response["error"] = "User not logged in";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!isset($_SESSION["user"]["id"])) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($_SESSION["user"]["id"]);
+        if (!$user) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        $json = json_decode(file_get_contents("php://input"), true);
+        $order = $json["order"];
+        $stripe_id = $json["stripe_id"] ?? null;
+        if (
+            !isset($order["items"]) ||
+            !is_array($order["items"]) ||
+            count($order["items"]) === 0
+        ) {
+            $response["status"] = 400;
+            $response["error"] = "Invalid order";
+            echo json_encode($response);
+            exit();
+        }
+
+        foreach ($order["items"] as $item) {
+            if (!isset($item["game_id"]) || $item["game_id"] <= 0) {
+                $response["status"] = 400;
+                $response["error"] = "Invalid order item";
+                echo json_encode($response);
+                exit();
+            }
+
+            $game = Game::getById($item["game_id"]);
+            if (!$game) {
+                $response["status"] = 404;
+                $response["error"] = "Game not found";
+                echo json_encode($response);
+                exit();
+            }
+
+            $user->adquireGame($game, $stripe_id);
+        }
+
+        $response["status"] = 200;
+        $response["message"] = "Order processed successfully";
+        echo json_encode($response);
+    });
 
     $router->post("/auth/login", function () {
         $email = $_POST["email"];

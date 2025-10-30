@@ -98,7 +98,7 @@ function showPage()
         </button>
     </div>
 
-    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/clover/stripe.js"></script>
     <script>
       const email = <?= json_encode($email) ?>;
       const total = <?= json_encode($total) ?>;
@@ -135,25 +135,25 @@ function showPage()
               setPayBtnState(true, true);
 
               if (total === 0) {
-                  await fetch('/order/save', {
+                  await fetch('/api/order/save', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify({ order, email })
+                      body: JSON.stringify({ order })
                   });
-                  return location.href = "/orders";
+                  return location.href = "/library";
               }
 
-              const { client_secret } = await (await fetch('/order', { method:"POST" })).json();
+              const { client_secret } = await (await fetch('/api/order', { method:"POST" })).json();
               const result = await stripe.confirmCardPayment(client_secret, {
                   payment_method: { card, billing_details: { email } }
               });
 
               if (result.error) return setPayBtnState(false, false);
 
-              await fetch('/order/save', {
+              await fetch('/api/order/save', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ order, email, stripe_id: result.paymentIntent.id })
+                  body: JSON.stringify({ order, stripe_id: result.paymentIntent.id })
               });
 
               location.href = "/orders";
