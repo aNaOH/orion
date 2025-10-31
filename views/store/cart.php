@@ -185,7 +185,7 @@ function showPage()
 
               setPayBtnState(false, false);
 
-              //location.href = "/library";
+              location.href = "/library";
           });
       });
     </script>
