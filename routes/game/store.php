@@ -26,4 +26,18 @@ $router->mount("/store", function () use ($router) {
             $router->trigger404();
         }
     });
+
+    $router->get("/cart", function () {
+        if (!isset($_SESSION["user"])) {
+            header("Location: /login");
+            exit();
+        }
+
+        if (!OrderHelper::getOrder()) {
+            header("Location: /store");
+            exit();
+        }
+
+        include_once "views/store/cart.php";
+    });
 });

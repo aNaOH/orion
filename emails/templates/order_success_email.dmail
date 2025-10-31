@@ -1,0 +1,11 @@
+<div class="container">
+    <h1 class="title">Gracias {{user_name}}, tu pedido ha sido realizado</h1>
+
+    <div class="col">
+        {{ foreach order as game:i }}
+            <div class="row">{{game.title}}</div>
+        {{ endforeach }}
+    </div>
+
+    <a href="{{url('/library')}}">Ir a tu biblioteca en Orion</a>
+</div>

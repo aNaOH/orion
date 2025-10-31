@@ -2,7 +2,8 @@
 
 $title = "¡Ups!";
 
-function showPage() {
+function showPage()
+{
     ?>
 
     <!-- 404 Page -->
@@ -10,7 +11,7 @@ function showPage() {
     <!-- Content -->
     <div data-aos="fade-right" class="md:w-1/2">
         <!-- Error Title -->
-        <h1 class="text-6xl font-bold text-gray-200 mb-4">Vaya, un 404</h1>
+        <h1 class="text-6xl font-bold text-gray-200 mb-4">Vaya, vaya...</h1>
         <h2 class="text-2xl font-semibold text-gray-400 mb-4">Página no encontrada</h2>
         <p class="text-lg text-gray-400 mb-8">
         Lo sentimos, no pudimos encontrar la página que buscas. Es posible que haya sido movida o ya no exista.
@@ -31,4 +32,4 @@ function showPage() {
     <?php
 }
 
-include("views/templates/nomain.php");
+include "views/templates/nomain.php";

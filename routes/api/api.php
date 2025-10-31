@@ -3,6 +3,7 @@
 require_once "controllers/UserController.php"; //Import user Controller
 require_once "controllers/HomeController.php"; //Import home Controller
 require_once "controllers/StripeController.php"; //Import stripe Controller
+require_once "emails/OrderSuccessEmail.php";
 
 //API
 $router->mount("/api", function () use ($router) {
@@ -59,8 +60,146 @@ $router->mount("/api", function () use ($router) {
         HomeController::do();
     });
 
-    $router->post("/stripe", function () {
-        StripeController::webhook();
+    $router->post("/cart", function () {
+        $gameId = $_POST["gameId"];
+        $game = Game::getById($gameId);
+        if (!$game) {
+            $response["status"] = 404;
+            $response["error"] = "Game not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!OrderHelper::getOrder()) {
+            OrderHelper::beginOrder();
+        }
+
+        if (OrderHelper::hasItem($gameId)) {
+            $response["status"] = 400;
+            $response["error"] = "Item already in cart";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (OrderHelper::addItem($game)) {
+            $response["status"] = 200;
+            $response["message"] = "Item added to cart";
+        } else {
+            $response["status"] = 500;
+            $response["error"] = "Failed to add item to cart";
+        }
+        echo json_encode($response);
+        exit();
+    });
+
+    $router->delete("/cart/{id}", function ($id) {
+        if (!OrderHelper::removeItem($id)) {
+            $response["status"] = 404;
+            $response["error"] = "Item not found in cart";
+            echo json_encode($response);
+            exit();
+        }
+
+        $response["status"] = 200;
+        $response["message"] = "Item removed from cart";
+        echo json_encode($response);
+        exit();
+    });
+
+    $router->post("/order", function () {
+        if (!isset($_SESSION["user"])) {
+            $response["status"] = 401;
+            $response["error"] = "User not logged in";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!isset($_SESSION["user"]["id"])) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($_SESSION["user"]["id"]);
+        if (!$user) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        StripeController::createOrder($user);
+    });
+
+    $router->post("/order/save", function () {
+        if (!isset($_SESSION["user"])) {
+            $response["status"] = 401;
+            $response["error"] = "User not logged in";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!isset($_SESSION["user"]["id"])) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($_SESSION["user"]["id"]);
+        if (!$user) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        $json = json_decode(file_get_contents("php://input"), true);
+        $order = $json["order"];
+        $stripe_id = $json["stripe_id"] ?? null;
+        if (
+            !isset($order["items"]) ||
+            !is_array($order["items"]) ||
+            count($order["items"]) === 0
+        ) {
+            $response["status"] = 400;
+            $response["error"] = "Invalid order";
+            echo json_encode($response);
+            exit();
+        }
+
+        foreach ($order["items"] as $item) {
+            if (!isset($item["game_id"]) || $item["game_id"] <= 0) {
+                $response["status"] = 400;
+                $response["error"] = "Invalid order item";
+                echo json_encode($response);
+                exit();
+            }
+
+            $game = Game::getById($item["game_id"]);
+            if (!$game) {
+                $response["status"] = 404;
+                $response["error"] = "Game not found";
+                echo json_encode($response);
+                exit();
+            }
+
+            $user->adquireGame($game, $stripe_id);
+        }
+
+        $email = new OrderSuccessEmail(
+            $user->email,
+            $user,
+            OrderHelper::getInstances(),
+        );
+        $email->send();
+
+        OrderHelper::clearOrder();
+
+        $response["status"] = 200;
+        $response["message"] = "Order processed successfully";
+        echo json_encode($response);
     });
 
     $router->post("/auth/login", function () {
