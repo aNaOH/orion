@@ -124,6 +124,11 @@ class StripeController
     {
         if (isset($_GET["from"])) {
             if ($_GET["from"] == "developer") {
+                $email = new DeveloperWelcomeEmail(
+                    "abehsosa2004@gmail.com",
+                    User::getById(1),
+                    Developer::getById(1),
+                );
                 include "views/stripe/success/dev.php";
                 exit();
             }

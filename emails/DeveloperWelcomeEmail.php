@@ -16,7 +16,7 @@ class DeveloperWelcomeEmail extends Email
 
     protected function getSubject(): string
     {
-        return "¡Bienvenido a Orion!";
+        return "¡Ahora eres un desarrollador!";
     }
 
     protected function getTemplatePath(): string
