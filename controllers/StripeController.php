@@ -7,7 +7,10 @@ class StripeController
 {
     private static function getStripe()
     {
-        return new \Stripe\StripeClient($_ENV["STRIPE_KEY"]);
+        return new \Stripe\StripeClient([
+            "api_key" => $_ENV["STRIPE_KEY"],
+            "stripe_version" => "2025-10-29.clover",
+        ]);
     }
 
     private static function getGoToText($goTo)
@@ -38,6 +41,8 @@ class StripeController
             "currency" => "eur",
             "product" => $product->id,
         ]);
+
+        $coupon = null;
 
         if (
             !is_null($game->discount) &&
@@ -90,6 +95,8 @@ class StripeController
                 "user" => $user->id,
             ],
             "ui_mode" => "custom",
+            "payment_method_types" => ["card"],
+            "return_url" => "https://example.com/checkout/success",
         ];
 
         if (count($coupons)) {
@@ -100,7 +107,7 @@ class StripeController
             ];
         }
 
-        $checkout_session = \Stripe\Checkout\Session::create(
+        $checkout_session = self::getStripe()->checkout->sessions->create(
             $checkout_session_array,
         );
 

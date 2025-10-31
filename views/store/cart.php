@@ -82,8 +82,9 @@ function showPage()
         </div>
 
         <?php if ($total > 0): ?>
-            <div class="bg-brand-200 text-white rounded-xl p-4">
-                <div id="stripe-element" class="text-white"></div>
+            <div class="flex flex-col space-y-4">
+                <div id="billing-element" class="bg-brand-200 p-4 shadow-md rounded-md"></div>
+                <div id="payment-element" class="shadow-md rounded-md"></div>
             </div>
         <?php endif; ?>
 
@@ -98,7 +99,7 @@ function showPage()
         </button>
     </div>
 
-    <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://js.stripe.com/clover/stripe.js"></script>
     <script>
       const email = <?= json_encode($email) ?>;
       const total = <?= json_encode($total) ?>;
@@ -119,44 +120,72 @@ function showPage()
           btn.disabled = disabled;
       }
 
+      const stripe = Stripe('<?= $_ENV["STRIPE_PUBLIC_KEY"] ?>');
+      let checkout;
+      let actions;
+      let loadActionsResult;
+
       document.addEventListener('DOMContentLoaded', async () => {
           const payBtn = document.getElementById('pay-btn');
           const cardElement = document.getElementById('stripe-element');
 
-          let stripe, card;
-          if (cardElement && total > 0) {
-              stripe = Stripe('<?= $_ENV["STRIPE_PUBLIC_KEY"] ?>');
-              const elements = stripe.elements();
-              card = elements.create('card');
-              card.mount('#stripe-element');
-          }
+          const promise = fetch('/api/order', {
+              method: 'POST',
+              headers: {'Content-Type': 'application/json'},
+            })
+              .then((r) => r.json())
+              .then((r) => r.client_secret);
+
+            const appearance = {
+              theme: 'stripe',
+            };
+            checkout = stripe.initCheckout({
+              clientSecret: promise,
+              elementsOptions: { appearance },
+            });
+
+            const loadActionsResult = await checkout.loadActions();
+            if (loadActionsResult.type === 'success') {
+                actions = loadActionsResult.actions;
+              }
+
+            const paymentElement = checkout.createPaymentElement();
+              paymentElement.mount("#payment-element");
+              const billingAddressElement = checkout.createBillingAddressElement();
+              billingAddressElement.mount("#billing-element");
 
           payBtn.addEventListener('click', async () => {
               setPayBtnState(true, true);
 
               if (total === 0) {
-                  await fetch('/order/save', {
+                  await fetch('/api/order/save', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({ order, email })
                   });
-                  return location.href = "/orders";
+                  return location.href = "/library";
               }
 
-              const { client_secret } = await (await fetch('/order', { method:"POST" })).json();
-              const result = await stripe.confirmCardPayment(client_secret, {
-                  payment_method: { card, billing_details: { email } }
-              });
+              if (loadActionsResult.type === 'success') {
+                  const { error } = await loadActionsResult.actions.confirm({
+                    redirect: 'if_required'
+                  });
+                  if(error) {
+                      return setPayBtnState(false, false);
+                  }
+                }
 
-              if (result.error) return setPayBtnState(false, false);
 
-              await fetch('/order/save', {
+
+              await fetch('/api/order/save', {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({ order, email, stripe_id: result.paymentIntent.id })
+                  body: JSON.stringify({ order, email, stripe_id: loadActionsResult.actions.getSession().id })
               });
 
-              location.href = "/orders";
+              setPayBtnState(false, false);
+
+              //location.href = "/library";
           });
       });
     </script>

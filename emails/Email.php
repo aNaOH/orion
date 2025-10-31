@@ -149,8 +149,14 @@ abstract class Email
 
         // Reemplazo de variables {{var}}
         foreach ($variables as $key => $value) {
-            $html = str_replace("{{{$key}}}", $value, $html);
+            if (is_scalar($value)) {
+                // solo strings, ints, floats, bool
+                $html = str_replace("{{{$key}}}", (string) $value, $html);
+            }
         }
+
+        // Procesamiento de lógica
+        $html = $this->processLogic($html, $variables);
 
         // Funciones especiales
         $html = $this->processFunctions($html);
@@ -170,6 +176,147 @@ abstract class Email
                 $html,
             );
         }
+
+        return $html;
+    }
+
+    protected function resolveVariable(string $expression, array $variables)
+    {
+        // Ej: "user.friends[0].name"
+        $parts = preg_split("/\./", $expression);
+
+        $value = $variables;
+
+        foreach ($parts as $part) {
+            // Manejo de índice: algo[3]
+            if (preg_match('/^([a-zA-Z0-9_]+)\[([0-9]+)\]$/', $part, $m)) {
+                $varName = $m[1];
+                $index = $m[2];
+
+                if (
+                    is_array($value) &&
+                    isset($value[$varName]) &&
+                    is_array($value[$varName]) &&
+                    isset($value[$varName][$index])
+                ) {
+                    $value = $value[$varName][$index];
+                    continue;
+                }
+
+                return "";
+            }
+
+            // Método sin argumentos: algo()
+            if (preg_match('/^([a-zA-Z0-9_]+)\(\)$/', $part, $m)) {
+                $method = $m[1];
+
+                if (is_object($value) && method_exists($value, $method)) {
+                    $value = $value->$method();
+                    continue;
+                }
+
+                return "";
+            }
+
+            // Propiedad normal
+            if (is_array($value) && isset($value[$part])) {
+                $value = $value[$part];
+            } elseif (
+                is_object($value) &&
+                (isset($value->$part) || method_exists($value, "__get"))
+            ) {
+                $value = $value->$part;
+            } else {
+                return "";
+            }
+        }
+
+        return $value;
+    }
+
+    protected function processLogic(string $html, array $variables): string
+    {
+        // FOREACH con índice: {{ foreach items as item:index }}...{{ endforeach }}
+        $html = preg_replace_callback(
+            "/\{\{\s*foreach\s+([a-zA-Z0-9_]+)\s+as\s+([a-zA-Z0-9_]+)(?::([a-zA-Z0-9_]+))?\s*\}\}(.*?)\{\{\s*endforeach\s*\}\}/is",
+            function ($m) use ($variables) {
+                [$full, $listName, $itemName, $indexName, $content] = $m;
+
+                if (
+                    !isset($variables[$listName]) ||
+                    !is_iterable($variables[$listName])
+                ) {
+                    return "";
+                }
+
+                $result = "";
+                $i = 0;
+
+                foreach ($variables[$listName] as $value) {
+                    $block = $content;
+
+                    // Reemplazo del item
+                    if (is_scalar($value)) {
+                        $block = str_replace(
+                            "{{{$itemName}}}",
+                            (string) $value,
+                            $block,
+                        );
+                    } else {
+                        // Si el valor no es escalar, simplemente elimina {{item}}
+                        // (el usuario debe usar {{item.prop}} o {{item.method()}})
+                        $block = str_replace("{{{$itemName}}}", "", $block);
+                    }
+
+                    // Reemplazo del índice si fue declarado
+                    if ($indexName) {
+                        $block = str_replace("{{{$indexName}}}", $i, $block);
+                    }
+
+                    $result .= $block;
+                    $i++;
+                }
+                return $result;
+            },
+            $html,
+        );
+
+        // IF: {{ if var }} ... {{ endif }}
+        $html = preg_replace_callback(
+            "/\{\{\s*if\s+([a-zA-Z0-9_]+)\s*\}\}(.*?)\{\{\s*endif\s*\}\}/is",
+            function ($m) use ($variables) {
+                [$full, $varName, $content] = $m;
+                return !empty($variables[$varName]) ? $content : "";
+            },
+            $html,
+        );
+
+        // ACCESO A INDICES: {{ var[3] }}
+        $html = preg_replace_callback(
+            "/\{\{\s*([a-zA-Z0-9_]+)\[([0-9]+)\]\s*\}\}/",
+            function ($m) use ($variables) {
+                [$full, $arrName, $idx] = $m;
+
+                if (
+                    isset($variables[$arrName]) &&
+                    is_array($variables[$arrName]) &&
+                    isset($variables[$arrName][$idx])
+                ) {
+                    return $variables[$arrName][$idx];
+                }
+
+                return "";
+            },
+            $html,
+        );
+
+        $html = preg_replace_callback(
+            "/\{\{\s*([a-zA-Z0-9_]+(?:[.\[][a-zA-Z0-9_()\]]+)+)\s*\}\}/",
+            function ($m) use ($variables) {
+                return $this->resolveVariable($m[1], $variables);
+            },
+            $html,
+        );
 
         return $html;
     }
