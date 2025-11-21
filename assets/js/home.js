@@ -1,5 +1,4 @@
 $(document).ready(function () {
-  // Realizar llamada AJAX a /api/home
   $.ajax({
     url: "/api/home",
     method: "GET",
@@ -7,28 +6,39 @@ $(document).ready(function () {
       const showcaseGames = response.showcaseGames;
       const users = response.users;
 
-      document.getElementById("userCount").innerHTML = users;
+      $("#userCount").text(users);
 
       if (!showcaseGames || showcaseGames.length === 0) {
-        console.error("No se encontraron juegos en la respuesta.");
+        console.error("No se encontraron juegos.");
         return;
       }
 
-      // Seleccionar contenedores aleatoriamente y asignar juegos
-      const containers = $("#hero .showcase-item");
-      const selectedContainers = containers
-        .toArray()
-        .sort(() => Math.random() - 0.5)
-        .slice(0, showcaseGames.length);
+      const carousel = $("#showcaseCarousel");
+      carousel.empty();
 
-      showcaseGames.forEach((game, index) => {
-        const container = $(selectedContainers[index]);
-        const gameHtml = `
-                    <img src="/media/game/thumb/${game.id}" alt="${game.title}"
-                         class="w-full h-full object-cover rounded-md shadow-lg opacity-70 hover:opacity-100 transition duration-300 animate-float">
-                `;
-        container.html(gameHtml).hide().fadeIn(1000); // Efecto fade-in
+      // Duplicamos los juegos para efecto loop
+      const gamesLoop = [...showcaseGames, ...showcaseGames];
+
+      gamesLoop.forEach((game) => {
+        carousel.append(`
+                    <div class="w-[213px] flex-shrink-0">
+                        <img src="/media/game/thumb/${game.id}"
+                             alt="${game.title}"
+                             class="w-full h-full object-cover rounded-lg shadow-md hover:opacity-90 transition duration-300">
+                    </div>
+                `);
       });
+
+      // Calcular ancho total
+      let totalWidth = (213 + 24) * showcaseGames.length;
+
+      // Asignar variable CSS
+      carousel[0].style.setProperty("--carousel-width", totalWidth + "px");
+
+      // Ajustar duración de la animación según ancho (opcional)
+      const speed = 50; // px por segundo
+      const duration = firstSetWidth / speed;
+      carousel.css("animation-duration", duration + "s");
     },
     error: function (error) {
       console.error("Error al obtener los juegos:", error);
