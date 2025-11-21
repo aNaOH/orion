@@ -86,43 +86,72 @@ function showPage()
     <div class="relative py-20 flex justify-center">
 
     <!-- Store Page -->
-    <section id="store" class="max-w-4xl w-full px-6">
-        <h1 class="text-2xl font-bold text-gray-200 mx-auto max-w-4xl mb-3"><?= $game->title ?></h1>
-      <div class="container mx-auto max-w-4xl bg-branddark shadow-lg rounded-lg p-8">
-        <!-- Header -->
-        <div class="flex">
-          <div class="text-left flex-1">
-            <img class="aspect-[2.14/1] h-[65%] rounded-md shadow-lg" src="/media/game/thumb/<?= $game->id ?>" alt="<?= $game->title ?> thumbnail">
-            <p class="text-lg text-gray-200"><?= $game->short_description ??
-                "No hay información" ?></p>
-          </div>
-          <div class="flex-1 flex flex-col gap-2 content-between">
-            <div class="flex flex-row gap-2 items-center mx-auto">
-                <?php getBuyWidget($game); ?>
-            </div>
-            <div class="text-center flex flex-row">
-                <div class="flex-1 flex flex-col">
-                    <p class="text-lg font-bold text-gray-200">DESARROLLADOR</p>
-                    <p class="text-md text-gray-400"><?= $game->as_editor
-                        ? $game->developer_name
-                        : $game->getDeveloper()->name ?></p>
-                </div>
-            <?php if ($game->as_editor) { ?>
-                <div class="flex-1 flex flex-col">
-                    <p class="text-lg font-bold text-gray-200">EDITOR</p>
-                    <p class="text-md text-gray-400"><?= $game->getDeveloper()
-                        ->name ?></p>
-                </div>
-            <?php } ?>
-            </div>
-          </div>
-        </div>
+    <section id="store" class="max-w-6xl w-full px-6">
+      <div class="container mx-auto max-w-6xl bg-branddark shadow-lg rounded-lg p-8 flex flex-col gap-8">
+          <!-- Header -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+                      <!-- THUMB (aspect ratio respetado) -->
+                      <div class="w-full">
+                          <img
+                              src="/media/game/thumb/<?= $game->id ?>"
+                              alt="<?= $game->title ?> Thumbnail"
+                              class="w-full h-auto rounded-lg shadow-md object-contain bg-black/20"
+                          >
+                      </div>
+
+                      <!-- INFORMACIÓN DEL JUEGO -->
+                      <div class="flex flex-col justify-center gap-3">
+
+                          <!-- NOMBRE -->
+                          <h1 class="text-3xl font-bold text-white"><?= $game->title ?></h1>
+
+                          <!-- DESARROLLADORA / EDITORA -->
+                          <p class="text-gray-300 text-sm leading-tight">
+                              <span class="font-semibold text-alt">Desarrolladora:</span> <?= $game->as_editor
+                                  ? $game->developer_name
+                                  : $game->getDeveloper()->name ?>
+                                                          <?php if (
+                                                              $game->as_editor
+                                                          ) { ?>
+                                                              <br>
+                                                              <span class="font-semibold text-alt">Editora:</span> <?= $game->getDeveloper()
+                                                                  ->name ?>
+
+                                                                      <?php } ?>
+                          </p>
+
+                          <!-- FECHA DE LANZAMIENTO -->
+                          <p class="text-gray-300 text-sm leading-tight">
+                              <span class="font-semibold text-alt">Lanzamiento:</span> <?= date(
+                                  "d M Y",
+                                  strtotime($game->launch_date),
+                              ) ?>
+                          </p>
+
+                          <!-- SHORT DESCRIPTION -->
+                          <p class="text-gray-200 text-base leading-relaxed">
+                              <?= $game->short_description ?>
+                          </p>
+                      </div>
+
+                      <!-- WIDGET DE COMPRA -->
+                      <div class="bg-black/20 rounded-lg p-6 shadow-md">
+
+                          <!-- BOTÓN DE COMPRA (usa tu widget real) -->
+                          <div class="flex flex-col items-center justify-center gap-2">
+                              <?php getBuyWidget($game); ?>
+                          </div>
+
+                      </div>
+
+                  </div>
 
         <!-- Store Details -->
         <div>
-          <div class="bg-brand-900 rounded-lg p-6 shadow-sm">
+          <div class="rounded-lg p-6">
             <div class="flex flex-row gap-4">
-                <div id="description container mx-auto p-6">
+                <div id="description container mx-auto p-6 max-w-4xl">
                     <?php
                     $Parsedown = new TailwindParsedown();
                     echo $Parsedown->text(
@@ -136,7 +165,7 @@ function showPage()
                     sizeof($game->getStats()) > 0 ||
                     sizeof($gameFeatures) > 0
                 ) { ?>
-                <div class="flex flex-col gap-2">
+                <div class="flex flex-col gap-2 w-64">
                     <p class="text-lg font-bold text-gray-200">CARACTERÍSTICAS</p>
                     <?php foreach ($gameFeatures as $feature) { ?>
                         <gradient-chip

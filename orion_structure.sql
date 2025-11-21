@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS `unlocks` (
   KEY `fk_unlocks_achievement_id` (`achievement_id`),
   KEY `fk_unlocks_user_id` (`user_id`),
   CONSTRAINT `fk_unlocks_game_id`
-    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)        -- <<-- CORRECCIÓN: antes referenciaba `games`
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_unlocks_achievement_id`
     FOREIGN KEY (`achievement_id`) REFERENCES `achievements` (`id`)
