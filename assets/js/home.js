@@ -22,7 +22,7 @@ $(document).ready(function () {
       gamesLoop.forEach((game) => {
         carousel.append(`
                     <div class="w-[213px] flex-shrink-0">
-                        <img src="/media/game/thumb/${game.id}"
+                        <img src="https://cdn.orion.moonnastd.com/game/thumb/${game.id}"
                              alt="${game.title}"
                              class="w-full h-full object-cover rounded-lg shadow-md hover:opacity-90 transition duration-300">
                     </div>
