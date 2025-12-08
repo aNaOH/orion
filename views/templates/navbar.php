@@ -49,7 +49,7 @@
 
                                 <!-- Imagen + título -->
                                 <div class="flex items-center gap-2 min-w-0 flex-1">
-                                    <img src="/media/game/icon/<?= $item->id ?>" alt="<?= $item->title ?>" class="w-6 h-6 rounded-md flex-shrink-0">
+                                    <img src="https://cdn.orion.moonnastd.com/game/icon/<?= $item->id ?>" alt="<?= $item->title ?>" class="w-6 h-6 rounded-md flex-shrink-0">
                                     <span class="truncate"><?= $item->title ?></span>
                                 </div>
 

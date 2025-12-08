@@ -39,7 +39,7 @@ function showPage()
           <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
             <td class="px-4 py-3 flex gap-2 items-center">
               <img
-                src="/media/game/icon/<?= $game->id ?>"
+                src="https://cdn.orion.moonnastd.com/game/icon/<?= $game->id ?>"
                 alt="<?= $game->title ?>"
                 class="w-5 h-5 rounded"
               />

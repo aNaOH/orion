@@ -42,14 +42,14 @@ function showPage()
             <td class="px-4 py-3"><?= $guidetype->tint ?></td>
             <td class="px-4 py-3">
               <gradient-square
-                icon-path="/media/guidetype/<?= $guidetype->icon ?>"
+                icon-path="https://cdn.orion.moonnastd.com/guidetype/<?= $guidetype->icon ?>"
                 base-color="<?= $guidetype->tint ?>"
                 size="50"
               ></gradient-square>
             </td>
             <td class="px-4 py-3">
               <gradient-chip
-                icon-path="/media/guidetype/<?= $guidetype->icon ?>"
+                icon-path="https://cdn.orion.moonnastd.com/guidetype/<?= $guidetype->icon ?>"
                 base-color="<?= $guidetype->tint ?>"
                 size="25"
                 text="<?= $guidetype->type ?>"

@@ -94,7 +94,7 @@ function showPage()
                       <!-- THUMB (aspect ratio respetado) -->
                       <div class="w-full">
                           <img
-                              src="/media/game/thumb/<?= $game->id ?>"
+                              src="https://cdn.orion.moonnastd.com/game/thumb/<?= $game->id ?>"
                               alt="<?= $game->title ?> Thumbnail"
                               class="w-full h-auto rounded-lg shadow-md object-contain bg-black/20"
                           >
@@ -171,7 +171,7 @@ function showPage()
                         <gradient-chip
                             base-color="<?= $feature->tint ?>"
                             size="24"
-                            icon-path="/media/game/feature/<?= $feature->icon ?>"
+                            icon-path="https://cdn.orion.moonnastd.com/game/feature/<?= $feature->icon ?>"
                             text="<?= $feature->name ?>"
                             border-radius="8">
                         </gradient-chip>
@@ -180,7 +180,7 @@ function showPage()
                         <gradient-chip
                             base-color="#1B2A49"
                             size="24"
-                            icon-path="/media/game/feature/achievement"
+                            icon-path="https://cdn.orion.moonnastd.com/game/feature/achievement"
                             text="Logros"
                             border-radius="8">
                         </gradient-chip>
@@ -189,7 +189,7 @@ function showPage()
                         <gradient-chip
                             base-color="#1B2A49"
                             size="24"
-                            icon-path="/media/game/feature/leaderboard"
+                            icon-path="https://cdn.orion.moonnastd.com/game/feature/leaderboard"
                             text="Clasificaciones"
                             border-radius="8">
                         </gradient-chip>
@@ -198,7 +198,7 @@ function showPage()
                         <gradient-chip
                             base-color="#1B2A49"
                             size="24"
-                            icon-path="/media/game/feature/stat"
+                            icon-path="https://cdn.orion.moonnastd.com/game/feature/stat"
                             text="Estadísticas"
                             border-radius="8">
                         </gradient-chip>

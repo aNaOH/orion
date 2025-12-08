@@ -43,10 +43,10 @@ function showPage()
                 <?= $feature->tint ?>
             </td>
             <td class="px-4 py-3">
-                <gradient-square icon-path="/media/game/feature/<?= $feature->icon ?>" base-color="<?= $feature->tint ?>" size="50"></gradient-square>
+                <gradient-square icon-path="https://cdn.orion.moonnastd.com/game/feature/<?= $feature->icon ?>" base-color="<?= $feature->tint ?>" size="50"></gradient-square>
             </td>
             <td class="px-4 py-3">
-                <gradient-chip icon-path="/media/game/feature/<?= $feature->icon ?>" base-color="<?= $feature->tint ?>" size="25" text="<?= $feature->name ?>"></gradient-chip>
+                <gradient-chip icon-path="https://cdn.orion.moonnastd.com/game/feature/<?= $feature->icon ?>" base-color="<?= $feature->tint ?>" size="25" text="<?= $feature->name ?>"></gradient-chip>
             </td>
             <td class="px-4 py-3 text-right">
                 <a

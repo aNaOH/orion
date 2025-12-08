@@ -146,7 +146,10 @@ async function addFeature(featureId) {
   const gradientChip = document.createElement("gradient-chip");
   gradientChip.setAttribute("base-color", feature.tint || "#007bff");
   gradientChip.setAttribute("size", 24);
-  gradientChip.setAttribute("icon-path", `/media/game/feature/${feature.icon}`);
+  gradientChip.setAttribute(
+    "icon-path",
+    `https://cdn.orion.moonnastd.com/game/feature/${feature.icon}`,
+  );
   gradientChip.setAttribute("text", feature.name);
   gradientChip.setAttribute("border-radius", 8);
   gradientChip.classList.add("w-full");

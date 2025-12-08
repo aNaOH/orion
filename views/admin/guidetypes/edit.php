@@ -48,7 +48,7 @@ function showPage()
     <gradient-square
       id="preview"
       base-color="<?= $guidetype->tint ?>"
-      icon-path="/media/guidetype/<?= $guidetype->icon ?>"
+      icon-path="https://cdn.orion.moonnastd.com/guidetype/<?= $guidetype->icon ?>"
       size="50"
       class="block"
     ></gradient-square>

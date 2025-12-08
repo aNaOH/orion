@@ -53,9 +53,9 @@ function showPage()
                     ); ?>
                     <div class="bg-branddark-600 flex flex-row p-2 gap-5 rounded-xl">
                         <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-alt-500">
-                            <img src="/media/profile/<?= $_SESSION["user"][
-                                "profile_pic"
-                            ] ??
+                            <img src="https://cdn.orion.moonnastd.com/profile/<?= $_SESSION[
+                                "user"
+                            ]["profile_pic"] ??
                                 "default" ?>" alt="Foto de perfil de <?= $_SESSION[
     "user"
 ]["username"] ?>" class="w-full h-full object-cover">

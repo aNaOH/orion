@@ -28,7 +28,7 @@ function showPage()
 
             <!-- Imagen + título -->
             <div class="flex items-center gap-3 flex-1">
-                <img src="/media/game/thumb/<?= $item->id ?>"
+                <img src="https://cdn.orion.moonnastd.com/game/thumb/<?= $item->id ?>"
                      alt="<?= htmlspecialchars($item->title) ?>"
                      class="aspect-[2.14/1] w-32 rounded-md shadow-lg object-cover">
                 <span class="text-gray-200"><?= htmlspecialchars(

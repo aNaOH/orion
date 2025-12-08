@@ -2,10 +2,10 @@
 
 $title = "Tu perfil en Orion";
 
-function showPage() {
-
-  global $user;
-  global $is_self;
+function showPage()
+{
+    global $user;
+    global $is_self;
     ?>
 
     <!-- Profile Page -->
@@ -15,12 +15,14 @@ function showPage() {
         <div class="flex items-center space-x-6">
           <!-- Profile Picture -->
           <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-alt-500">
-            <img src="/media/profile/<?= $user->profile_pic ?? 'default' ?>" alt="Foto de perfil de <?= $user->username ?>" class="w-full h-full object-cover">
+            <img src="https://cdn.orion.moonnastd.com/profile/<?= $user->profile_pic ??
+                "default" ?>" alt="Foto de perfil de <?= $user->username ?>" class="w-full h-full object-cover">
           </div>
           <!-- User Info -->
           <div>
-            <h1 class="text-4xl font-bold text-gray-200"><?= $user->username ?> <span class="text-2xl font-normal text-gray-400"><?=$user->getHandle()?></span></h1>
-            <p class="text-gray-400 text-lg"><?= $user->motd ?? 'Sin mensaje personalizado.' ?></p>
+            <h1 class="text-4xl font-bold text-gray-200"><?= $user->username ?> <span class="text-2xl font-normal text-gray-400"><?= $user->getHandle() ?></span></h1>
+            <p class="text-gray-400 text-lg"><?= $user->motd ??
+                "Sin mensaje personalizado." ?></p>
             <?php if (isset($is_self) && $is_self) { ?>
               <div class="mt-6">
                 <a href="/profile/edit" class="px-4 py-2 bg-alt text-gray-200 font-semibold rounded-lg shadow-lg hover:bg-alt-400 transition">
@@ -30,7 +32,7 @@ function showPage() {
             <?php } ?>
           </div>
         </div>
-        
+
         <!-- Profile Details -->
         <div class="mt-10">
           <h2 class="text-2xl font-semibold text-gray-200 mb-4">Acerca del Usuario</h2>
@@ -46,7 +48,9 @@ function showPage() {
     <?php
 }
 
-include("views/templates/main.php");
+include "views/templates/main.php";
 
-unset($GLOBALS['user']);
-if(isset($GLOBALS['is_self'])) unset($GLOBALS['is_self']);
+unset($GLOBALS["user"]);
+if (isset($GLOBALS["is_self"])) {
+    unset($GLOBALS["is_self"]);
+}

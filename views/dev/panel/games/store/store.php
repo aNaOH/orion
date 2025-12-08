@@ -126,7 +126,7 @@ $genre->id
                   <gradient-chip
                         base-color="<?= $gameFeature->tint ?>"
                         size="24"
-                        icon-path="/media/game/feature/<?= $gameFeature->icon ?>"
+                        icon-path="https://cdn.orion.moonnastd.com/game/feature/<?= $gameFeature->icon ?>"
                         text="<?= $gameFeature->name ?>"
                         border-radius="8"
                         class="w-full">

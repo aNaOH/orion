@@ -5,7 +5,7 @@
     <img src="{{asset('/assets/img/orion-logo.svg')}}" alt="Asset Local">
 
     <!-- Imagen online inline (puede ser localhost con puerto) -->
-    <img src="{{onlineAsset('/media/game/cover/1')}}" alt="Asset Remoto">
+    <img src="{{onlineAsset('https://cdn.orion.moonnastd.com/game/cover/1')}}" alt="Asset Remoto">
 
     <!-- Enlace dinámico -->
     <a href="{{url('/')}}">Ir a Orion</a>

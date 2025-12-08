@@ -67,7 +67,7 @@ function showPage()
                             <gradient-chip
                                 base-color="<?= $feature->tint ?>"
                                 size="12"
-                                icon-path="/media/game/feature/<?= $feature->icon ?>"
+                                icon-path="https://cdn.orion.moonnastd.com/game/feature/<?= $feature->icon ?>"
                                 text="<?= $feature->name ?>"
                                 border-radius="8"
                                 class="flex-1"

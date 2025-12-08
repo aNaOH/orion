@@ -2,10 +2,10 @@
 
 $title = "Posts de $game->title en Orion";
 
-function showPage() {
+function showPage()
+{
     global $game;
     global $guideTypes;
-
     ?>
     <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.min.css">
     <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
@@ -23,7 +23,7 @@ function showPage() {
     <section id="features" class="py-20">
     <div class="container mx-auto max-w-2xl">
         <form id="communityCreateForm" novalidate class="bg-branddark shadow-lg rounded-lg p-8 space-y-6">
-        <?php OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION) ?>
+        <?php OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION); ?>
 
         <!-- Título -->
         <div>
@@ -36,14 +36,21 @@ function showPage() {
         <!-- Tipo -->
         <div>
             <label for="guideType" class="block text-sm font-medium text-gray-200">Seleccionar tipo</label>
-            <div class="p-2 bg-white rounded-lg shadow-lg flex flex-row gap-x-2 content-center transition-colors duration-200" style="background-color: <?= $guideTypes[0]->tint ?>;" id="guideContainer">
+            <div class="p-2 bg-white rounded-lg shadow-lg flex flex-row gap-x-2 content-center transition-colors duration-200" style="background-color: <?= $guideTypes[0]
+                ->tint ?>;" id="guideContainer">
                 <div class="shadow-2xl">
-                    <gradient-square id="guideIcon" size="55" base-color="<?= $guideTypes[0]->tint ?>" icon-path="/media/guidetype/<?=$guideTypes[0]->icon?>" ></gradient-square>
+                    <gradient-square id="guideIcon" size="55" base-color="<?= $guideTypes[0]
+                        ->tint ?>" icon-path="https://cdn.orion.moonnastd.com/guidetype/<?= $guideTypes[0]
+    ->icon ?>" ></gradient-square>
                 </div>
                 <select name="guideType" id="guideType" class="text-brand form-control block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200">
-                    <?php if(isset($guideTypes) && count($guideTypes) > 0) foreach ($guideTypes as $gType) { ?>
-                        <option <?php if ($guideTypes[0] == $gType) echo 'selected'; ?> value="<?= $gType->id ?>" data-color="<?= $gType->tint ?>" data-icon="/media/guidetype/<?=$gType->icon?>"><?= $gType->type ?></option>
-                    <?php } ?>
+                    <?php if (isset($guideTypes) && count($guideTypes) > 0) {
+                        foreach ($guideTypes as $gType) { ?>
+                        <option <?php if ($guideTypes[0] == $gType) {
+                            echo "selected";
+                        } ?> value="<?= $gType->id ?>" data-color="<?= $gType->tint ?>" data-icon="https://cdn.orion.moonnastd.com/guidetype/<?= $gType->icon ?>"><?= $gType->type ?></option>
+                    <?php };
+                    } ?>
                 </select>
             </div>
         </div>
@@ -67,7 +74,7 @@ function showPage() {
     </section><!-- /Features Section -->
 
     <script>
-        var simplemde = new SimpleMDE({ 
+        var simplemde = new SimpleMDE({
             element: document.getElementById("body"),
             autosave: {
                 enabled: true,
@@ -93,7 +100,9 @@ function showPage() {
     <?php
 }
 
-include("views/templates/main.php");
+include "views/templates/main.php";
 
-unset($GLOBALS['game']);
-if(isset($GLOBALS['guideTypes'])) unset($GLOBALS['guideTypes']);
+unset($GLOBALS["game"]);
+if (isset($GLOBALS["guideTypes"])) {
+    unset($GLOBALS["guideTypes"]);
+}

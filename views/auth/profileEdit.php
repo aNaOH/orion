@@ -2,35 +2,35 @@
 
 $title = "Editar perfil de Orion";
 
-function showPage() {
-
-  global $user;
-    ?>
+function showPage()
+{
+    global $user; ?>
 
     <!-- Profile Page -->
     <section id="profile" class="py-20">
       <form id="profileEditForm" novalidate>
-        <?php OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION) ?>
+        <?php OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION); ?>
         <div class="container mx-auto max-w-4xl bg-branddark shadow-lg rounded-lg p-8">
           <!-- Header -->
           <div class="flex items-center space-x-6">
             <!-- Profile Picture -->
             <div class="group w-32 h-32 rounded-full overflow-hidden border-4 border-alt-500 relative cursor-pointer">
-              <div 
-                id="editPic" 
+              <div
+                id="editPic"
                 class="absolute inset-0 flex items-center justify-center bg-branddark/40 opacity-0 transition-opacity group-hover:opacity-100">
                 <i class="bi bi-pencil-fill text-gray-200"></i>
               </div>
               <img
-                id="profilePicImg" 
-                src="/media/profile/<?= $user->profile_pic ?? 'default' ?>" 
-                alt="Foto de perfil de <?= $user->username ?>" 
+                id="profilePicImg"
+                src="https://cdn.orion.moonnastd.com/profile/<?= $user->profile_pic ??
+                    "default" ?>"
+                alt="Foto de perfil de <?= $user->username ?>"
                 class="w-full h-full object-cover">
-                <input 
-                  type="file" 
-                  id="profilePic" 
-                  name="profilePic" 
-                  class="hidden" 
+                <input
+                  type="file"
+                  id="profilePic"
+                  name="profilePic"
+                  class="hidden"
                   accept="image/*">
             </div>
             <!-- User Info -->
@@ -41,11 +41,12 @@ function showPage() {
               </div>
               <div class="flex flex-row items-center gap-2">
                 <i class="bi bi-pencil-fill text-gray-400"></i>
-                <input type="text" id="motd" name="motd" class="bg-transparent text-gray-400 text-lg" value="<?= $user->motd ?? '' ?>" />
+                <input type="text" id="motd" name="motd" class="bg-transparent text-gray-400 text-lg" value="<?= $user->motd ??
+                    "" ?>" />
               </div>
             </div>
         </div>
-        
+
         <!-- Profile Details -->
         <div class="mt-10">
           <h2 class="text-2xl font-semibold text-gray-200 mb-4">Ajustes de la cuenta</h2>
@@ -82,6 +83,6 @@ function showPage() {
     <?php
 }
 
-include("views/templates/main.php");
+include "views/templates/main.php";
 
-unset($GLOBALS['user']);
+unset($GLOBALS["user"]);

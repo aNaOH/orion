@@ -69,10 +69,10 @@ function showPage()
                 <?= $achievement->secret ? "Si" : "No" ?>
             </td>
             <td class="px-4 py-3">
-                <img src="/media/game/achievement/<?= $achievement->icon ?>" alt="Ícono para el logro de <?= $game->name ?> '<?= $achievement->name ?>'">
+                <img src="https://cdn.orion.moonnastd.com/game/achievement/<?= $achievement->icon ?>" alt="Ícono para el logro de <?= $game->name ?> '<?= $achievement->name ?>'">
             </td>
             <td class="px-4 py-3">
-              <img src="/media/game/achievement/<?= $achievement->locked_icon ?>" alt="Ícono para el logro de <?= $game->name ?> '<?= $achievement->name ?>' bloqueado">
+              <img src="https://cdn.orion.moonnastd.com/game/achievement/<?= $achievement->locked_icon ?>" alt="Ícono para el logro de <?= $game->name ?> '<?= $achievement->name ?>' bloqueado">
             </td>
             <td class="px-4 py-3 text-right">
                 <a
