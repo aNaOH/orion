@@ -63,13 +63,15 @@ function showPage()
                     <h3 class="text-lg font-semibold mb-2">Características</h3>
                     <?php foreach ($features as $feature): ?>
                         <div class="flex items-center">
-                            <input type="checkbox" name="feature[]" value="<?= $feature->id ?>" id="feature-<?= $feature->id ?>" class="mr-2">
+                            <input type="checkbox" name="features[]" value="<?= $feature->id ?>" id="feature-<?= $feature->id ?>" class="mr-2">
                             <gradient-chip
                                 base-color="<?= $feature->tint ?>"
                                 size="12"
                                 icon-path="/media/game/feature/<?= $feature->icon ?>"
                                 text="<?= $feature->name ?>"
-                                border-radius="8">
+                                border-radius="8"
+                                class="flex-1"
+                            >
                             </gradient-chip>
                         </div>
                     <?php endforeach; ?>

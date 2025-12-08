@@ -74,7 +74,9 @@ $filteredGender
                                 size="12"
                                 icon-path="/media/game/feature/<?= $feature->icon ?>"
                                 text="<?= $feature->name ?>"
-                                border-radius="8">
+                                border-radius="8"
+                                class="flex-1"
+                            >
                             </gradient-chip>
                         </div>
                     <?php endforeach; ?>

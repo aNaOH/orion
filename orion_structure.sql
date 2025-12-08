@@ -1,5 +1,5 @@
 -- -----------------------------------------------------
--- Estructura de la base de datos ORION
+-- Estructura de la base de datos ORION (corregida)
 -- -----------------------------------------------------
 
 -- ===========================
@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `game` (
   KEY `fk_game_genre_id` (`genre_id`),
   CONSTRAINT `fk_game_developer_id`
     FOREIGN KEY (`developer_id`) REFERENCES `developers` (`id`)
-    ON DELETE SET CASCADE ON UPDATE CASCADE,
+    ON DELETE SET NULL ON UPDATE CASCADE,       -- <<-- CORRECCIÓN: antes estaba "ON DELETE SET CASCADE" (inválido)
   CONSTRAINT `fk_game_genre_id`
     FOREIGN KEY (`genre_id`) REFERENCES `game_genres` (`id`)
     ON DELETE SET NULL ON UPDATE CASCADE
@@ -327,7 +327,7 @@ CREATE TABLE IF NOT EXISTS `unlocks` (
   KEY `fk_unlocks_achievement_id` (`achievement_id`),
   KEY `fk_unlocks_user_id` (`user_id`),
   CONSTRAINT `fk_unlocks_game_id`
-    FOREIGN KEY (`game_id`) REFERENCES `games` (`id`)
+    FOREIGN KEY (`game_id`) REFERENCES `game` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE,
   CONSTRAINT `fk_unlocks_achievement_id`
     FOREIGN KEY (`achievement_id`) REFERENCES `achievements` (`id`)

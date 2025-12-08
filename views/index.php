@@ -2,30 +2,17 @@
 
 $title = "Bienvenido a Orion";
 
-function showPage() {
+function showPage()
+{
     ?>
 
     <!-- Hero Section -->
     <section id="hero" class="relative bg-brand-500 text-white min-h-screen flex items-center justify-center overflow-hidden">
         <!-- Fondo con imagen y degradado -->
         <div class="absolute inset-0">
-            <div class="h-full w-full bg-cover bg-center" 
+            <div class="h-full w-full bg-cover bg-center"
                 style="background-image: url('/assets/img/hero-bg-transparent.png'); mask-image: linear-gradient(to bottom, rgba(0,0,0,0.05) 0.25%, rgba(0,0,0,0)); -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,0.05) 0.25%, rgba(0,0,0,0));">
             </div>
-        </div>
-
-        <!-- Contenedores prefijados para juegos flotantes -->
-        <div class="absolute inset-0 pointer-events-none">
-            <div class="absolute w-[213px] h-[100px] showcase-item top-10 left-10"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item top-20 right-10"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item top-1/2 left-1/4"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item top-[30%] right-[20%]"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item bottom-[20%] left-[15%]"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item bottom-10 right-1/4"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item top-[40%] left-[60%]"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item bottom-[30%] right-[10%]"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item bottom-10 left-[30%]"></div>
-            <div class="absolute w-[213px] h-[100px] showcase-item top-[5%] right-[40%]"></div>
         </div>
 
         <!-- Contenido principal -->
@@ -44,11 +31,11 @@ function showPage() {
 
                 <!-- Campo de Búsqueda -->
                 <div class="relative flex-grow">
-                    <input 
-                    type="text" 
-                    name="search" 
-                    id="search" 
-                    placeholder="¡Mira si lo tenemos aquí!" 
+                    <input
+                    type="text"
+                    name="search"
+                    id="search"
+                    placeholder="¡Mira si lo tenemos aquí!"
                     class="w-full bg-transparent text-text-gray-200 placeholder-text-gray-200/75 px-4 py-2 rounded-full border-none focus:outline-none"
                     >
                     <!-- Icono de Búsqueda -->
@@ -57,6 +44,12 @@ function showPage() {
                     </div>
                 </div>
             </form>
+            <!-- Carrusel Infinito de Showcase -->
+            <div class="relative w-full overflow-hidden mt-10">
+                <div id="showcaseCarousel" class="flex gap-6 whitespace-nowrap animate-carousel">
+                    <!-- Juegos dinámicos se insertarán aquí -->
+                </div>
+            </div>
         </div>
 
         <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 mb-4 animate__animated animate__fadeInUp">
@@ -72,7 +65,7 @@ function showPage() {
             <h2 class="text-3xl sm:text-4xl font-bold text-gray-200 mb-12 text-center">Por qué es el punto de encuentro para <span id="userCount">N</span> usuarios</h2>
             <div class="flex flex-col gap-10">
                 <!-- Comunidad Activa -->
-                <div data-aos="fade-left" 
+                <div data-aos="fade-left"
                     class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6">
                     <img src="https://placehold.co/300x200" alt="Comunidad Activa" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-right">
@@ -81,7 +74,7 @@ function showPage() {
                     </div>
                 </div>
                 <!-- Herramientas para Creadores -->
-                <div data-aos="fade-right" 
+                <div data-aos="fade-right"
                     class="bg-gradient-to-r from-branddark to-transparent rounded-xl p-6 flex flex-col lg:flex-row items-center gap-6">
                     <img src="https://placehold.co/300x200" alt="Herramientas para Creadores" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-left">
@@ -90,7 +83,7 @@ function showPage() {
                     </div>
                 </div>
                 <!-- Logros y Más -->
-                <div data-aos="fade-left" 
+                <div data-aos="fade-left"
                     class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6">
                     <img src="https://placehold.co/300x200" alt="Logros y Más" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-right">
@@ -118,4 +111,4 @@ function showPage() {
     <?php
 }
 
-include("views/templates/nomain.php");
+include "views/templates/nomain.php";

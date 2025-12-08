@@ -1,10 +1,21 @@
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 @keyframes pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    0%,
+    100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
 }
 
 .animate-fadeIn {
@@ -17,7 +28,7 @@
     position: relative;
 }
 .link-underline::after {
-    content: '';
+    content: "";
     position: absolute;
     width: 0;
     height: 2px;
@@ -38,73 +49,46 @@
     animation: fadeIn 0.3s ease-in-out;
 }
 
-@keyframes float {
-    0%, 100% {
-        transform: translateY(0);
+@keyframes carouselMove {
+    0% {
+        transform: translateX(0);
     }
-    50% {
-        transform: translateY(-10px);
-    }
-}
-
-.animate-float {
-    animation: float 5s ease-in-out infinite;
-}
-
-.showcase-item img {
-    opacity: 0.7; /* Transparencia inicial */
-    transition: opacity 0.3s ease-in-out; /* Transición para hover */
-}
-
-.showcase-item img:hover {
-    opacity: 1; /* Opacidad completa al pasar el mouse */
-}
-
-@media (max-width: 768px) {
-    .showcase-item {
-        width: 100px;
-        height: 60px;
+    100% {
+        transform: translateX(calc(-1 * var(--carousel-width)));
     }
 }
 
-@media (min-width: 769px) and (max-width: 1024px) {
-    .showcase-item {
-        width: 140px;
-        height: 80px;
-    }
-}
-
-@media (min-width: 1025px) {
-    .showcase-item {
-        width: 200px;
-        height: 120px;
-    }
+.animate-carousel {
+    display: flex;
+    animation: carouselMove 20s linear infinite;
 }
 
 body {
     height: 100vh;
     display: flex;
     flex-direction: column;
-    }
-    
-    main {
+}
+
+main {
     flex-grow: 1;
-    }
+}
 
 .library-game {
     padding-left: 0rem;
     border-left: solid 0rem transparent;
-    transition: padding-left 0.3s ease, border-left 0.3s ease;
+    transition:
+        padding-left 0.3s ease,
+        border-left 0.3s ease;
 }
 
 .library-game:hover {
     padding-left: 0.5rem;
-    border-left: solid 0.175rem #DEAB18;
+    border-left: solid 0.175rem #deab18;
 }
 
 .library-game.active {
     padding-left: 1rem;
-    border-left: solid 0.2rem #DEAB18;
+    border-left: solid 0.2rem #deab18;
 }
 
 #searchForm > .relative > select {
