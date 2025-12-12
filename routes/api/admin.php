@@ -116,32 +116,36 @@ $router->mount("/admin", function () use ($router) {
         if ($tool === "email") {
             $email = $json["email"];
             $template = $json["template"];
+
             FormHelper::ValidateRequiredField($email, "email");
             FormHelper::ValidateRequiredField($template, "template");
             FormHelper::ValidateEmailField($email, "email");
+
             try {
                 switch ($template) {
                     case "testemail":
-                        $email = new TestEmail($email);
+                        $emailObj = new TestEmail($email);
                         break;
+
                     case "noassetmail":
-                        $email = new NoAssetMail($email);
+                        $emailObj = new NoAssetMail($email);
                         break;
+
                     default:
                         throw new Exception("Invalid template");
                 }
-                $email->send();
+
+                $emailObj->send();
+
                 header("HTTP/1.1 200 OK");
                 $response["status"] = 200;
                 $response["message"] = "Correo enviado";
-
                 echo json_encode($response);
                 exit();
             } catch (Exception $e) {
                 header("HTTP/1.1 400 Bad Request");
                 $response["status"] = 400;
                 $response["message"] = $e->getMessage();
-
                 echo json_encode($response);
                 exit();
             }
@@ -150,7 +154,6 @@ $router->mount("/admin", function () use ($router) {
         header("HTTP/1.1 500 Internal Server Error");
         $response["status"] = 500;
         $response["message"] = "Algo salió mal";
-
         echo json_encode($response);
         exit();
     });
