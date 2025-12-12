@@ -8,6 +8,109 @@ $router->mount("/dev", function () use ($router) {
         HomeController::devDo();
     });
 
+    $router->post("/pay", function () {
+        if (!isset($_SESSION["user"])) {
+            $response["status"] = 401;
+            $response["error"] = "User not logged in";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!isset($_SESSION["user"]["id"])) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($_SESSION["user"]["id"]);
+        if (!$user) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!is_null($user->getDeveloperInfo())) {
+            $response["status"] = 400;
+            $response["error"] = "User already has a developer account";
+            echo json_encode($response);
+            exit();
+        }
+
+        $checkout_session_array = [
+            "customer_email" => $user->email,
+            "billing_address_collection" => "required",
+            "line_items" => [
+                [
+                    "price" => $_ENV["STRIPE_DEVACCOUNT_PRICE"],
+                    "quantity" => 1,
+                ],
+            ],
+            "mode" => "payment",
+            "automatic_tax" => [
+                "enabled" => true,
+            ],
+            "metadata" => [
+                "user" => $user->id,
+            ],
+            "ui_mode" => "custom",
+            "payment_method_types" => ["card"],
+            "return_url" => "https://example.com/checkout/success",
+        ];
+
+        $checkout_session = StripeController::getStripe()->checkout->sessions->create(
+            $checkout_session_array,
+        );
+
+        header("HTTP/1.1 200 OK");
+
+        $response["status"] = "200";
+        $response["message"] = "Checkout session created successfully";
+        $response["client_secret"] = $checkout_session->client_secret;
+
+        echo json_encode($response);
+    });
+
+    $router->post("/save", function () {
+        $json = json_decode(file_get_contents("php://input"), true);
+
+        if (!isset($_SESSION["user"])) {
+            $response["status"] = 401;
+            $response["error"] = "User not logged in";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!isset($_SESSION["user"]["id"])) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        $user = User::getById($_SESSION["user"]["id"]);
+        if (!$user) {
+            $response["status"] = 404;
+            $response["error"] = "User not found";
+            echo json_encode($response);
+            exit();
+        }
+
+        if (!is_null($user->getDeveloperInfo())) {
+            $response["status"] = 400;
+            $response["error"] = "User already has a developer account";
+            echo json_encode($response);
+            exit();
+        }
+
+        $user->addDeveloperInfo($json["name"]);
+
+        $response["status"] = 200;
+        $response["message"] = "Developer account created";
+        echo json_encode($response);
+    });
+
     $router->post("/game", function () {
         $json = json_decode(file_get_contents("php://input"), true);
 

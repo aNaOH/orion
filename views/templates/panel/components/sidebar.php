@@ -27,11 +27,11 @@
       <i class="bi bi-newspaper text-alt-400 text-lg"></i>
       <span class="menu-text text-sm font-medium">Categorías de noticias</span>
     </a>
-    <a href="/admin/reports" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
+    <!--<a href="/admin/reports" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
       data-tooltip="Reportes">
       <i class="bi bi-file-text-fill text-alt-400 text-lg"></i>
       <span class="menu-text text-sm font-medium">Reportes</span>
-    </a>
+    </a> -->
     <hr class="my-2 border-branddark-500">
     <a href="/admin/gamegenres" class="menu-item flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-branddark-500 transition-all"
       data-tooltip="Géneros">

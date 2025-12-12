@@ -5,7 +5,7 @@ use Stripe\Price;
 
 class StripeController
 {
-    private static function getStripe()
+    public static function getStripe()
     {
         return new \Stripe\StripeClient([
             "api_key" => $_ENV["STRIPE_KEY"],

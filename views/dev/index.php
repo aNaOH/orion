@@ -80,12 +80,22 @@ function showPage()
 
         <div class="container mx-auto text-center">
             <h2 class="text-4xl font-bold text-alt mb-4">Publica tus juegos en Orion</h2>
-            <form action="/stripe/dev" method="get">
-                <div class="flex items-center space-x-2 p-2 rounded-full bg-branddark bg-opacity-75 shadow-md w-[50%] mx-auto">
-                    <input type="text" class="w-full bg-transparent text-text-gray-200 placeholder-text-gray-200/75 px-4 py-2 rounded-full border-none focus:outline-none" name="devName" placeholder="Nombre de tu desarrolladora/editora">
+                <div class="flex flex-col space-y-4 w-[50%] sm:w-full mx-auto">
+                <div class="flex items-center space-x-2 p-2 rounded-full bg-branddark bg-opacity-75 shadow-md w-full mx-auto">
+                    <input type="text" id="devName" class="w-full bg-transparent text-text-gray-200 placeholder-text-gray-200/75 px-4 py-2 rounded-full border-none focus:outline-none" name="devName" placeholder="Nombre de tu desarrolladora/editora">
                 </div>
-                <input type="submit" value="Adquirir cuenta (24,99 €)" class="mt-5 px-8 py-4 bg-alt-500 text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition"></input>
-            </form>
+                <div class="flex flex-col space-y-4">
+                    <div id="billing-element" class="bg-brand-200 p-4 shadow-md rounded-md"></div>
+                    <div id="payment-element" class="shadow-md rounded-md"></div>
+                </div>
+                <button id="pay-btn"
+                        class="w-full px-5 py-2 rounded-md shadow-md font-semibold text-white bg-alt hover:bg-alt-400 transition-all flex justify-center gap-2">
+                    <span id="pay-btn-text">Adquirir cuenta (24,99 €)</span>
+                    <span id="pay-btn-spinner" class="hidden animate-spin">
+                        <i class="bi bi-arrow-repeat"></i>
+                    </span>
+                </button>
+        </div>
         </div>
 
         <?php } else { ?>
@@ -101,6 +111,81 @@ function showPage()
     </section>
 
     <script src="/assets/js/dev.js"></script>
+
+    <?php if (isset($user) && is_null($user->getDeveloperInfo())) { ?>
+        <script src="https://js.stripe.com/clover/stripe.js"></script>
+
+        <script>
+
+        function setPayBtnState(disabled, showSpinner = false) {
+            const btn = document.getElementById('pay-btn');
+            document.getElementById('pay-btn-text').classList.toggle('hidden', showSpinner);
+            document.getElementById('pay-btn-spinner').classList.toggle('hidden', !showSpinner);
+            btn.disabled = disabled;
+        }
+
+        const stripe = Stripe('<?= $_ENV["STRIPE_PUBLIC_KEY"] ?>');
+        let checkout;
+        let actions;
+        let loadActionsResult;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+          const userId = <?= $user->id ?>;
+          const devName = document.getElementById('devName');
+            const payBtn = document.getElementById('pay-btn');
+            const cardElement = document.getElementById('stripe-element');
+
+            const promise = fetch('/api/dev/pay', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+              })
+                .then((r) => r.json())
+                .then((r) => r.client_secret);
+
+              const appearance = {
+                theme: 'stripe',
+              };
+              checkout = stripe.initCheckout({
+                clientSecret: promise,
+                elementsOptions: { appearance },
+              });
+
+              const loadActionsResult = await checkout.loadActions();
+              if (loadActionsResult.type === 'success') {
+                  actions = loadActionsResult.actions;
+                }
+
+              const paymentElement = checkout.createPaymentElement();
+                paymentElement.mount("#payment-element");
+                const billingAddressElement = checkout.createBillingAddressElement();
+                billingAddressElement.mount("#billing-element");
+
+            payBtn.addEventListener('click', async () => {
+                setPayBtnState(true, true);
+
+                if (loadActionsResult.type === 'success') {
+                    const { error } = await loadActionsResult.actions.confirm({
+                      redirect: 'if_required'
+                    });
+                    if(error) {
+                        return setPayBtnState(false, false);
+                    }
+                  }
+
+                await fetch('/api/dev/save', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name: devName.value, stripe_id: loadActionsResult.actions.getSession().id })
+                });
+
+                setPayBtnState(false, false);
+
+                location.href = "/dev/panel";
+            });
+        });
+        </script>
+
+        <?php } ?>
 
     <?php
 }

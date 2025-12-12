@@ -31,7 +31,7 @@ function showPage()
           >Gestionar logros</a>
         </div>
 
-        <!-- Estadísticas -->
+        <!-- Estadísticas
         <div
           class="group bg-[#1B2A49]/50 hover:bg-[#1B2A49]/70 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#1B2A49]/60 text-center transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl"
         >
@@ -44,7 +44,7 @@ function showPage()
             href="/dev/panel/games/<?= $game->id ?>/community/stats"
             class="inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition text-center bg-alt text-[#1B2A49] hover:bg-yellow-400 w-full transition-transform hover:scale-[1.02]"
           >Gestionar estadísticas</a>
-        </div>
+        </div> -->
 
         <!-- Tablas de Clasificación -->
         <div
@@ -64,7 +64,7 @@ function showPage()
 
       <!-- Sección inferior -->
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Normas -->
+        <!-- Normas
         <div
           class="group bg-[#1B2A49]/50 hover:bg-[#1B2A49]/70 backdrop-blur-md rounded-2xl p-6 shadow-lg border border-[#1B2A49]/60 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl"
         >
@@ -85,7 +85,7 @@ function showPage()
               >Ver normas</a>
             </div>
           </div>
-        </div>
+        </div> -->
 
         <!-- Noticias -->
         <div
