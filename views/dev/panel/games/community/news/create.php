@@ -95,7 +95,7 @@ function showPage()
 
             const simplemde = setupMarkdownEditor({
               selector: "#body",
-              uniqueId: "OrionDev_New_GameNew_" + gameID.toString()
+              uniqueId: "OrionDev_New_GameNew_<?= $game->id ?>"
             });
 
             const form = document.getElementById("editNewForm");

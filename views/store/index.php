@@ -214,7 +214,7 @@ function showPage()
     <?php if (sizeof($news) > 0) { ?>
             <!-- Noticias pegadas al borde derecho -->
             <aside id="news-section"
-                class="hidden lg:block absolute right-[-50px] top-20 w-80 mr-6">
+                class="hidden lg:block absolute right-[-150px] top-20 w-80 mr-6">
                 <div class="rounded-lg p-6">
                     <h3 class="text-2xl font-semibold text-gray-200 mb-4">Noticias</h3>
                     <div class="space-y-4">

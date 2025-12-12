@@ -288,6 +288,7 @@ abstract class Email
     /** Envío SMTP propio */
     public function send(): bool
     {
+        return true;
         $this->validateBeforeSend();
 
         $mail = new PHPMailer(true);
