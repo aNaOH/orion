@@ -2,10 +2,10 @@
 
 $title = "Posts de $game->title en Orion";
 
-function showPage() {
-    global $game;
-    ?>
-    <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.min.css">
+function showPage()
+{
+    global $game; ?>
+    <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.orion.css">
     <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
 
     <!-- Hero Section -->
@@ -19,7 +19,7 @@ function showPage() {
     <section id="features" class="py-20">
     <div class="container mx-auto max-w-2xl">
         <form id="communityCreateForm" novalidate class="bg-branddark shadow-lg rounded-lg p-8 space-y-6">
-        <?php OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION) ?>
+        <?php OrionComponents::TokenInput(ETOKEN_TYPE::USERACTION); ?>
 
         <!-- Título -->
         <div>
@@ -48,7 +48,7 @@ function showPage() {
     </section><!-- /Features Section -->
 
     <script>
-        var simplemde = new SimpleMDE({ 
+        var simplemde = new SimpleMDE({
             element: document.getElementById("body"),
             autosave: {
                 enabled: true,
@@ -71,6 +71,6 @@ function showPage() {
     <?php
 }
 
-include("views/templates/main.php");
+include "views/templates/main.php";
 
-unset($GLOBALS['game']);
+unset($GLOBALS["game"]);

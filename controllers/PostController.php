@@ -217,7 +217,18 @@ class PostController
                         Post::getAllByTypeAndGame(EPOST_TYPE::GALLERY, $gameId),
                     ) + 1,
                 );
-            $uuid = Tript::encryptString($filename);
+
+            $uploadedType = $media["type"];
+
+            if (str_contains($uploadedType, "image")) {
+                $mediaType = "image";
+            } elseif (str_contains($uploadedType, "video")) {
+                $mediaType = "video";
+            } else {
+                $mediaType = "unknown";
+            }
+
+            $uuid = Tript::encryptString($filename) . "." . $mediaType;
 
             $post = new Post(
                 $title,

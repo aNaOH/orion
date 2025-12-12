@@ -7,7 +7,7 @@ function showPage()
     global $game;
     global $guideTypes;
     ?>
-    <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.min.css">
+    <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.orion.css">
     <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
 
     <script src="/assets/js/components/gradientSquare.js"></script>
@@ -40,7 +40,7 @@ function showPage()
                 ->tint ?>;" id="guideContainer">
                 <div class="shadow-2xl">
                     <gradient-square id="guideIcon" size="55" base-color="<?= $guideTypes[0]
-                        ->tint ?>" icon-path="https://cdn.orion.moonnastd.com/guidetype/<?= $guideTypes[0]
+                        ->tint ?>" icon-path="https://cdn.orion.moonnastd.com/community/guide/type/<?= $guideTypes[0]
     ->icon ?>" ></gradient-square>
                 </div>
                 <select name="guideType" id="guideType" class="text-brand form-control block w-full p-4 border border-gray-300 rounded-lg shadow-sm focus:border-brand-500 focus:ring focus:ring-brand-200">
@@ -49,7 +49,7 @@ function showPage()
                         <option <?php if ($guideTypes[0] == $gType) {
                             echo "selected";
                         } ?> value="<?= $gType->id ?>" data-color="<?= $gType->tint ?>" data-icon="https://cdn.orion.moonnastd.com/guidetype/<?= $gType->icon ?>"><?= $gType->type ?></option>
-                    <?php };
+                    <?php }
                     } ?>
                 </select>
             </div>

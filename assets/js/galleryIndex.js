@@ -6,21 +6,17 @@ mediaContainers = $('*[data-galleryslot="media"]');
 async function loadMedia(mediaContainer, uuid) {
   try {
     // Aquí la URL del archivo se construye a partir del UUID
-    const mediaUrl = `https://cdn.orion.moonnastd.com/gallery/` + uuid;
+    const mediaUrl =
+      `https://cdn.orion.moonnastd.com/community/gallery/` + uuid;
 
-    const response = await fetch(mediaUrl, { method: "HEAD" }); // Usamos 'HEAD' para obtener solo los encabezados
-    const contentType = response.headers.get("Content-Type");
-
-    mediaContainer.innerHTML = ""; // Limpiar contenido anterior
-
-    if (contentType.includes("image")) {
+    if (uuid.endsWith("image")) {
       // Si es una imagen
       const img = document.createElement("img");
       img.src = mediaUrl;
       img.alt = "Media content";
       img.classList.add("w-full", "h-auto", "rounded-lg");
       mediaContainer.appendChild(img);
-    } else if (contentType.includes("video")) {
+    } else if (uuid.endsWith("video")) {
       // Si es un video
       const video = document.createElement("video");
       video.src = mediaUrl;

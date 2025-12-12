@@ -38,6 +38,8 @@ class Post
         $this->game_id = $game_id;
         $this->author_id = $author_id;
         $this->id = $id;
+        $this->created_at = new DateTime();
+        $this->last_updated_at = new DateTime();
     }
 
     public function save(): bool
