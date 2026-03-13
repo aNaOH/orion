@@ -289,6 +289,152 @@ $router->mount("/dev", function () use ($router) {
         exit();
     });
 
+    $router->post("/game/build/chunk", function () {
+        header("Content-Type: application/json");
+
+        // ── Validación básica ──────────────────────────────────────────────────
+        $gameID = $_POST["game"] ?? null;
+        $version = $_POST["version"] ?? null;
+        $uploadId = $_POST["upload_id"] ?? null;
+        $chunkIndex = $_POST["chunk_index"] ?? null;
+        $totalChunks = $_POST["total_chunks"] ?? null;
+
+        if (
+            !$gameID ||
+            !$version ||
+            !$uploadId ||
+            !isset($chunkIndex) ||
+            !$totalChunks
+        ) {
+            http_response_code(400);
+            echo json_encode([
+                "status" => 400,
+                "message" => "Parámetros incompletos",
+            ]);
+            exit();
+        }
+
+        $game = Game::getById($gameID);
+        if (is_null($game)) {
+            http_response_code(400);
+            echo json_encode([
+                "status" => 400,
+                "message" => "No existe ningún juego con ese ID. ($gameID)",
+            ]);
+            exit();
+        }
+
+        FormHelper::ValidateRequiredField($version, "version");
+        FormHelper::ValidateRequiredFile($_FILES["file"], "file");
+
+        // Sanitizar uploadId para uso como nombre de archivo (solo alfanumérico y guiones)
+        $safeUploadId = preg_replace("/[^a-zA-Z0-9\-]/", "", $uploadId);
+        if (empty($safeUploadId)) {
+            http_response_code(400);
+            echo json_encode([
+                "status" => 400,
+                "message" => "upload_id inválido",
+            ]);
+            exit();
+        }
+
+        $chunkIndex = intval($chunkIndex);
+        $totalChunks = intval($totalChunks);
+
+        // ── Directorio temporal ────────────────────────────────────────────────
+        $tmpDir = sys_get_temp_dir() . "/orion_uploads/" . $safeUploadId . "/";
+        if (!is_dir($tmpDir)) {
+            mkdir($tmpDir, 0700, true);
+        }
+
+        // ── Guardar el chunk recibido ──────────────────────────────────────────
+        $chunkPath =
+            $tmpDir . "chunk_" . str_pad($chunkIndex, 6, "0", STR_PAD_LEFT);
+        if (!move_uploaded_file($_FILES["file"]["tmp_name"], $chunkPath)) {
+            http_response_code(500);
+            echo json_encode([
+                "status" => 500,
+                "message" => "No se pudo almacenar el chunk $chunkIndex",
+            ]);
+            exit();
+        }
+
+        // ── Respuesta intermedia si no es el último chunk ──────────────────────
+        if ($chunkIndex < $totalChunks - 1) {
+            echo json_encode([
+                "status" => 202,
+                "message" => "Chunk $chunkIndex recibido",
+                "chunk" => $chunkIndex,
+            ]);
+            exit();
+        }
+
+        // ── Último chunk: ensamblar y subir a R2 ──────────────────────────────
+        $assembledPath = $tmpDir . "assembled.zip";
+        $outHandle = fopen($assembledPath, "wb");
+
+        if (!$outHandle) {
+            self::cleanTmpDir($tmpDir);
+            http_response_code(500);
+            echo json_encode([
+                "status" => 500,
+                "message" => "Error al crear archivo ensamblado",
+            ]);
+            exit();
+        }
+
+        for ($i = 0; $i < $totalChunks; $i++) {
+            $part = $tmpDir . "chunk_" . str_pad($i, 6, "0", STR_PAD_LEFT);
+            if (!file_exists($part)) {
+                fclose($outHandle);
+                cleanTmpDir($tmpDir);
+                http_response_code(400);
+                echo json_encode([
+                    "status" => 400,
+                    "message" => "Falta el chunk $i, reintenta la subida",
+                ]);
+                exit();
+            }
+            $inHandle = fopen($part, "rb");
+            while (!feof($inHandle)) {
+                fwrite($outHandle, fread($inHandle, 8 * 1024 * 1024));
+            }
+            fclose($inHandle);
+        }
+        fclose($outHandle);
+
+        // ── Subir a R2 y persistir el build ───────────────────────────────────
+        $build = new Build($game->id, $version);
+        $fakeFile = [
+            "type" => "application/zip",
+            "tmp_name" => $assembledPath,
+        ];
+
+        $uploaded = $build->setFile($fakeFile);
+        $saved = $uploaded ? $build->save() : false;
+
+        // Limpiar temporales siempre
+        cleanTmpDir($tmpDir);
+
+        if (!$uploaded || !$saved) {
+            http_response_code(500);
+            echo json_encode([
+                "status" => 500,
+                "message" =>
+                    "Fallo al subir la compilación a storage, prueba más tarde",
+                "field" => "file",
+            ]);
+            exit();
+        }
+
+        http_response_code(200);
+        echo json_encode([
+            "status" => 200,
+            "message" => "Compilación subida (Game ID: {$game->id} · Version: {$version})",
+        ]);
+        exit();
+    });
+
     $router->post("/game/public", function () {
         $gameID = $_POST["game"];
 

@@ -304,33 +304,34 @@ if (formEdit) {
 }
 
 /* ---------------------------------------------------------
-   FORMULARIO: SUBIR BUILD
+   FORMULARIO: SUBIR BUILD (chunked upload)
 --------------------------------------------------------- */
+const CHUNK_SIZE = 7 * 1024 * 1024; // 7 MB — bajo el límite de 8 MB de PHP
+
 const formBuild = document.getElementById("buildForm");
 const submitBuild = document.getElementById("submitButtonBuild");
 
 if (formBuild) {
-  formBuild.onsubmit = (e) => {
+  formBuild.onsubmit = async (e) => {
     e.preventDefault();
     resetField("version");
 
     const fields = e.target.elements;
     const file = document.getElementById("file").files[0];
+    const version = fields["version"].value;
+
     if (!file)
       return showError({
         field: "file",
         message: "Selecciona un archivo .zip",
       });
-
-    const formData = new FormData();
-    formData.append("game", gameID);
-    formData.append("version", fields["version"].value);
-    formData.append("file", file);
+    if (!version)
+      return showError({ field: "version", message: "Indica una versión" });
 
     submitBuild.dataset.defaultText = "Subir";
-    toggleSpinner(submitBuild, true, "Subiendo...");
+    toggleSpinner(submitBuild, true, "Preparando...");
 
-    // Crear barra de progreso si no existe
+    // ── Barra de progreso ──────────────────────────────────────────────
     let progressContainer = document.getElementById("uploadProgress");
     if (!progressContainer) {
       progressContainer = document.createElement("div");
@@ -338,35 +339,108 @@ if (formBuild) {
       progressContainer.className =
         "w-full bg-gray-700 rounded-lg overflow-hidden mt-3";
       progressContainer.innerHTML = `
-        <div id="uploadProgressBar" class="bg-alt text-[#1B2A49] text-xs font-medium text-center py-1 transition-all duration-200" style="width:0%">0%</div>`;
+        <div id="uploadProgressBar"
+             class="bg-alt text-[#1B2A49] text-xs font-medium text-center py-1 transition-all duration-200"
+             style="width:0%">0%</div>
+        <p id="uploadProgressLabel" class="text-xs text-center text-gray-400 mt-1"></p>`;
       formBuild.appendChild(progressContainer);
     }
 
+    const bar = document.getElementById("uploadProgressBar");
+    const label = document.getElementById("uploadProgressLabel");
+
+    const setProgress = (loaded, total, status = "") => {
+      const pct = Math.round((loaded / total) * 100);
+      bar.style.width = pct + "%";
+      bar.innerText = pct + "%";
+      label.innerText = status;
+    };
+
+    // ── Chunking ───────────────────────────────────────────────────────
+    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
+    const uploadId = crypto.randomUUID(); // ID único para esta subida
+
+    try {
+      for (let index = 0; index < totalChunks; index++) {
+        const start = index * CHUNK_SIZE;
+        const end = Math.min(start + CHUNK_SIZE, file.size);
+        const chunk = file.slice(start, end);
+        const isLast = index === totalChunks - 1;
+
+        const formData = new FormData();
+        formData.append("game", gameID);
+        formData.append("version", version);
+        formData.append("upload_id", uploadId);
+        formData.append("chunk_index", index);
+        formData.append("total_chunks", totalChunks);
+        formData.append("filename", file.name);
+        formData.append("file", chunk, file.name);
+
+        toggleSpinner(
+          submitBuild,
+          true,
+          `Subiendo ${index + 1}/${totalChunks}...`,
+        );
+
+        await uploadChunk(formData, (chunkLoaded, chunkTotal) => {
+          const globalLoaded =
+            start + (chunkLoaded / chunkTotal) * (end - start);
+          setProgress(
+            globalLoaded,
+            file.size,
+            `Parte ${index + 1} de ${totalChunks}`,
+          );
+        });
+
+        // Si es el último chunk el servidor devolverá la respuesta final
+        if (isLast) {
+          setProgress(file.size, file.size, "¡Subida completada!");
+        }
+      }
+
+      // Éxito
+      toggleSpinner(submitBuild, false);
+      setTimeout(() => {
+        progressContainer.remove();
+        location.reload();
+      }, 1500);
+    } catch (err) {
+      showError({
+        field: "file",
+        message: err.message || "Error al subir el archivo",
+      });
+      toggleSpinner(submitBuild, false);
+      setProgress(0, 1, "");
+    }
+  };
+}
+
+/**
+ * Sube un chunk y reporta progreso.
+ * Resuelve con la respuesta JSON del servidor en el último chunk.
+ * Rechaza con un Error si el servidor devuelve un error.
+ */
+function uploadChunk(formData, onProgress) {
+  return new Promise((resolve, reject) => {
     $.ajax({
       xhr: () => {
         const xhr = new window.XMLHttpRequest();
         xhr.upload.addEventListener("progress", (e) => {
-          if (e.lengthComputable) {
-            const percent = Math.round((e.loaded / e.total) * 100);
-            const bar = document.getElementById("uploadProgressBar");
-            if (bar) {
-              bar.style.width = percent + "%";
-              bar.innerText = percent + "%";
-            }
-          }
+          if (e.lengthComputable) onProgress(e.loaded, e.total);
         });
         return xhr;
       },
-      url: "/api/dev/game/build",
+      url: "/api/dev/game/build/chunk",
       type: "POST",
       data: formData,
       processData: false,
       contentType: false,
-      success: () => (location.href = `/dev/panel/games/${gameID}/store`),
+      success: (res) => resolve(res),
       error: (xhr) => {
-        showError(xhr.responseJSON);
-        toggleSpinner(submitBuild, false);
+        const msg =
+          xhr.responseJSON?.message || `Error en chunk (HTTP ${xhr.status})`;
+        reject(new Error(msg));
       },
     });
-  };
+  });
 }

@@ -37,20 +37,40 @@ function showPage()
                                 <img id="game-image" src="" alt="Cover" class="aspect-[2.14/1] w-full rounded-md shadow-lg">
                             </div>
                             <h1 id="game-title" class="text-3xl">Title</h1>
-                            <div id="game-actions" class="flex flex-row gap-2 mb-5 items-center py-2">
-                                <div id="game-download" class="flex flex-row gap-2">
-                                    <span id="download" class="text-lg bg-alt hover:bg-alt-600 rounded-md transition-all duration-[50ms] p-2 cursor-pointer" onclick="downloadGame()">Descargar</span>
-                                    <select name="version" id="version" class="text-lg p-2 bg-branddark text-white rounded-md cursor-pointer hover:bg-branddark-600 transition-all duration-[50ms]">
-                                        <option value="latest">Última versión</option>
-                                    </select>
+                            <div id="game-actions" class="flex flex-col gap-3 mb-5 py-2">
+
+                                <!-- Fila de controles de descarga -->
+                                <div class="flex flex-row gap-2 items-center">
+                                    <div id="game-download" class="flex flex-row gap-2">
+                                        <span id="download" class="text-lg bg-alt hover:bg-alt-600 rounded-md transition-all duration-[50ms] p-2 cursor-pointer select-none" onclick="downloadGame()">Descargar</span>
+                                        <select name="version" id="version" class="text-lg p-2 bg-branddark text-white rounded-md cursor-pointer hover:bg-branddark-600 transition-all duration-[50ms]">
+                                            <option value="latest">Última versión</option>
+                                        </select>
+                                    </div>
+                                    <div id="no-download-avaliable" class="flex flex-row gap-2">
+                                        <span class="text-lg">No hay descargas disponibles :(</span>
+                                    </div>
+                                    <div class="ml-auto flex flex-row gap-4 bg-branddark-600 p-3 rounded-md">
+                                        <a id="game-store-link" href="/store/" class="text-lg link-hover transition-all duration-[50ms]">Tienda</a>
+                                        <a id="game-community-link" href="/communities/" class="text-lg link-hover transition-all duration-[50ms]">Comunidad</a>
+                                    </div>
                                 </div>
-                                <div id="no-download-avaliable" class="flex flex-row gap-2">
-                                    <span class="text-lg">No hay descargas disponibles :(</span>
+
+                                <!-- Barra de progreso de descarga -->
+                                <div id="download-progress-wrapper" class="hidden w-full flex flex-col gap-1">
+                                    <div class="flex flex-row justify-between items-center">
+                                        <span class="text-sm text-gray-400">Descarga en progreso</span>
+                                        <span id="download-progress-label" class="text-sm font-mono text-white">0%</span>
+                                    </div>
+                                    <div class="w-full bg-branddark-600 rounded-full h-2 overflow-hidden">
+                                        <div id="download-progress-bar"
+                                             class="h-2 rounded-full bg-alt transition-all duration-150 ease-out"
+                                             style="width: 0%">
+                                        </div>
+                                    </div>
+                                    <span id="download-progress-error" class="hidden text-sm text-red-400 mt-1"></span>
                                 </div>
-                                <div class="ml-auto flex flex-row gap-4 bg-branddark-600 p-3 rounded-md">
-                                    <a id="game-store-link" href="/store/" class="text-lg link-hover transition-all duration-[50ms]">Tienda</a>
-                                    <a id="game-community-link" href="/communities/" class="text-lg link-hover transition-all duration-[50ms]">Comunidad</a>
-                                </div>
+
                             </div>
                             <div id="game-details" class="flex-1">
                                 <h2 class="text-2xl">Novedades</h2>
@@ -88,6 +108,23 @@ function showPage()
         .link-hover:hover::after {
             transform: scaleX(1);
             transform-origin: bottom left;
+        }
+
+        /* Animación indeterminada cuando no hay Content-Length */
+        #download-progress-bar.indeterminate {
+            background: linear-gradient(90deg, transparent 0%, var(--color-alt, #f59e0b) 50%, transparent 100%);
+            background-size: 200% 100%;
+            animation: indeterminate-slide 1.4s infinite linear;
+        }
+        @keyframes indeterminate-slide {
+            0%   { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Botón deshabilitado durante descarga */
+        #download.disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
         }
     </style>
 

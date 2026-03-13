@@ -49,9 +49,6 @@ function showGamesOnLibrary(games) {
     sidebar.append(gameElement);
   });
 
-  // Show the first game by default, if there are any games. Otherwise, show the no games message located in the HTML as #no-games.
-  // If there are games and is a query parameter, show the game with the id in the query parameter.
-  // If there isn't an element with data-gameid with the query parameter as value, show the first game.
   if (games.length > 0) {
     $("#sidebar").show();
     const gameSelectParam = new URLSearchParams(window.location.search).get(
@@ -74,14 +71,11 @@ function showGamesOnLibrary(games) {
 }
 
 function changeGameShown(id) {
-  // Remove active class from all elements with data-gameid
   $("[data-gameid]").removeClass("active");
 
-  // Get the sidebar button by data-gameid
   const sidebarButton = $('[data-gameid="' + id.toString() + '"');
   sidebarButton.addClass("active");
 
-  // Do an AJAX request to get the game info
   $.ajax({
     url: "/api/library/" + id,
     method: "GET",
@@ -102,32 +96,28 @@ function changeGameShown(id) {
 }
 
 function showGameInfo(game) {
-  //Game basic info
   $("#game-title").text(game.title);
   $("#game-image").attr(
     "src",
     "https://cdn.orion.moonnastd.com/game/thumb/" + game.id,
   );
 
-  //Store and community links
   $("#game-store-link").attr("href", "/store/" + game.id);
   $("#game-community-link").attr("href", "/communities/" + game.id);
 
-  // Get builds and news
   let gameNews = [];
 
   $("#game-download").hide();
   $("#no-download-avaliable").show();
-  // Parse build info
+  hideDownloadProgress();
+
   if (game.builds.length > 0) {
     $("#game-download").show();
     $("#no-download-avaliable").hide();
     $("#version").empty();
     $("#version").append('<option value="latest">Última versión</option>');
     game.builds.forEach((build) => {
-      const buildElement = `
-                <option value="${build.version}">${build.version}</option>
-            `;
+      const buildElement = `<option value="${build.version}">${build.version}</option>`;
       $("#version").append(buildElement);
       gameNews.push(
         new News(
@@ -140,15 +130,9 @@ function showGameInfo(game) {
     });
   }
 
-  //Order gameNews by date
-  gameNews.sort((a, b) => {
-    return new Date(b.date) - new Date(a.date);
-  });
-  //Trim gameNews to 5 elements
+  gameNews.sort((a, b) => new Date(b.date) - new Date(a.date));
   gameNews = gameNews.slice(0, 5);
-  console.log(gameNews);
 
-  //Parse gameNews to HTML
   $("#game-news").empty();
   gameNews.forEach((news) => {
     let description;
@@ -169,11 +153,101 @@ function showGameInfo(game) {
   $("#game-info").show();
 }
 
-function downloadGame() {
+// ── Download with progress bar ─────────────────────────────────────────────
+
+async function downloadGame() {
   const gameId = $("[data-gameid].active").data("gameid");
   const version = $("#version").val();
-  window.location.href = "/library/" + gameId + "/" + version;
+
+  const $btn = $("#download");
+  $btn.addClass("disabled").css("pointer-events", "none").text("Iniciando...");
+  showDownloadProgress(0);
+
+  try {
+    // 1. Obtener token firmado y URL de stream
+    const res = await fetch(`/api/library/${gameId}/download/${version}`);
+    const json = await res.json();
+
+    if (!res.ok) throw new Error(json.error || "Error al iniciar la descarga");
+
+    const { url, filename } = json;
+
+    // 2. Stream con seguimiento de progreso
+    const fileRes = await fetch(url);
+    if (!fileRes.ok) throw new Error("Error al obtener el archivo");
+
+    const contentLength = fileRes.headers.get("Content-Length");
+    const total = contentLength ? parseInt(contentLength) : null;
+    const reader = fileRes.body.getReader();
+    const chunks = [];
+    let received = 0;
+
+    $btn.text("Descargando...");
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+      received += value.length;
+      showDownloadProgress(total ? Math.round((received / total) * 100) : null);
+    }
+
+    showDownloadProgress(100);
+
+    // 3. Trigger descarga en el navegador
+    const blob = new Blob(chunks);
+    const objUrl = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = objUrl;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(objUrl);
+  } catch (err) {
+    console.error("Download error:", err);
+    showDownloadError(err.message);
+  } finally {
+    setTimeout(hideDownloadProgress, 2500);
+    $btn.removeClass("disabled").css("pointer-events", "").text("Descargar");
+  }
 }
+
+function showDownloadProgress(pct) {
+  const $wrapper = $("#download-progress-wrapper");
+  const $bar = $("#download-progress-bar");
+  const $label = $("#download-progress-label");
+
+  $wrapper.show();
+  $("#download-progress-error").hide();
+
+  if (pct === null) {
+    // Sin Content-Length: animación indeterminada
+    $bar.addClass("indeterminate").css("width", "100%");
+    $label.text("Descargando...");
+  } else {
+    $bar.removeClass("indeterminate").css("width", pct + "%");
+    $label.text(pct < 100 ? pct + "%" : "¡Listo!");
+  }
+}
+
+function hideDownloadProgress() {
+  $("#download-progress-wrapper").fadeOut(300, function () {
+    $("#download-progress-bar").css("width", "0%").removeClass("indeterminate");
+    $("#download-progress-label").text("0%");
+    $("#download-progress-error").hide();
+  });
+}
+
+function showDownloadError(msg) {
+  const $wrapper = $("#download-progress-wrapper");
+  $wrapper.show();
+  $("#download-progress-bar").css("width", "0%").removeClass("indeterminate");
+  $("#download-progress-label").text("Error");
+  $("#download-progress-error").text(msg).show();
+}
+
+// ── Helpers ────────────────────────────────────────────────────────────────
 
 class News {
   constructor(title, description, date, newsType = "news") {
