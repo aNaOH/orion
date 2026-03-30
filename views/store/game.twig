@@ -1,0 +1,183 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}{{ game.title }} | Orion Store{% endblock %}
+
+{% block content %}
+    <script src="/assets/js/components/gradientChip.js"></script>
+
+    <div class="relative min-h-[60vh] -mt-8 flex items-center justify-center overflow-hidden">
+        <!-- Background Banner -->
+        <div class="absolute inset-0 z-0">
+            <img src="https://cdn.orion.moonnastd.com/game/banner/{{ game.id }}" class="w-full h-full object-cover blur-sm opacity-30 scale-110" alt="background">
+            <div class="absolute inset-0 bg-gradient-to-t from-brand-500 via-brand-500/80 to-transparent"></div>
+        </div>
+
+        <div class="container mx-auto px-6 relative z-10 py-20">
+            <div class="flex flex-col lg:flex-row gap-12 items-center lg:items-start">
+                <!-- Cover Image -->
+                <div class="w-72 md:w-80 flex-shrink-0 shadow-2xl rounded-2xl overflow-hidden transform lg:-rotate-2 hover:rotate-0 transition-transform duration-500">
+                    <img src="https://cdn.orion.moonnastd.com/game/cover/{{ game.id }}" class="w-full h-full object-cover" alt="{{ game.title }}">
+                </div>
+
+                <!-- Basic Info & Buy Widget -->
+                <div class="flex-grow text-center lg:text-left space-y-6">
+                    <div class="space-y-2">
+                        <h1 class="text-4xl md:text-6xl font-black text-white leading-tight">{{ game.title }}</h1>
+                        <div class="flex flex-wrap justify-center lg:justify-start gap-3">
+                            {% for feature in game.getFeatures() %}
+                                <gradient-chip
+                                    base-color="{{ feature.tint }}"
+                                    size="12"
+                                    icon-path="https://cdn.orion.moonnastd.com/game/feature/{{ feature.icon }}"
+                                    text="{{ feature.name }}"
+                                    border-radius="8"
+                                ></gradient-chip>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <div class="bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 max-w-xl mx-auto lg:mx-0 shadow-2xl">
+                        <div class="flex items-center justify-between mb-8">
+                            <div class="text-left">
+                                <p class="text-gray-400 text-sm uppercase tracking-widest font-bold">Precio actual</p>
+                                <p class="text-4xl font-black text-white">
+                                    {% if game.price == 0 %}
+                                        GRATIS
+                                    {% else %}
+                                        {{ game.price|number_format(2, ',', '.') }}€
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="text-right">
+                                <span class="px-4 py-1.5 bg-alt/20 text-alt rounded-full text-xs font-bold uppercase border border-alt/30">
+                                    Digital Edition
+                                </span>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-4">
+                            {% if hasGame %}
+                                <a href="/library" class="flex-grow bg-white/10 hover:bg-white/20 text-white font-bold py-4 px-8 rounded-2xl text-center transition-all border border-white/10 flex items-center justify-center gap-2">
+                                    <i class="bi bi-collection-play"></i> En tu biblioteca
+                                </a>
+                            {% else %}
+                                <form action="/cart" method="POST" class="flex-grow">
+                                    <input type="hidden" name="game_id" value="{{ game.id }}">
+                                    <button type="submit" class="w-full bg-alt hover:bg-alt-600 text-white font-bold py-4 px-8 rounded-2xl shadow-lg shadow-alt/20 transition-all active:scale-95 flex items-center justify-center gap-2">
+                                        <i class="bi bi-cart-plus"></i> Añadir al carrito
+                                    </button>
+                                </form>
+                                <button class="p-4 bg-white/5 hover:bg-white/10 text-white rounded-2xl border border-white/10 transition-all">
+                                    <i class="bi bi-heart"></i>
+                                </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container mx-auto px-6 py-16">
+        <div class="flex flex-col lg:flex-row gap-12">
+            <!-- Left Side: Content -->
+            <div class="lg:w-2/3 space-y-16">
+                <!-- Description -->
+                <section>
+                    <div class="flex items-center gap-4 mb-8">
+                        <h2 class="text-3xl font-bold text-white">Sobre este juego</h2>
+                        <div class="h-1 flex-grow bg-gradient-to-r from-alt/50 to-transparent rounded-full"></div>
+                    </div>
+                    <div class="prose prose-invert prose-lg max-w-none prose-headings:text-alt prose-a:text-alt prose-strong:text-white prose-img:rounded-3xl">
+                        {{ game.description|markdown|raw }}
+                    </div>
+                </section>
+
+                <!-- Requirements -->
+                <section class="bg-branddark/30 rounded-3xl p-10 border border-white/5">
+                    <div class="flex items-center gap-4 mb-8">
+                        <h2 class="text-2xl font-bold text-white">Requisitos del sistema</h2>
+                        <div class="h-px flex-grow bg-white/10"></div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="space-y-6">
+                            <h3 class="text-alt font-bold uppercase tracking-widest text-sm">Mínimos</h3>
+                            <ul class="space-y-4 text-gray-300">
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">SO</span> {{ requirements.min.os }}</li>
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">Procesador</span> {{ requirements.min.cpu }}</li>
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">Memoria</span> {{ requirements.min.ram }}</li>
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">Gráficos</span> {{ requirements.min.gpu }}</li>
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">Espacio</span> {{ requirements.min.storage }}</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-6">
+                            <h3 class="text-alt font-bold uppercase tracking-widest text-sm">Recomendados</h3>
+                            <ul class="space-y-4 text-gray-300">
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">SO</span> {{ requirements.rec.os }}</li>
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">Procesador</span> {{ requirements.rec.cpu }}</li>
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">Memoria</span> {{ requirements.rec.ram }}</li>
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">Gráficos</span> {{ requirements.rec.gpu }}</li>
+                                <li class="flex flex-col"><span class="text-white text-xs font-bold uppercase opacity-50">Espacio</span> {{ requirements.rec.storage }}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Right Side: Sidebar -->
+            <aside class="lg:w-1/3 space-y-12">
+                <!-- Details Box -->
+                <div class="bg-branddark/50 rounded-3xl p-8 border border-white/5 space-y-6">
+                    <h3 class="text-xl font-bold text-white mb-4">Detalles</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Desarrollador</span>
+                            <span class="text-white font-medium">{{ game.developer }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Editor</span>
+                            <span class="text-white font-medium">{{ game.editor }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Lanzamiento</span>
+                            <span class="text-white font-medium">{{ game.releaseDate|date('d M Y') }}</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span class="text-gray-400">Género</span>
+                            <span class="text-alt font-bold">{{ game.getGenre().name }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Community Links -->
+                <div class="grid grid-cols-2 gap-4">
+                    <a href="/hub/{{ game.id }}" class="flex flex-col items-center justify-center p-6 bg-brand-400 hover:bg-brand-300 rounded-3xl border border-white/5 transition-all text-center group">
+                        <i class="bi bi-people text-3xl text-alt group-hover:scale-110 transition-transform mb-2"></i>
+                        <span class="text-white font-bold text-sm">Comunidad</span>
+                    </a>
+                    <a href="/hub/{{ game.id }}/guides" class="flex flex-col items-center justify-center p-6 bg-brand-400 hover:bg-brand-300 rounded-3xl border border-white/5 transition-all text-center group">
+                        <i class="bi bi-book text-3xl text-alt group-hover:scale-110 transition-transform mb-2"></i>
+                        <span class="text-white font-bold text-sm">Guías</span>
+                    </a>
+                </div>
+
+                <!-- News Sidebar (if any) -->
+                {% if news is defined and news|length > 0 %}
+                    <div class="space-y-6">
+                        <h3 class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="bi bi-newspaper text-alt"></i> Últimas noticias
+                        </h3>
+                        <div class="space-y-4">
+                            {% for post in news %}
+                                <a href="/post/{{ post.id }}" class="block p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/5 transition-all group">
+                                    <h4 class="text-white font-bold line-clamp-2 group-hover:text-alt transition-colors">{{ post.title }}</h4>
+                                    <p class="text-gray-400 text-xs mt-2">{{ post.createdAt|date('d/m/Y') }}</p>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+            </aside>
+        </div>
+    </div>
+{% endblock %}

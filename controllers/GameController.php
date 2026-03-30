@@ -3,6 +3,8 @@
 require_once "models/Game.php";
 require_once "models/Developer.php";
 require_once "models/GameFeature.php";
+require_once "models/GameGenre.php";
+require_once "helpers/Recommender.php";
 
 class GameController
 {
@@ -82,7 +84,22 @@ class GameController
 
     public static function showStore()
     {
-        include "views/store/hub.php";
+        $genres = GameGenre::getAll();
+        $features = GameFeature::getAll();
+        $randomGames = Game::pickRandom(12);
+        
+        $recommended = [];
+        if (isset($_SESSION["user"])) {
+            $user = User::getById($_SESSION["user"]["id"]);
+            $recommended = Recommender::getRecommendations($user);
+        }
+
+        ViewController::render('store/hub', [
+            'genres' => $genres,
+            'features' => $features,
+            'randomGames' => $randomGames,
+            'recommended' => $recommended
+        ]);
     }
 
     public static function showSearch(
@@ -92,19 +109,24 @@ class GameController
         int $page = 1,
     ) {
         $totalPages = 0;
-        $GLOBALS["searchQuery"] = $query;
-        $GLOBALS["games"] = Game::search(
+        $games = Game::search(
             $query,
             $genre,
             $features,
             $page,
             $totalPages,
         );
-        $GLOBALS["totalPages"] = $totalPages;
-        $GLOBALS["filteredGender"] = $genre;
-        $GLOBALS["filteredFeatures"] = $features;
 
-        include "views/store/search.php";
+        ViewController::render('store/search', [
+            'searchQuery' => $query,
+            'games' => $games,
+            'totalPages' => $totalPages,
+            'page' => $page,
+            'filteredGender' => $genre,
+            'filteredFeatures' => $features,
+            'genres' => GameGenre::getAll(),
+            'features' => GameFeature::getAll()
+        ]);
     }
 
     public static function openCommunity($gameId)
@@ -130,12 +152,24 @@ class GameController
             return false;
         }
 
-        $GLOBALS["game"] = $game;
-        $GLOBALS["news"] = Post::getAllByTypeAndGame(
+        $news = Post::getAllByTypeAndGame(
             EPOST_TYPE::GAME_NEWS,
             $game->id,
         );
 
-        include "views/store/index.php";
+        $hasGame = false;
+        if (isset($_SESSION["user"])) {
+            $user = User::getById($_SESSION["user"]["id"]);
+            $hasGame = $user->hasAdquiredGame($game);
+        }
+
+        ViewController::render('store/game', [
+            'game' => $game,
+            'news' => $news,
+            'hasGame' => $hasGame,
+            'requirements' => method_exists($game, 'getRequirements') ? $game->getRequirements() : []
+        ]);
+
+        return true;
     }
 }

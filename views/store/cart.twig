@@ -1,0 +1,187 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Carrito de compra | Orion Store{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto px-6 py-12">
+        <div class="flex items-center gap-4 mb-12">
+            <h1 class="text-4xl font-black text-white italic tracking-tighter">TU CARRITO</h1>
+            <div class="h-1 flex-grow bg-gradient-to-r from-alt to-transparent rounded-full opacity-50"></div>
+        </div>
+
+        {% if cartItems is defined and cartItems|length > 0 %}
+            <div class="flex flex-col lg:flex-row gap-12">
+                <!-- Cart Items -->
+                <div class="flex-grow space-y-6">
+                    {% for item in cartItems %}
+                        <div class="group bg-branddark/40 hover:bg-branddark/60 border border-white/5 hover:border-white/10 rounded-3xl p-6 transition-all flex flex-col sm:flex-row items-center gap-8 shadow-xl">
+                            <!-- Game Image -->
+                            <div class="w-32 h-44 flex-shrink-0 rounded-xl overflow-hidden shadow-2xl group-hover:scale-105 transition-transform">
+                                <img src="https://cdn.orion.moonnastd.com/game/cover/{{ item.id }}" class="w-full h-full object-cover" alt="{{ item.title }}">
+                            </div>
+
+                            <!-- Game Info -->
+                            <div class="flex-grow text-center sm:text-left">
+                                <h3 class="text-2xl font-bold text-white mb-2">{{ item.title }}</h3>
+                                <p class="text-gray-400 text-sm italic">{{ item.getGenre().name }}</p>
+                                <div class="mt-4 flex flex-wrap justify-center sm:justify-start gap-2">
+                                    {% for feature in item.getFeatures() %}
+                                        <span class="px-2 py-0.5 bg-white/5 text-white/50 text-[10px] uppercase font-black rounded border border-white/5 tracking-widest leading-tight">
+                                            {{ feature.name }}
+                                        </span>
+                                    {% endfor %}
+                                </div>
+                            </div>
+
+                            <!-- Price & Actions -->
+                            <div class="text-center sm:text-right space-y-4">
+                                <div class="text-3xl font-black text-white">
+                                    {% if item.price == 0 %}
+                                        GRATIS
+                                    {% else %}
+                                        {{ item.price|number_format(2, ',', '.') }}€
+                                    {% endif %}
+                                </div>
+                                <form action="/cart/remove" method="POST">
+                                    {{ token_input()|raw }}
+                                    <input type="hidden" name="game_id" value="{{ item.id }}">
+                                    <button type="submit" class="text-gray-500 hover:text-red-500 text-sm font-bold transition-colors uppercase tracking-widest">
+                                        Eliminar
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    {% endfor %}
+
+                    <div class="pt-8">
+                        <a href="/store" class="inline-flex items-center gap-2 text-gray-400 hover:text-white font-bold transition-all group">
+                            <i class="bi bi-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                            Seguir comprando
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Summary & Checkout -->
+                <aside class="lg:w-96">
+                    <div class="bg-branddark/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sticky top-24 shadow-2xl shadow-black/50">
+                        <h2 class="text-xl font-bold text-white mb-8 flex items-center gap-3">
+                            <i class="bi bi-receipt text-alt"></i> Resumen del pedido
+                        </h2>
+
+                        <div class="space-y-4 mb-8">
+                            <div class="flex justify-between text-gray-400">
+                                <span>Subtotal</span>
+                                <span>{{ totalPrice|number_format(2, ',', '.') }}€</span>
+                            </div>
+                            <div class="flex justify-between text-gray-400">
+                                <span>Impuestos (IVA incluido)</span>
+                                <span>0,00€</span>
+                            </div>
+                            <div class="h-px bg-white/10 my-4"></div>
+                            <div class="flex justify-between items-end">
+                                <span class="text-white font-bold">Total estimado</span>
+                                <span class="text-4xl font-black text-alt">{{ totalPrice|number_format(2, ',', '.') }}€</span>
+                            </div>
+                        </div>
+
+                        {% if user %}
+                            <div class="space-y-4">
+                                <p class="text-xs text-gray-500 text-center italic">
+                                    Al continuar, aceptas las Condiciones de Venta de Orion Store.
+                                </p>
+                                
+                                <button
+                                    id="checkout-button"
+                                    class="w-full bg-alt hover:bg-alt-600 text-white font-black py-5 px-8 rounded-2xl shadow-xl shadow-alt/20 transition-all active:scale-95 flex items-center justify-center gap-3 group"
+                                >
+                                    <span>{% if totalPrice > 0 %}REALIZAR PAGO{% else %}OBTENER GRATIS{% endif %}</span>
+                                    <i class="bi bi-lightning-fill text-xl group-hover:rotate-12 transition-transform"></i>
+                                </button>
+                                
+                                <div class="flex items-center justify-center gap-4 text-white/20">
+                                    <i class="bi bi-stripe text-2xl"></i>
+                                    <i class="bi bi-shield-check text-2xl"></i>
+                                    <i class="bi bi-lock text-2xl"></i>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="p-6 bg-alt/10 border border-alt/20 rounded-2xl text-center space-y-4">
+                                <p class="text-sm text-gray-300">Inicia sesión para completar tu compra y añadir estos juegos a tu biblioteca.</p>
+                                <a href="/login?redirect=/cart" class="block w-full bg-alt text-white font-bold py-3 px-6 rounded-xl transition-all hover:bg-alt-600 shadow-lg shadow-alt/10">
+                                    Iniciar sesión
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </aside>
+            </div>
+        {% else %}
+            <div class="bg-branddark/30 rounded-3xl p-32 text-center border border-dashed border-white/10 italic">
+                <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <i class="bi bi-cart-x text-5xl text-white/20"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white/50 mb-2 whitespace-nowrap">Tu carrito está vacío</h3>
+                <p class="text-gray-400 mb-10 max-w-sm mx-auto">Parece que aún no has añadido ninguna aventura a tu colección.</p>
+                <a href="/store" class="inline-flex items-center gap-2 px-10 py-4 bg-alt hover:bg-alt-600 text-white font-bold rounded-2xl shadow-xl shadow-alt/20 transition-all active:scale-95">
+                    Explorar la tienda
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    {% if cartItems|length > 0 and user %}
+    <script src="https://js.stripe.com/v3/"></script>
+    <script type="text/javascript">
+        const stripe = Stripe('{{ stripePublicKey }}');
+        const checkoutButton = document.getElementById('checkout-button');
+
+        checkoutButton.addEventListener('click', function() {
+            checkoutButton.disabled = true;
+            checkoutButton.innerHTML = `
+                <svg class="animate-spin h-5 w-5 text-white mr-3" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                PROCESANDO...
+            `;
+
+            fetch('/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    items: [
+                        {% for item in cartItems %}
+                        { id: {{ item.id }} }{% if not loop.last %},{% endif %}
+                        {% endfor %}
+                    ]
+                })
+            })
+            .then(function(response) {
+                return response.json();
+            })
+            .then(function(session) {
+                if (session.url) {
+                    window.location.href = session.url;
+                } else if (session.id) {
+                    return stripe.redirectToCheckout({ sessionId: session.id });
+                } else if (session.success) {
+                    window.location.href = '/checkout/success';
+                } else {
+                    alert(session.error || 'Error al procesar el pago');
+                    location.reload();
+                }
+            })
+            .catch(function(error) {
+                console.error('Error:', error);
+                alert('Ocurrió un error inesperado');
+                location.reload();
+            });
+        });
+    </script>
+    {% endif %}
+{% endblock %}
