@@ -45,6 +45,10 @@ $router->get("/profile", function () {
     include "views/auth/profile.php";
 });
 
+$router->get("/profile/friends", function () {
+    FriendController::friendsList();
+});
+
 $router->get("/library", function () {
     if (!isset($_SESSION["user"])) {
         header("location: /");

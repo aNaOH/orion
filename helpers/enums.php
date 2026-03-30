@@ -51,4 +51,12 @@ enum EACHIEVEMENT_TYPE: int
     case STAT = 1;
 }
 
+enum EUSER_RELATIONSHIP: int
+{
+    case NONE = -1;
+    case PENDING = 0;
+    case FRIEND = 1;
+    case BLOCKED = 2;
+}
+
 ?>

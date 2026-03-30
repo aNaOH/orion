@@ -3,6 +3,7 @@
 require_once "controllers/UserController.php"; //Import user Controller
 require_once "controllers/HomeController.php"; //Import home Controller
 require_once "controllers/StripeController.php"; //Import stripe Controller
+require_once "controllers/FriendController.php"; //Import friend Controller
 require_once "emails/OrderSuccessEmail.php";
 
 //API
@@ -275,6 +276,27 @@ $router->mount("/api", function () use ($router) {
     include "routes/api/library.php";
 
     include "routes/api/game.php";
+
+    $router->mount("/friends", function () use ($router) {
+        $router->post("/request/(\d+)", function ($id) {
+            FriendController::sendRequest($id);
+        });
+        $router->post("/accept/(\d+)", function ($id) {
+            FriendController::acceptRequest($id);
+        });
+        $router->post("/decline/(\d+)", function ($id) {
+            FriendController::declineRequest($id);
+        });
+        $router->post("/remove/(\d+)", function ($id) {
+            FriendController::removeFriend($id);
+        });
+        $router->post("/block/(\d+)", function ($id) {
+            FriendController::blockUser($id);
+        });
+        $router->post("/unblock/(\d+)", function ($id) {
+            FriendController::unblockUser($id);
+        });
+    });
 });
 
 $router->set404("/api(/.*)?", function () {

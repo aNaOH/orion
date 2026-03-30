@@ -203,29 +203,30 @@ $router->mount("/library", function () use ($router) {
 
         if (!DownloadToken::validateToken($token)) {
             http_response_code(403);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Invalid or expired token']);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => "Invalid or expired token"]);
             return;
         }
 
-        $data  = DownloadToken::getTokenData($token);
-        $game  = Game::getById($data['game_id']);
+        $data = DownloadToken::getTokenData($token);
+        $game = Game::getById($data["game_id"]);
 
         if (!$game) {
             http_response_code(404);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Game not found']);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => "Game not found"]);
             return;
         }
 
-        $build = $data['version'] === 'latest'
-            ? $game->getLatestBuild()
-            : $game->getBuildVersion($data['version']);
+        $build =
+            $data["version"] === "latest"
+                ? $game->getLatestBuild()
+                : $game->getBuildVersion($data["version"]);
 
         if (!$build) {
             http_response_code(404);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'Build not found']);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => "Build not found"]);
             return;
         }
 
@@ -233,28 +234,35 @@ $router->mount("/library", function () use ($router) {
 
         if (!$file) {
             http_response_code(404);
-            header('Content-Type: application/json');
-            echo json_encode(['error' => 'File not found in storage']);
+            header("Content-Type: application/json");
+            echo json_encode(["error" => "File not found in storage"]);
             return;
         }
 
-        $filename = str_replace(' ', '_', $game->title) . '-ver-' . $build->version . '.zip';
+        $filename =
+            str_replace(" ", "_", $game->title) .
+            "-ver-" .
+            $build->version .
+            ".zip";
 
         // Cabeceras de descarga
-        header('Content-Type: ' . $file['type']);
+        header("Content-Type: " . $file["type"]);
         header('Content-Disposition: attachment; filename="' . $filename . '"');
-        header('Cache-Control: must-revalidate');
-        header('Pragma: public');
-        header('Expires: 0');
+        header("Cache-Control: must-revalidate");
+        header("Pragma: public");
+        header("Expires: 0");
 
         // Content-Length solo si conocemos el tamaño (permite barra de progreso en el frontend)
-        if (!empty($file['size'])) {
-            header('Content-Length: ' . $file['size']);
+        if (!empty($file["size"])) {
+            header("Content-Length: " . $file["size"]);
         }
 
         // Deshabilitar output buffering para que los chunks lleguen al cliente en tiempo real
-        if (ob_get_level()) ob_end_clean();
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
 
         // Delegar el stream al helper (soporta tanto archivos pequeños como multipart)
         S3Helper::streamToClient($file);
     });
+});
