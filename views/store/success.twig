@@ -1,0 +1,73 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}{{ type == 'game' ? '¡Enhorabuena!' : '¡Bienvenido!' }}{% endblock %}
+
+{% block content %}
+    <section class="min-h-screen flex flex-col md:flex-row items-center justify-center text-center md:text-left p-8">
+        <!-- Content -->
+        <div data-aos="fade-right" class="md:w-1/2">
+            <h1 class="text-6xl font-bold text-gray-200 mb-4">¡Enhorabuena!</h1>
+            <h2 class="text-2xl font-semibold text-gray-400 mb-4">Pago realizado con éxito</h2>
+            
+            <p class="text-lg text-gray-400 mb-8">
+                {% if type == 'game' %}
+                    ¡Disfruta de tu nuevo juego! Ya está disponible en tu biblioteca.
+                {% elseif type == 'developer' %}
+                    Ahora eres parte del programa de desarrolladores de Orion. ¡Empieza a crear!
+                {% else %}
+                    Gracias por tu compra. Tu pedido ha sido procesado correctamente.
+                {% endif %}
+            </p>
+
+            <!-- Buttons -->
+            <div class="flex justify-center md:justify-start space-x-4">
+                {% if type == 'game' %}
+                    <a href="/library#game{{ game.id }}" class="px-6 py-3 bg-alt-500 text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition">
+                        Ver en mi biblioteca
+                    </a>
+                {% elseif type == 'developer' %}
+                    <a href="/dev/panel" class="px-6 py-3 bg-alt-500 text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition">
+                        Ir al panel de desarrollador
+                    </a>
+                {% else %}
+                    <a href="/" class="px-6 py-3 bg-alt-500 text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition">
+                        Volver al inicio
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if type == 'game' and game %}
+            <!-- Decorative Image / Game Info -->
+            <div data-aos="fade-left" class="md:w-1/2 flex flex-col justify-center mt-12 md:mt-0">
+                <h2 class="text-2xl font-semibold text-gray-400 mb-4">Detalles del pedido</h2>
+                <div class="bg-branddark flex flex-row gap-5 p-4 rounded-xl border border-white/5 shadow-2xl">
+                    <img class="aspect-[2.14/1] h-[85px] rounded-md shadow-lg object-cover" 
+                         src="https://cdn.orion.moonnastd.com/game/thumb/{{ game.id }}" 
+                         alt="{{ game.title }} thumbnail">
+                    
+                    <div class="flex flex-col justify-center">
+                        <h1 class="text-2xl font-bold text-gray-200">{{ game.title }}</h1>
+                        <div class="flex items-center gap-3 mt-1">
+                            <p class="text-lg text-gray-200">
+                                <span class="{{ checkout.discountedAmount > 0 ? 'line-through text-gray-500 text-sm' : '' }}">
+                                    {{ checkout.price > 0 ? (checkout.price|number_format(2, ',', '.')) ~ ' €' : 'Gratis' }}
+                                </span>
+                                {% if checkout.discountedAmount > 0 %}
+                                    <span class="text-alt-400 font-bold ml-1">
+                                        {{ (checkout.price - checkout.discountedAmount)|number_format(2, ',', '.') }} €
+                                    </span>
+                                {% endif %}
+                            </p>
+                            {% if checkout.discount > 0 %}
+                                <span class="text-xs font-bold bg-green-600/20 text-green-500 px-2 py-1 rounded-lg border border-green-500/30">
+                                    -{{ checkout.discount }}%
+                                </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </section>
+{% endblock %}

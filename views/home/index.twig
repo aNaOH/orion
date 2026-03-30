@@ -1,11 +1,8 @@
-<?php
+{% extends "layouts/base.twig" %}
 
-$title = "Bienvenido a Orion";
+{% block title %}Bienvenido a Orion{% endblock %}
 
-function showPage()
-{
-    ?>
-
+{% block content %}
     <!-- Hero Section -->
     <section id="hero" class="relative bg-brand-500 text-white min-h-screen flex items-center justify-center overflow-hidden">
         <!-- Fondo con imagen y degradado -->
@@ -19,8 +16,9 @@ function showPage()
         <div data-aos="fade-up" class="relative z-10 container mx-auto text-center">
             <img src="/assets/img/orion-logo.svg" alt="Orion logo" class="mx-auto mb-5 w-1/4 animate-fade-in">
             <p class="text-lg md:text-xl mb-6">Descubre, comparte y gestiona videojuegos en una plataforma creada para jugadores y desarrolladores.</p>
+            
             <!-- Formulario de Búsqueda -->
-            <form id="searchForm" class="flex items-center space-x-2 p-2 rounded-full bg-branddark bg-opacity-75 shadow-md w-[50%] mx-auto">
+            <form id="searchForm" class="flex items-center space-x-2 p-2 rounded-full bg-branddark bg-opacity-75 shadow-md w-full md:w-[50%] mx-auto">
                 <!-- Selector -->
                 <div class="relative">
                     <select name="where" id="where" class="bg-transparent text-gray-200 px-4 py-2 rounded-full border-none outline-none cursor-pointer">
@@ -32,22 +30,37 @@ function showPage()
                 <!-- Campo de Búsqueda -->
                 <div class="relative flex-grow">
                     <input
-                    type="text"
-                    name="search"
-                    id="search"
-                    placeholder="¡Mira si lo tenemos aquí!"
-                    class="w-full bg-transparent text-text-gray-200 placeholder-text-gray-200/75 px-4 py-2 rounded-full border-none focus:outline-none"
+                        type="text"
+                        name="search"
+                        id="search"
+                        placeholder="¡Mira si lo tenemos aquí!"
+                        class="w-full bg-transparent text-gray-200 placeholder-gray-200/75 px-4 py-2 rounded-full border-none focus:outline-none"
                     >
                     <!-- Icono de Búsqueda -->
                     <div class="absolute inset-y-0 right-3 flex items-center pointer-events-none">
-                    <i class="bi bi-search text-white"></i>
+                        <i class="bi bi-search text-white"></i>
                     </div>
                 </div>
             </form>
+
             <!-- Carrusel Infinito de Showcase -->
             <div class="relative w-full overflow-hidden mt-10">
                 <div id="showcaseCarousel" class="flex gap-6 whitespace-nowrap animate-carousel">
-                    <!-- Juegos dinámicos se insertarán aquí -->
+                    {% for game in showcaseGames %}
+                        <div class="w-[213px] flex-shrink-0">
+                            <img src="https://cdn.orion.moonnastd.com/game/thumb/{{ game.id }}"
+                                 alt="{{ game.title }}"
+                                 class="w-full h-full object-cover rounded-lg shadow-md hover:opacity-90 transition duration-300">
+                        </div>
+                    {% endfor %}
+                    {# Duplicate for loop effect #}
+                    {% for game in showcaseGames %}
+                        <div class="w-[213px] flex-shrink-0">
+                            <img src="https://cdn.orion.moonnastd.com/game/thumb/{{ game.id }}"
+                                 alt="{{ game.title }}"
+                                 class="w-full h-full object-cover rounded-lg shadow-md hover:opacity-90 transition duration-300">
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </div>
@@ -60,13 +73,15 @@ function showPage()
     </section>
 
     <!-- Features Section -->
-    <section id="why" class="py-10">
+    <section id="why" class="py-10 bg-brand-500">
         <div class="container mx-auto px-4">
-            <h2 class="text-3xl sm:text-4xl font-bold text-gray-200 mb-12 text-center">Por qué es el punto de encuentro para <span id="userCount">N</span> usuarios</h2>
+            <h2 class="text-3xl sm:text-4xl font-bold text-gray-200 mb-12 text-center">
+                Por qué es el punto de encuentro para <span id="userCount">{{ users }}</span> usuarios
+            </h2>
             <div class="flex flex-col gap-10">
                 <!-- Comunidad Activa -->
                 <div data-aos="fade-left"
-                    class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6">
+                    class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6 border border-white/5">
                     <img src="https://placehold.co/300x200" alt="Comunidad Activa" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-right">
                         <h3 class="text-xl font-semibold text-gray-200 mb-2">Comunidad Activa</h3>
@@ -75,7 +90,7 @@ function showPage()
                 </div>
                 <!-- Herramientas para Creadores -->
                 <div data-aos="fade-right"
-                    class="bg-gradient-to-r from-branddark to-transparent rounded-xl p-6 flex flex-col lg:flex-row items-center gap-6">
+                    class="bg-gradient-to-r from-branddark to-transparent rounded-xl p-6 flex flex-col lg:flex-row items-center gap-6 border border-white/5">
                     <img src="https://placehold.co/300x200" alt="Herramientas para Creadores" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-left">
                         <h3 class="text-xl font-semibold text-gray-200 mb-2">Herramientas para Creadores</h3>
@@ -84,7 +99,7 @@ function showPage()
                 </div>
                 <!-- Logros y Más -->
                 <div data-aos="fade-left"
-                    class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6">
+                    class="bg-gradient-to-l from-branddark to-transparent rounded-xl p-6 flex flex-col-reverse lg:flex-row-reverse items-center gap-6 border border-white/5">
                     <img src="https://placehold.co/300x200" alt="Logros y Más" class="rounded-lg w-full max-w-md lg:max-w-xs">
                     <div class="text-center lg:text-right">
                         <h3 class="text-xl font-semibold text-gray-200 mb-2">Logros y Más</h3>
@@ -96,19 +111,27 @@ function showPage()
     </section>
 
     <!-- Call to Action Section -->
-    <section data-aos="fade-up" class="text-white py-20">
-    <div class="container mx-auto text-center">
-        <h2 class="text-4xl font-bold text-alt mb-4">Únete a Orion Hoy</h2>
-        <p class="text-lg mb-6">Sé parte de una comunidad única donde jugadores y desarrolladores conectan y colaboran.</p>
-        <a href="/register" class="px-8 py-4 bg-alt-500 text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition">
-        Registrarme Ahora
-        </a>
-    </div>
+    <section data-aos="fade-up" class="bg-brand-500 text-white py-20">
+        <div class="container mx-auto text-center">
+            <h2 class="text-4xl font-bold text-alt mb-4">Únete a Orion Hoy</h2>
+            <p class="text-lg mb-6">Sé parte de una comunidad única donde jugadores y desarrolladores conectan y colaboran.</p>
+            <a href="/register" class="px-8 py-4 bg-alt-500 text-white font-semibold rounded-lg shadow-lg hover:bg-alt-400 focus:ring focus:ring-brand-300 transition">
+                Registrarme Ahora
+            </a>
+        </div>
     </section>
 
     <script src="/assets/js/home.js"></script>
-
-    <?php
-}
-
-include "views/templates/nomain.php";
+    <style>
+        @keyframes carousel {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(-1 * var(--carousel-width))); }
+        }
+        .animate-carousel {
+            animation: carousel 30s linear infinite;
+        }
+        #showcaseCarousel {
+            --carousel-width: {{ (213 + 24) * showcaseGames|length }}px;
+        }
+    </style>
+{% endblock %}

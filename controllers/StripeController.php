@@ -124,56 +124,60 @@ class StripeController
     {
         if (isset($_GET["from"])) {
             if ($_GET["from"] == "developer") {
-                $email = new DeveloperWelcomeEmail(
+                new DeveloperWelcomeEmail(
                     "abehsosa2004@gmail.com",
                     User::getById(1),
                     Developer::getById(1),
                 );
-                include "views/stripe/success/dev.php";
+
+                ViewController::render("store/success", [
+                    "type" => "developer"
+                ]);
                 exit();
             }
 
             if (preg_match('/^game(\d+)$/', $_GET["from"], $matches)) {
                 $gameId = $matches[1];
                 $user = User::getById($_SESSION["user"]["id"]);
-
                 $game = Game::getById($gameId);
 
                 if (is_null($game)) {
-                    return false;
+                    header("Location: /404");
+                    exit();
                 }
 
                 if (!$user->hasAdquiredGame($game, false, $checkoutId)) {
-                    return false;
+                    header("Location: /");
+                    exit();
                 }
 
                 \Stripe\Stripe::setApiKey($_ENV["STRIPE_KEY"]);
-
-                $checkout_session = \Stripe\Checkout\Session::retrieve(
-                    $checkoutId,
-                );
+                $checkout_session = \Stripe\Checkout\Session::retrieve($checkoutId);
 
                 $price = $checkout_session->amount_subtotal;
-                $discountedAmount =
-                    $checkout_session->total_details->amount_discount ?? 0;
+                $discountedAmount = $checkout_session->total_details->amount_discount ?? 0;
+                $discount = 0;
 
                 if ($price > 0) {
                     $discount = intval(($discountedAmount / $price) * 100);
                 }
 
-                $GLOBALS["game"] = $game;
-                $GLOBALS["checkoutinfo"] = [
-                    "price" => $price / 100,
-                    "discountedAmount" => $discountedAmount / 100,
-                    "discount" => $discount ?? 0,
-                ];
-
-                include "views/stripe/success/game.php";
+                ViewController::render("store/success", [
+                    "type" => "game",
+                    "game" => $game,
+                    "checkout" => [
+                        "price" => $price / 100,
+                        "discountedAmount" => $discountedAmount / 100,
+                        "discount" => $discount,
+                    ]
+                ]);
                 exit();
             }
         }
 
-        include "views/stripe/success.php";
+        ViewController::render("store/success", [
+            "type" => "generic"
+        ]);
     }
 
     public static function cancel() {}

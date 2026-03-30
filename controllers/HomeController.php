@@ -2,6 +2,17 @@
 
 class HomeController
 {
+    public static function showHome()
+    {
+        $games = Game::pickRandom(10);
+        $users = User::getCount();
+
+        ViewController::render("home/index", [
+            "showcaseGames" => $games,
+            "users" => $users
+        ]);
+    }
+
     //Esta función existe con el proposito de tener una alternativa para añadir juegos mientras la tienda y los desarrolladores no estén implementados
     public static function do()
     {

@@ -22,9 +22,7 @@ session_start([
 // Create Router instance
 $router = new \Bramus\Router\Router();
 
-$router->get("/", function () {
-    include "views/index.php";
-});
+$router->get("/", [HomeController::class, "showHome"]);
 
 include "routes/routes.php";
 
@@ -32,7 +30,7 @@ include "routes/middlewares.php";
 
 $router->set404(function () {
     header("HTTP/1.1 404 Not Found");
-    include "views/404.php";
+    ViewController::render("errors/404");
 });
 
 // Run it!
