@@ -45,7 +45,7 @@
             {% if session_user %}
                 <!-- Comment Form -->
                 <form id="commentForm" method="post" action="/api/communities/comment/{{ post.id }}" class="mb-10">
-                    {{ token_input('USERACTION') }}
+                    {{ csrf_token('USERACTION') }}
                     <div class="bg-branddark-600 flex flex-col md:flex-row p-4 gap-5 rounded-xl border border-alt-500/30">
                         <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-alt-500 flex-shrink-0 hidden md:block">
                             <img src="{{ profile_pic(user) }}" alt="Tu foto de perfil" class="w-full h-full object-cover">

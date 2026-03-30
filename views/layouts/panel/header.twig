@@ -11,18 +11,18 @@
     <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Lexend:wght@100..900&display=swap" rel="stylesheet">
 
     <!-- Tailwind -->
-    <script src="/assets/vendor/tailwind-3.4.15.js"></script>
-    <script src="/assets/js/tailwindConfig.js"></script>
+    <script src="{{ asset('vendor/tailwind-3.4.15.js') }}"></script>
+    <script src="{{ asset('js/tailwindConfig.js') }}"></script>
 
     <!-- JQuery -->
-    <script src="/assets/vendor/jquery/jquery-3.7.1.min.js"></script>
+    <script src="{{ asset('vendor/jquery/jquery-3.7.1.min.js') }}"></script>
 
     <!-- Orion CSS -->
-    <link rel="stylesheet" href="/assets/css/main.css">
-    <link rel="stylesheet" href="/assets/css/orion-panel.css">
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/orion-panel.css') }}">
 
     <!-- Vendor CSS -->
-    <link rel="stylesheet" href="/assets/vendor/bootstrap-icons/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
     
     {% block styles %}{% endblock %}
 </head>

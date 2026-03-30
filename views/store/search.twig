@@ -3,7 +3,7 @@
 {% block title %}Resultados de búsqueda | Orion Store{% endblock %}
 
 {% block content %}
-    <script src="/assets/js/components/gradientChip.js"></script>
+    <script src="{{ asset('js/components/gradientChip.js') }}"></script>
 
     <!-- Hero Section -->
     <section id="hero" class="bg-brand-500 text-white py-20 -mt-8 mb-8 shadow-inner">
@@ -151,5 +151,5 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/assets/js/storeFiltering.js"></script>
+    <script src="{{ asset('js/storeFiltering.js') }}"></script>
 {% endblock %}

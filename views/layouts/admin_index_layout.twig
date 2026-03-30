@@ -1,0 +1,49 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block styles %}
+    <link rel="stylesheet" href="{{ asset('vendor/animate.css/animate.min.css') }}">
+    {% block extra_styles %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+    <div class="flex justify-between items-center mb-6 animate__animated animate__fadeIn">
+      <div class="flex items-center gap-2">
+        {% if back_url %}
+            <a href="{{ back_url }}" class="text-alt font-medium hover:opacity-90 transition">
+                <i class="bi bi-arrow-left me-1"></i>
+            </a>
+        {% endif %}
+        <h1 class="text-xl font-semibold text-alt">{{ title }}</h1>
+      </div>
+      
+      {% if new_url %}
+          <a
+            href="{{ new_url }}"
+            id="add-entry"
+            class="bg-alt text-[#1B2A49] px-4 py-2 rounded-lg font-medium hover:opacity-90 transition"
+          >
+            <i class="bi bi-plus-lg me-1"></i> {{ new_label|default('Nuevo registro') }}
+          </a>
+      {% endif %}
+    </div>
+
+    <div class="overflow-x-auto animate__animated animate__fadeInUp">
+      <table
+        class="min-w-full border-separate border-spacing-0 rounded-lg overflow-hidden bg-[#111827] text-gray-200"
+      >
+        {% block table %}{% endblock %}
+      </table>
+    </div>
+
+    <div id="table-tooltip" class="hidden absolute bg-[#1B2A49] text-[#FFD700] text-sm px-2 py-1 rounded-md shadow-lg pointer-events-none z-50"></div>
+{% endblock %}
+
+{% block scripts %}
+    {{ asset_scripts('admin-table') }}
+    
+    {% if api_delete_url %}
+        {{ admin_delete_setup(api_delete_url, redirect_after_delete|default(current_url), delete_title|default('¿Eliminar registro?')) }}
+    {% endif %}
+
+    {% block extra_scripts %}{% endblock %}
+{% endblock %}

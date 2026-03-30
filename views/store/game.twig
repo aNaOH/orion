@@ -3,12 +3,12 @@
 {% block title %}{{ game.title }} | Orion Store{% endblock %}
 
 {% block content %}
-    <script src="/assets/js/components/gradientChip.js"></script>
+    <script src="{{ asset('js/components/gradientChip.js') }}"></script>
 
     <div class="relative min-h-[60vh] -mt-8 flex items-center justify-center overflow-hidden">
         <!-- Background Banner -->
         <div class="absolute inset-0 z-0">
-            <img src="https://cdn.orion.moonnastd.com/game/banner/{{ game.id }}" class="w-full h-full object-cover blur-sm opacity-30 scale-110" alt="background">
+            <img src="{{ cdn_url('game/banner', game.id) }}" class="w-full h-full object-cover blur-sm opacity-30 scale-110" alt="background">
             <div class="absolute inset-0 bg-gradient-to-t from-brand-500 via-brand-500/80 to-transparent"></div>
         </div>
 
@@ -16,7 +16,7 @@
             <div class="flex flex-col lg:flex-row gap-12 items-center lg:items-start">
                 <!-- Cover Image -->
                 <div class="w-72 md:w-80 flex-shrink-0 shadow-2xl rounded-2xl overflow-hidden transform lg:-rotate-2 hover:rotate-0 transition-transform duration-500">
-                    <img src="https://cdn.orion.moonnastd.com/game/cover/{{ game.id }}" class="w-full h-full object-cover" alt="{{ game.title }}">
+                    <img src="{{ cdn_url('game/cover', game.id) }}" class="w-full h-full object-cover" alt="{{ game.title }}">
                 </div>
 
                 <!-- Basic Info & Buy Widget -->
@@ -28,7 +28,7 @@
                                 <gradient-chip
                                     base-color="{{ feature.tint }}"
                                     size="12"
-                                    icon-path="https://cdn.orion.moonnastd.com/game/feature/{{ feature.icon }}"
+                                    icon-path="{{ cdn_url('game/feature', feature.icon) }}"
                                     text="{{ feature.name }}"
                                     border-radius="8"
                                 ></gradient-chip>

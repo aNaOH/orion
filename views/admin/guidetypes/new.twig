@@ -5,6 +5,7 @@
 
 {% block content %}
 <form id="guideTypeForm" class="space-y-6">
+  {{ csrf_token('COMMON') }}
   <!-- Nombre -->
   <div class="relative">
     <input
@@ -74,7 +75,7 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/assets/js/components/gradientSquare.js"></script>
-    <script src="/assets/js/forms/validator.js"></script>
-    <script src="/assets/js/forms/admin/guidetype.js"></script>
+    <script src="{{ asset('js/components/gradientSquare.js') }}"></script>
+    <script src="{{ asset('js/forms/validator.js') }}"></script>
+    <script src="{{ asset('js/forms/admin/guidetype.js') }}"></script>
 {% endblock %}

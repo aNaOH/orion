@@ -4,13 +4,13 @@
 {% set panel_title = 'Nueva noticia | Orion Dev Panel' %}
 
 {% block styles %}
-    <link rel="stylesheet" href="/assets/vendor/simplemde/simplemde.orion.css">
+    <link rel="stylesheet" href="{{ asset('vendor/simplemde/simplemde.orion.css') }}">
 {% endblock %}
 
 {% block content %}
 <div id="edit-new" class="block">
   <form id="editNewForm" class="space-y-6">
-    {{ token_input('DEVACTION', { 'userID': user.id, 'gameID': game.id })|raw }}
+    {{ csrf_token('DEVACTION', { 'userID': user.id, 'gameID': game.id }) }}
     <input type="hidden" name="game" value="{{ game.id }}">
 
     <div class="flex items-center gap-2">
@@ -85,9 +85,9 @@
 {% endblock %}
 
 {% block scripts %}
-    <script src="/assets/vendor/simplemde/simplemde.min.js"></script>
-    <script src="/assets/js/forms/validator.js"></script>
-    <script src="/assets/js/orion-panel/markdown-editor.js"></script>
+    <script src="{{ asset('vendor/simplemde/simplemde.min.js') }}"></script>
+    <script src="{{ asset('js/forms/validator.js') }}"></script>
+    <script src="{{ asset('js/orion-panel/markdown-editor.js') }}"></script>
     <script>
         const simplemde = setupMarkdownEditor({
             selector: "#body",
