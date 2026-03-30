@@ -75,7 +75,9 @@ class GameController
 
     public static function showCommunities()
     {
-        include "views/community/hub.php";
+        ViewController::render('community/hub', [
+            'games' => Game::all()
+        ]);
     }
 
     public static function showStore()
@@ -113,9 +115,11 @@ class GameController
             return false;
         }
 
-        $GLOBALS["game"] = $game;
+        ViewController::render('community/dashboard', [
+            'game' => $game
+        ]);
 
-        include "views/community/index.php";
+        return true;
     }
 
     public static function openGame($gameId)

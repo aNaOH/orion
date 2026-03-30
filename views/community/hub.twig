@@ -1,0 +1,33 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Comunidades en Orion{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="hero" class="bg-brand-500 text-white py-20 -mt-8 mb-10">
+    <div class="container mx-auto text-center px-4">
+        <h2 class="text-4xl md:text-5xl font-bold">Comunidades</h2>
+        <p class="text-lg md:text-xl mt-4">Explora y únete a comunidades apasionadas por los videojuegos.</p>
+    </div>
+</section>
+
+<!-- Communities Grid -->
+<section id="communities" class="py-5">
+    {% if games is empty %}
+        <div class="container mx-auto text-center py-16">
+            <h1 class="text-3xl md:text-4xl font-bold text-gray-200">No hay comunidades disponibles...</h1>
+            <p class="text-lg text-gray-400 mt-4">¡Vuelve pronto para descubrir nuevos títulos increíbles!</p>
+        </div>
+    {% else %}
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 justify-items-center">
+                {% for game in games %}
+                    {% if game.is_public %}
+                        {% include 'partials/game_card.twig' with {'game': game} %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+</section>
+{% endblock %}

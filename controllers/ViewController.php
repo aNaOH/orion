@@ -64,6 +64,12 @@ class ViewController
                 }
                 return '<input type="hidden" name="tript_token" id="tript_token" value="' . $token . '">';
             }, ['is_safe' => ['html']]));
+
+            // markdown filter using TailwindParsedown
+            self::$twig->addFilter(new \Twig\TwigFilter('markdown', function (string $content): string {
+                $parsedown = new TailwindParsedown();
+                return $parsedown->text($content);
+            }, ['is_safe' => ['html']]));
         }
 
         return self::$twig;

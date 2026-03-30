@@ -1,0 +1,39 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Comunidad de {{ game.title }} - Orion{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section id="hero" class="bg-brand-500 text-white py-20 -mt-8 mb-10">
+    <div class="container mx-auto text-center px-4">
+        <h2 class="text-4xl md:text-5xl font-bold">{{ game.title }}</h2>
+        <p class="text-lg md:text-xl mt-4">Explora y contribuye al contenido creado por la comunidad de este juego.</p>
+        
+        <div class="flex flex-wrap justify-center gap-4 mt-8">
+            <a href="/communities/{{ game.id }}/posts" class="px-6 py-3 bg-alt hover:bg-alt-400 text-white font-semibold rounded-lg shadow-md transition-all">
+                Posts
+            </a>
+            <a href="/communities/{{ game.id }}/gallery" class="px-6 py-3 bg-alt hover:bg-alt-400 text-white font-semibold rounded-lg shadow-md transition-all">
+                Galería
+            </a>
+            <a href="/communities/{{ game.id }}/guides" class="px-6 py-3 bg-alt hover:bg-alt-400 text-white font-semibold rounded-lg shadow-md transition-all">
+                Guías
+            </a>
+            <a href="/communities/{{ game.id }}/news" class="px-6 py-3 bg-alt hover:bg-alt-400 text-white font-semibold rounded-lg shadow-md transition-all">
+                Noticias
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Dashboard Content Mockup (Optional - Can show recent posts) -->
+<div class="container mx-auto px-4 py-10">
+    <div class="bg-branddark rounded-xl p-8 border border-gray-700 shadow-lg text-center">
+        <h3 class="text-2xl font-bold text-gray-200 mb-4">¿Qué hay de nuevo?</h3>
+        <p class="text-gray-400 mb-6">Selecciona una categoría arriba para ver el contenido más reciente de la comunidad.</p>
+        <div class="flex justify-center">
+            <img src="{{ cdn_url('game/cover', game.id) }}" alt="{{ game.title }}" class="w-48 h-auto rounded-lg shadow-2xl opacity-50">
+        </div>
+    </div>
+</div>
+{% endblock %}
