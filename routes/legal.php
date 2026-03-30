@@ -5,17 +5,17 @@ $router->get('/legal', function(){
 });
 
 $router->get('/legal/terms', function(){
-    include('views/legal/terms.php');
+    ViewController::render('legal/terms', ['title' => 'Términos y condiciones de Orion']);
 });
 
 $router->get('/legal/privacy', function(){
-    include('views/legal/privacy.php');
+    ViewController::render('legal/privacy', ['title' => 'Política de privacidad de Orion']);
 });
 
 $router->get('/legal/cookies', function(){
-    include('views/legal/cookies.php');
+    ViewController::render('legal/cookies', ['title' => 'Política de cookies de Orion']);
 });
 
 $router->get('/legal/refund', function(){
-    include('views/legal/refund.php');
+    ViewController::render('legal/refund', ['title' => 'Política de reembolso y devoluciones de Orion']);
 });
