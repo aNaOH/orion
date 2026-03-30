@@ -3,15 +3,17 @@
 $router->get("/register", function () {
     if (isset($_SESSION["user"])) {
         header("location: /");
+        exit();
     }
-    include "views/auth/register.php";
+    ViewController::renderFromController('auth/register', ['title' => 'Unirse a Orion']);
 });
 
 $router->get("/login", function () {
     if (isset($_SESSION["user"])) {
         header("location: /");
+        exit();
     }
-    include "views/auth/login.php";
+    ViewController::renderFromController('auth/login', ['title' => 'Entrar a Orion']);
 });
 
 $router->get("/logout", function () {

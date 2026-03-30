@@ -60,4 +60,16 @@ class ViewController
         $twig = self::getTwig();
         echo $twig->render($view . '.twig', array_merge(ViewHelpers::getBaseData(), $data));
     }
+
+    /**
+     * Render a Twig view and exit. Useful for controllers/routes.
+     *
+     * @param string $view View name without extension
+     * @param array  $data Data to pass to the template
+     */
+    public static function renderFromController(string $view, array $data = []): void
+    {
+        self::render($view, $data);
+        exit();
+    }
 }
