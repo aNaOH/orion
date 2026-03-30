@@ -32,19 +32,21 @@ $router->get("/logout", function () {
 
 $router->get("/profile", function () {
     if (!isset($_SESSION["user"])) {
-        header("location: /");
+        header("location: /login");
+        exit();
     }
 
     $user = User::getById($_SESSION["user"]["id"]);
 
     if (!isset($user)) {
         header("location: /logout?to=login");
+        exit();
     }
 
-    $GLOBALS["user"] = $user;
-    $GLOBALS["is_self"] = true;
-
-    include "views/auth/profile.php";
+    ViewController::renderFromController('auth/profile', [
+        'target_user' => $user,
+        'is_self' => true
+    ]);
 });
 
 $router->get("/profile/friends", function () {
@@ -53,16 +55,20 @@ $router->get("/profile/friends", function () {
 
 $router->get("/library", function () {
     if (!isset($_SESSION["user"])) {
-        header("location: /");
+        header("location: /login");
+        exit();
     }
 
     $user = User::getById($_SESSION["user"]["id"]);
 
     if (!isset($user)) {
         header("location: /logout?to=login");
+        exit();
     }
 
-    include "views/auth/library.php";
+    ViewController::renderFromController('auth/library', [
+        'title' => 'Tu biblioteca en Orion'
+    ]);
 });
 
 $router->get("/library/{gameid}/{version}", function ($gameid, $version) use (
@@ -119,35 +125,57 @@ $router->get("/library/{gameid}/{version}", function ($gameid, $version) use (
 
 $router->get("/profile/edit", function () {
     if (!isset($_SESSION["user"])) {
-        header("location: /");
+        header("location: /login");
+        exit();
     }
 
     $user = User::getById($_SESSION["user"]["id"]);
 
     if (!isset($user)) {
         header("location: /logout");
+        exit();
     }
 
-    $GLOBALS["user"] = $user;
-
-    include "views/auth/profileEdit.php";
+    ViewController::renderFromController('auth/profileEdit', [
+        'title' => 'Editar perfil de Orion'
+    ]);
 });
 
 $router->get("/profile/(\d+)", function ($userId) use ($router) {
     if (isset($_SESSION["user"])) {
         if ($_SESSION["user"]["id"] == $userId) {
             header("location: /profile");
+            exit();
         }
     }
 
-    $user = User::getById($userId);
+    $targetUser = User::getById($userId);
 
-    if (!isset($user)) {
+    if (!isset($targetUser)) {
         $router->trigger404();
         exit();
     }
 
-    $GLOBALS["user"] = $user;
+    $data = [
+        'target_user' => $targetUser,
+        'is_self' => false,
+        'has_blocked' => false,
+        'is_blocked_by' => false,
+        'is_friends' => false,
+        'has_friend_request' => false,
+        'friend_request_pending' => false
+    ];
 
-    include "views/auth/profile.php";
+    if (isset($_SESSION["user"])) {
+        $currentUser = User::getById($_SESSION["user"]["id"]);
+        if ($currentUser) {
+            $data['has_blocked'] = $currentUser->hasBlocked($targetUser);
+            $data['is_blocked_by'] = $currentUser->isBlockedBy($targetUser);
+            $data['is_friends'] = $currentUser->isFriendWith($targetUser);
+            $data['has_friend_request'] = $currentUser->hasPendingFriendRequestFrom($targetUser);
+            $data['friend_request_pending'] = $currentUser->isFriendRequestPending($targetUser);
+        }
+    }
+
+    ViewController::renderFromController('auth/profile', $data);
 });

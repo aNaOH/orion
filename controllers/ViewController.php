@@ -44,6 +44,26 @@ class ViewController
             self::$twig->addFunction(new \Twig\TwigFunction('user_handle', function ($user): string {
                 return $user->getHandle();
             }));
+
+            // token_input('type', params) → generates <input type="hidden" ...>
+            self::$twig->addFunction(new \Twig\TwigFunction('token_input', function (string $type, array $params = []): string {
+                $token = "";
+                switch (strtoupper($type)) {
+                    case 'COMMON':
+                        $token = Token::createToken();
+                        break;
+                    case 'AUTHFORM':
+                        $token = AuthFormToken::createToken();
+                        break;
+                    case 'USERACTION':
+                        $token = UserActionToken::createToken();
+                        break;
+                    case 'DEVACTION':
+                        $token = DevActionToken::createToken($params["userID"], $params["gameID"]);
+                        break;
+                }
+                return '<input type="hidden" name="tript_token" id="tript_token" value="' . $token . '">';
+            }, ['is_safe' => ['html']]));
         }
 
         return self::$twig;

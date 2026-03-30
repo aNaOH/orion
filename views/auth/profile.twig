@@ -1,0 +1,118 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}{{ target_user.username }} - Perfil en Orion{% endblock %}
+
+{% block content %}
+<section id="profile" class="py-20">
+  <div class="container mx-auto max-w-4xl bg-branddark shadow-lg rounded-lg p-8">
+    <!-- Header -->
+    <div class="flex items-center space-x-6">
+      <!-- Profile Picture -->
+      <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-alt-500">
+        <img src="{{ profile_pic(target_user) }}" alt="Foto de perfil de {{ target_user.username }}" class="w-full h-full object-cover">
+      </div>
+      <!-- User Info -->
+      <div>
+        <h1 class="text-4xl font-bold text-gray-200">
+          {{ target_user.username }} 
+          <span class="text-2xl font-normal text-gray-400">{{ user_handle(target_user) }}</span>
+        </h1>
+        <p class="text-gray-400 text-lg">{{ target_user.motd ?: "Sin mensaje personalizado." }}</p>
+        
+        {% if is_self %}
+          <div class="mt-6">
+            <a href="/profile/edit" class="px-4 py-2 bg-alt text-gray-200 font-semibold rounded-lg shadow-lg hover:bg-alt-400 transition">
+              Editar perfil
+            </a>
+          </div>
+        {% else %}
+          <div class="mt-6 flex flex-wrap gap-2 items-center">
+            {% if has_blocked %}
+                <button onclick="friendAction('unblock', {{ target_user.id }})" class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-500 transition">
+                  Desbloquear
+                </button>
+            {% elseif is_blocked_by %}
+                <p class="text-red-500 font-semibold italic text-sm"><i class="bi bi-slash-circle mr-1"></i> Este usuario te ha bloqueado.</p>
+            {% else %}
+                {% if is_friends %}
+                    <button onclick="friendAction('remove', {{ target_user.id }})" class="px-4 py-2 bg-red-600/20 text-red-500 border border-red-600/30 font-semibold rounded-lg shadow-lg hover:bg-red-600 hover:text-white transition">
+                      Eliminar amigo
+                    </button>
+                {% elseif friend_request_pending %}
+                    <button onclick="friendAction('cancel', {{ target_user.id }})" class="px-4 py-2 bg-gray-700 text-gray-300 font-semibold rounded-lg shadow-lg hover:bg-gray-600 transition italic">
+                      Solicitud enviada...
+                    </button>
+                {% elseif has_friend_request %}
+                    <div class="flex gap-2">
+                        <button onclick="friendAction('accept', {{ target_user.id }})" class="px-4 py-2 bg-green-600 text-white font-semibold rounded-lg shadow-lg hover:bg-green-500 transition">
+                          Aceptar solicitud
+                        </button>
+                        <button onclick="friendAction('decline', {{ target_user.id }})" class="px-4 py-2 bg-red-600/20 text-red-500 border border-red-600/30 font-semibold rounded-lg shadow-lg hover:bg-red-600 hover:text-white transition">
+                          Rechazar
+                        </button>
+                    </div>
+                {% else %}
+                    <button onclick="friendAction('request', {{ target_user.id }})" class="px-4 py-2 bg-alt text-gray-200 font-semibold rounded-lg shadow-lg hover:bg-alt-400 transition">
+                      <i class="bi bi-person-plus-fill mr-1"></i> Enviar solicitud
+                    </button>
+                {% endif %}
+                
+                <button onclick="friendAction('block', {{ target_user.id }})" class="ml-2 py-1 px-2 text-gray-600 hover:text-red-500 transition text-xs flex items-center">
+                  <i class="bi bi-slash-circle mr-1"></i> Bloquear
+                </button>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Profile Details -->
+    <div class="mt-10">
+      <h2 class="text-2xl font-semibold text-gray-200 mb-4">Acerca del Usuario</h2>
+      <div class="bg-brand-900 rounded-lg p-6 shadow-sm">
+          <h3 class="text-lg font-semibold text-gray-200">Fecha de Registro</h3>
+          <p class="text-gray-400">Miembro desde {{ target_user.created_at }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function friendAction(action, userId) {
+        let url = '';
+        let confirmMsg = '';
+        
+        switch(action) {
+            case 'request': url = `/api/friends/request/${userId}`; break;
+            case 'accept': url = `/api/friends/accept/${userId}`; break;
+            case 'decline': url = `/api/friends/decline/${userId}`; break;
+            case 'cancel': url = `/api/friends/decline/${userId}`; break;
+            case 'remove': 
+                confirmMsg = '¿Estás seguro de que quieres eliminar a este amigo?';
+                url = `/api/friends/remove/${userId}`; 
+                break;
+            case 'block': 
+                confirmMsg = '¿Bloquear a este usuario? Se eliminará vuestra relación actual.';
+                url = `/api/friends/block/${userId}`; 
+                break;
+            case 'unblock': url = `/api/friends/unblock/${userId}`; break;
+        }
+
+        if (confirmMsg && !confirm(confirmMsg)) return;
+
+        $.ajax({
+            url: url,
+            method: 'POST',
+            success: function(response) {
+                location.reload();
+            },
+            error: function(error) {
+                console.error('Error in friend action:', error);
+                alert('Acción fallida');
+            }
+        });
+    }
+</script>
+{% endblock %}

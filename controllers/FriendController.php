@@ -141,10 +141,9 @@ class FriendController
         $friends = $user->getFriends();
         $pending = $user->getPendingFriendRequests();
         
-        $GLOBALS["friends"] = $friends;
-        $GLOBALS["pending_requests"] = $pending;
-        
-        include "views/auth/friends.php";
-        exit();
+        ViewController::renderFromController('auth/friends', [
+            'friends' => $friends,
+            'pending_requests' => $pending
+        ]);
     }
 }
