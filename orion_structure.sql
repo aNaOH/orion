@@ -350,3 +350,21 @@ CREATE TABLE IF NOT EXISTS `badge_unlocked` (
     FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+-- ===========================
+-- AMISTADES
+-- ===========================
+
+CREATE TABLE IF NOT EXISTS `users_relationship` (
+    `user_id1` INT NOT NULL,
+    `user_id2` INT NOT NULL,
+    `status` INT NOT NULL,
+    KEY `fk_users_relationship_user_id1` (`user_id1`),
+    KEY `fk_users_relationship_user_id2` (`user_id2`),
+    CONSTRAINT `fk_users_relationship_user_id1`
+      FOREIGN KEY (`user_id1`) REFERENCES `users` (`id`)
+      ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTRAINT `fk_users_relationship_user_id2`
+      FOREIGN KEY (`user_id2`) REFERENCES `users` (`id`)
+      ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;

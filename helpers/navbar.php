@@ -17,6 +17,9 @@ class NavbarHelper {
                         <a href="/profile" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200" role="menuitem">Perfil</a>
                     </li>
                     <li>
+                        <a href="/profile/friends" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200" role="menuitem">Amigos</a>
+                    </li>
+                    <li>
                         <a href="/library" class="block px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors duration-200" role="menuitem">Biblioteca</a>
                     </li>
                     <?php if($user->role == EUSER_TYPE::ADMIN)
