@@ -38,6 +38,10 @@ $router->mount("/store", function () use ($router) {
             exit();
         }
 
-        include_once "views/store/cart.php";
+        ViewController::render('store/cart', [
+            'cartItems' => OrderHelper::getInstances(),
+            'totalPrice' => OrderHelper::getTotal(),
+            'stripePublicKey' => $_ENV["STRIPE_PUBLIC_KEY"]
+        ]);
     });
 });

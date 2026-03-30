@@ -4,7 +4,7 @@ require_once "models/Developer.php";
 
 $router->mount("/dev", function () use ($router) {
     $router->get("/", function () {
-        include "views/dev/index.php";
+        ViewController::render('dev/index', ['stripe_public_key' => $_ENV["STRIPE_PUBLIC_KEY"]]);
     });
 
     $router->get("/(\d+)", function ($devId) use ($router) {
@@ -14,9 +14,7 @@ $router->mount("/dev", function () use ($router) {
             exit();
         }
 
-        $GLOBALS["developer"] = $developer;
-
-        include "views/dev/profile.php";
+        ViewController::render('dev/profile', ['developer' => $developer]);
     });
 
     include "routes/dev/panel/panel.php";

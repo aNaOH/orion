@@ -1,0 +1,32 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Perfil de {{ developer.name }} en Orion{% endblock %}
+
+{% block content %}
+    <!-- Profile Page -->
+    <section id="profile" class="py-20">
+      <div class="container mx-auto max-w-4xl bg-branddark shadow-lg rounded-lg p-8">
+        <!-- Header -->
+        <div class="flex items-center space-x-6">
+          <!-- Profile Picture -->
+          <div class="w-32 h-32 rounded-full overflow-hidden border-4 border-alt-500">
+            <img src="{{ cdn_url('profile/' ~ (developer.profile_pic|default('default'))) }}" alt="Foto de perfil de {{ developer.name }}" class="w-full h-full object-cover">
+          </div>
+          <!-- User Info -->
+          <div>
+            <h1 class="text-4xl font-bold text-gray-200">{{ developer.name }}</h1>
+            <p class="text-gray-400 text-lg">{{ developer.motd|default('Sin mensaje personalizado.') }}</p>
+          </div>
+        </div>
+
+        <!-- Profile Details -->
+        <div class="mt-10">
+          <h2 class="text-2xl font-semibold text-gray-200 mb-4">Juegos de esta desarrolladora</h2>
+          <div class="bg-brand-900 rounded-lg p-6 shadow-sm">
+            {# Aquí iría la lista de juegos si se implementara #}
+            <p class="text-gray-400">Próximamente...</p>
+          </div>
+        </div>
+      </div>
+    </section>
+{% endblock %}

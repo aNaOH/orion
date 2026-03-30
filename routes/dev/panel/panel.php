@@ -2,18 +2,19 @@
 
 $router->mount("/panel", function () use ($router) {
     $router->get("/", function () {
-        include "views/dev/panel/home.php";
+        $user = User::getById($_SESSION["user"]["id"]);
+        $developer = $user->getDeveloperInfo();
+        ViewController::render('dev/panel/home', ['developer' => $developer]);
     });
 
     $router->get("/games", function () {
         $user = User::getById($_SESSION["user"]["id"]);
         $games = $user->getDeveloperInfo()->getGames();
-        $GLOBALS["games"] = $games;
-        include "views/dev/panel/games/index.php";
+        ViewController::render('dev/panel/games/index', ['games' => $games]);
     });
 
     $router->get("/games/new", function () {
-        include "views/dev/panel/games/new.php";
+        ViewController::render('dev/panel/games/new');
     });
 
     $router->get("/games/{gameId}/store", function ($gameId) use ($router) {
@@ -29,10 +30,11 @@ $router->mount("/panel", function () use ($router) {
         $features = GameFeature::getAll();
         $genres = GameGenre::getAll();
 
-        $GLOBALS["game"] = $game;
-        $GLOBALS["features"] = $features;
-        $GLOBALS["genres"] = $genres;
-        include "views/dev/panel/games/store/store.php";
+        ViewController::render('dev/panel/games/store/store', [
+            'game' => $game,
+            'features' => $features,
+            'genres' => $genres
+        ]);
     });
 
     $router->get("/games/{gameId}/community", function ($gameId) use ($router) {
@@ -44,8 +46,7 @@ $router->mount("/panel", function () use ($router) {
         ) {
             $router->trigger404();
         }
-        $GLOBALS["game"] = $game;
-        include "views/dev/panel/games/community/community.php";
+        ViewController::render('dev/panel/games/community/community', ['game' => $game]);
     });
 
     $router->get("/games/{gameId}/community/achievements", function (
@@ -59,10 +60,12 @@ $router->mount("/panel", function () use ($router) {
         ) {
             $router->trigger404();
         }
-        $GLOBALS["game"] = $game;
-        $GLOBALS["achievements"] = $game->getAchievements();
+        $achievements = $game->getAchievements();
 
-        include "views/dev/panel/games/community/achievements/index.php";
+        ViewController::render('dev/panel/games/community/achievements/index', [
+            'game' => $game,
+            'achievements' => $achievements
+        ]);
     });
 
     $router->get("/games/{gameId}/community/achievements/new", function (
@@ -76,10 +79,12 @@ $router->mount("/panel", function () use ($router) {
         ) {
             $router->trigger404();
         }
-        $GLOBALS["game"] = $game;
-        $GLOBALS["stats"] = $game->getStats();
+        $stats = $game->getStats();
 
-        include "views/dev/panel/games/community/achievements/create.php";
+        ViewController::render('dev/panel/games/community/achievements/create', [
+            'game' => $game,
+            'stats' => $stats
+        ]);
     });
 
     $router->get(
@@ -98,11 +103,13 @@ $router->mount("/panel", function () use ($router) {
                 $router->trigger404();
             }
 
-            $GLOBALS["game"] = $game;
-            $GLOBALS["stats"] = $game->getStats();
-            $GLOBALS["achievement"] = $achievement;
+            $stats = $game->getStats();
 
-            include "views/dev/panel/games/community/achievements/edit.php";
+            ViewController::render('dev/panel/games/community/achievements/edit', [
+                'game' => $game,
+                'stats' => $stats,
+                'achievement' => $achievement
+            ]);
         },
     );
 
@@ -111,5 +118,5 @@ $router->mount("/panel", function () use ($router) {
 
 $router->set404("/dev/panel(/.*)?", function () {
     header("HTTP/1.1 404 Not Found");
-    include "views/dev/panel/404.php";
+    ViewController::render('errors/404');
 });

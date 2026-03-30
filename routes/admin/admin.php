@@ -2,49 +2,44 @@
 
 $router->mount("/admin", function () use ($router) {
     $router->get("/", function () {
-        include "views/admin/home.php";
+        ViewController::render('admin/home');
     });
 
     $router->get("/guidetypes", function () {
         $guidetypes = GuideType::getAll();
-        $GLOBALS["guidetypes"] = $guidetypes;
-        include "views/admin/guidetypes/index.php";
+        ViewController::render('admin/guidetypes/index', ['guidetypes' => $guidetypes]);
     });
 
     $router->get("/guidetypes/new", function () {
-        include "views/admin/guidetypes/new.php";
+        ViewController::render('admin/guidetypes/new');
     });
 
     $router->get("/guidetypes/{id}/edit/", function ($id) {
         $guidetype = GuideType::getById($id);
-        $GLOBALS["guidetype"] = $guidetype;
-        include "views/admin/guidetypes/edit.php";
+        ViewController::render('admin/guidetypes/edit', ['guidetype' => $guidetype]);
     });
 
     $router->get("/newscategories", function () {
         $newscategories = GameNewsCategory::getAll();
-        $GLOBALS["newscategories"] = $newscategories;
-        include "views/admin/newscategories/index.php";
+        ViewController::render('admin/newscategories/index', ['newscategories' => $newscategories]);
     });
 
     $router->get("/gamegenres", function () {
         $gamegenres = GameGenre::getAll();
-        $GLOBALS["gamegenres"] = $gamegenres;
-        include "views/admin/gamegenres/index.php";
+        ViewController::render('admin/gamegenres/index', ['gamegenres' => $gamegenres]);
     });
 
     $router->get("/gamefeatures", function () {
         $gamefeatures = GameFeature::getAll();
-        $GLOBALS["gamefeatures"] = $gamefeatures;
-        include "views/admin/gamefeatures/index.php";
+        ViewController::render('admin/gamefeatures/index', ['gamefeatures' => $gamefeatures]);
     });
 
     $router->get("/tools", function () {
-        include "views/admin/tools.php";
+        ViewController::render('admin/tools');
     });
 });
 
 $router->set404("/admin(/.*)?", function () {
     header("HTTP/1.1 404 Not Found");
-    include "views/admin/404.php";
+    ViewController::render('errors/404');
 });

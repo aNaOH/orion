@@ -1,62 +1,45 @@
 <?php
 
-$router->get("/games/{gameId}/community/news", function ($gameId) use (
-    $router,
-) {
+$router->get("/games/{gameId}/community/news", function ($gameId) use ($router) {
     $user = User::getById($_SESSION["user"]["id"]);
     $game = Game::getById($gameId);
     if (is_null($game) || $game->getDeveloper() != $user->getDeveloperInfo()) {
         $router->trigger404();
     }
-    $GLOBALS["game"] = $game;
-    $GLOBALS["news"] = Post::getAllByTypeAndGame(
-        EPOST_TYPE::GAME_NEWS,
-        $game->id,
-    );
-
-    include "views/dev/panel/games/community/news/index.php";
+    
+    ViewController::render('dev/panel/games/community/news/index', [
+        'game' => $game,
+        'news' => Post::getAllByTypeAndGame(EPOST_TYPE::GAME_NEWS, $game->id)
+    ]);
 });
 
-$router->get("/games/{gameId}/community/news/new", function ($gameId) use (
-    $router,
-) {
+$router->get("/games/{gameId}/community/news/new", function ($gameId) use ($router) {
     $user = User::getById($_SESSION["user"]["id"]);
     $game = Game::getById($gameId);
     if (is_null($game) || $game->getDeveloper() != $user->getDeveloperInfo()) {
         $router->trigger404();
     }
-    $GLOBALS["game"] = $game;
-    $GLOBALS["newscategories"] = GameNewsCategory::getAll();
-
-    include "views/dev/panel/games/community/news/create.php";
+    
+    ViewController::render('dev/panel/games/community/news/create', [
+        'game' => $game,
+        'newscategories' => GameNewsCategory::getAll()
+    ]);
 });
 
-$router->get("/games/{gameId}/community/news/{newsId}/edit", function (
-    $gameId,
-    $newsId,
-) use ($router) {
+$router->get("/games/{gameId}/community/news/{newsId}/edit", function ($gameId, $newsId) use ($router) {
     $user = User::getById($_SESSION["user"]["id"]);
     $game = Game::getById($gameId);
     if (is_null($game) || $game->getDeveloper() != $user->getDeveloperInfo()) {
         $router->trigger404();
     }
     $new = Post::getById($newsId);
-    if (is_null($new)) {
-        $router->trigger404();
-    }
-    if ($new->game_id != $gameId) {
-        $router->trigger404();
-    }
-    if ($new->author_id != $user->id) {
-        $router->trigger404();
-    }
-    if ($new->type != EPOST_TYPE::GAME_NEWS) {
+    if (is_null($new) || $new->game_id != $gameId || $new->author_id != $user->id || $new->type != EPOST_TYPE::GAME_NEWS) {
         $router->trigger404();
     }
 
-    $GLOBALS["game"] = $game;
-    $GLOBALS["new"] = $new;
-    $GLOBALS["newscategories"] = GameNewsCategory::getAll();
-
-    include "views/dev/panel/games/community/news/edit.php";
+    ViewController::render('dev/panel/games/community/news/edit', [
+        'game' => $game,
+        'new' => $new,
+        'newscategories' => GameNewsCategory::getAll()
+    ]);
 });
