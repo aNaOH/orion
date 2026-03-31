@@ -1,0 +1,28 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = true %}
+{% set panel_title = 'Noticias para ' ~ game.title ~ ' | Orion Dev Panel' %}
+{% set title = 'Noticias para ' ~ game.title %}
+{% set back_url = '/dev/panel/games/' ~ game.id ~ '/community/' %}
+{% set new_url = '/dev/panel/games/' ~ game.id ~ '/community/news/new' %}
+{% set new_label = 'Nueva noticia' %}
+{% set api_delete_url = '/api/dev/news/{id}/delete/' %}
+{% set redirect_after_delete = '/dev/panel/games/' ~ game.id ~ '/community/news/' %}
+{% set delete_title = '¿Eliminar noticia?' %}
+
+{% block table %}
+    {{ csrf_token('DEVACTION', { userID: user.id, gameID: game.id }) }}
+    {{ ui.table_header(['Título', 'Categoría', 'Fecha de publicación', 'Fecha de última edición', 'Acciones']) }}
+    <tbody>
+      {% for new in news %}
+      <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+        <td class="px-4 py-3">{{ new.title }}</td>
+        <td class="px-4 py-3">{{ new.getPostInfo().getCategory().name }}</td>
+        <td class="px-4 py-3">{{ new.created_at.format("Y-m-d H:i:s") }}</td>
+        <td class="px-4 py-3">{{ new.last_updated_at.format("Y-m-d H:i:s") }}</td>
+        {{ ui.action_buttons('/dev/panel/games/' ~ game.id ~ '/community/news/' ~ new.id ~ '/edit/', new.id, new.title) }}
+      </tr>
+      {% endfor %}
+    </tbody>
+{% endblock %}

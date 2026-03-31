@@ -1,0 +1,9 @@
+{#
+  Base layout WITHOUT the <main> container wrapper.
+  Used for pages with full-width hero sections (home, dev index, etc.)
+#}
+{% extends 'layouts/base.twig' %}
+
+{% block body %}
+  {% block content %}{% endblock %}
+{% endblock %}

@@ -1,0 +1,14 @@
+{# Game Card Component (formerly OrionComponents::GameCommunity) #}
+<div class="relative rounded-lg overflow-hidden group w-64 h-96 shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-105 mx-auto lg:mx-0">
+    <a class="aspect-[2/3]" href="/communities/{{ game.id }}">
+      <img
+        src="{{ cdn_url('game/cover', game.id) }}"
+        class="w-full h-full object-cover"
+        alt="{{ game.title }} cover"
+      />
+      <!-- Overlay and Title -->
+      <div class="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+        <h3 class="text-white text-base font-semibold">{{ game.title }}</h3>
+      </div>
+    </a>
+</div>

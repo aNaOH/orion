@@ -1,0 +1,108 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Crear {{ post_type_label }} - {{ game.title }} - Orion{% endblock %}
+
+{% block styles %}
+    {% if post_type != 'gallery' %}
+        <link rel="stylesheet" href="{{ asset('vendor/simplemde/simplemde.orion.css') }}">
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+<section id="hero" class="bg-brand-500 text-white py-20 -mt-8 mb-10">
+    <div class="container mx-auto text-center">
+        <h2 class="text-2xl md:text-4xl font-bold">Crear {{ post_type_label }} para {{ game.title }}</h2>
+    </div>
+</section>
+
+<section id="create-form" class="py-10">
+    <div class="container mx-auto max-w-2xl px-4">
+        <form id="communityCreateForm" novalidate class="bg-branddark shadow-lg rounded-lg p-8 space-y-6 border border-gray-700/50">
+            {{ csrf_token('USERACTION') }}
+
+            <!-- Título -->
+            <div>
+                <label for="title" class="block text-sm font-medium text-gray-200 mb-2">Título</label>
+                <input class="form-control block w-full p-4 border border-gray-700 bg-branddark-600 text-gray-200 rounded-lg shadow-sm focus:border-alt focus:ring focus:ring-alt/20 transition-all outline-none"
+                    id="title" name="title" type="text" placeholder="Título del contenido" required />
+                <div id="titleError" class="text-sm text-red-500 mt-2 hidden"></div>
+            </div>
+
+            {% if post_type == 'guides' %}
+                <!-- Tipo de Guía -->
+                <div>
+                    <label for="guideType" class="block text-sm font-medium text-gray-200 mb-2">Seleccionar tipo de guía</label>
+                    <div class="p-3 bg-branddark-600 rounded-lg shadow-inner flex flex-row gap-x-4 items-center transition-colors duration-300 border border-gray-700" 
+                         style="background-color: {{ guideTypes[0].tint|default('#1a1a1a') }};" id="guideContainer">
+                        <div class="shadow-2xl flex-shrink-0">
+                            <gradient-square id="guideIcon" size="55" 
+                                base-color="{{ guideTypes[0].tint|default('#1a1a1a') }}" 
+                                icon-path="{{ cdn_url('community/guide/type', guideTypes[0].icon|default('default.svg')) }}">
+                            </gradient-square>
+                        </div>
+                        <select name="guideType" id="guideType" class="bg-transparent text-gray-100 font-semibold block w-full p-2 border-none focus:ring-0 outline-none cursor-pointer">
+                            {% for gType in guideTypes %}
+                                <option value="{{ gType.id }}" 
+                                        data-color="{{ gType.tint }}" 
+                                        data-icon="{{ cdn_url('guidetype', gType.icon) }}"
+                                        class="bg-branddark text-gray-200">
+                                    {{ gType.type }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Cuerpo / Media -->
+            <div>
+                <label for="body" class="block text-sm font-medium text-gray-200 mb-2">
+                    {% if post_type == 'gallery' %}Imagen o Video{% else %}Contenido{% endif %}
+                </label>
+                <div class="{% if post_type != 'gallery' %}p-2 bg-white rounded-lg{% endif %}">
+                    {% if post_type == 'gallery' %}
+                        <file-upload id="body" accept-video="true" max-video-size="15MB"></file-upload>
+                    {% else %}
+                        <textarea name="body" id="body" class="w-full p-4 border border-gray-300 rounded-lg text-brand" rows="8" required></textarea>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Botón Publicar -->
+            <div class="flex justify-end pt-4">
+                <button class="px-8 py-3 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105" id="submitButton" type="submit">
+                    Publicar {{ post_type_label }}
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ asset('js/helpers/colorHelper.js') }}"></script>
+    <script src="{{ asset('js/forms/community-create.js') }}"></script>
+    
+    {% if post_type == 'gallery' %}
+        <script src="{{ asset('js/components/fileUpload.js') }}"></script>
+        <script src="{{ asset('js/forms/gallery-create.js') }}"></script>
+    {% else %}
+        <script src="{{ asset('vendor/simplemde/simplemde.min.js') }}"></script>
+        <script>
+            var simplemde = new SimpleMDE({
+                element: document.getElementById("body"),
+                autosave: {
+                    enabled: true,
+                    uniqueId: "Orion_New{{ post_type|capitalize }}_Body",
+                    delay: 1000,
+                },
+                placeholder: "Escribe aquí el contenido...",
+                hideIcons: ["side-by-side", "fullscreen"],
+            });
+        </script>
+        {% if post_type == 'guides' %}
+            <script src="{{ asset('js/components/gradientSquare.js') }}"></script>
+            <script src="{{ asset('js/forms/guide-create.js') }}"></script>
+        {% endif %}
+    {% endif %}
+{% endblock %}

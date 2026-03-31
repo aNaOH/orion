@@ -1,0 +1,27 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = false %}
+{% set panel_title = 'Categorías de noticias | Orion Admin Panel' %}
+{% set title = 'Categorías de noticias' %}
+{% set new_url = '/admin/newscategories/new' %}
+{% set new_label = 'Nueva categoría' %}
+{% set api_delete_url = '/api/admin/newscategories/{id}/delete/' %}
+{% set redirect_after_delete = '/admin/newscategories/' %}
+{% set delete_title = '¿Eliminar categoría de noticia?' %}
+
+{% block table %}
+    {{ ui.table_header(['Nombre', 'Color distintivo (en hexadecimal)', 'Previsualización', 'Acciones']) }}
+    <tbody>
+      {% for newscategory in newscategories %}
+      <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+        <td class="px-4 py-3">{{ newscategory.name }}</td>
+        <td class="px-4 py-3">{{ newscategory.tint }}</td>
+        <td class="px-4 py-3">
+            {{ ui.gradient_chip(newscategory.tint, newscategory.name) }}
+        </td>
+        {{ ui.action_buttons('/admin/newscategories/' ~ newscategory.id ~ '/edit/', newscategory.id, newscategory.name) }}
+      </tr>
+      {% endfor %}
+    </tbody>
+{% endblock %}

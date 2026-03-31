@@ -1,0 +1,40 @@
+{# Gallery Card Component (formerly OrionComponents::GalleryEntry) #}
+<div class="max-w-xl mx-auto bg-branddark rounded-lg shadow-md overflow-hidden mb-6 border border-gray-700/50">
+    <div class="p-4">
+        <h1 class="text-2xl font-bold text-gray-200">
+            {{ post.title }}
+        </h1>
+        <span class="text-gray-400 text-sm">
+            Publicado por 
+            <a href="/profile/{{ post.getAuthor().id }}" class="font-semibold hover:text-alt transition link-underline">
+                {{ post.getAuthor().username }}
+            </a>
+        </span>
+    </div>
+
+    {# Media slot for JS injection (standard in current Gallery implementation) #}
+    <div data-galleryslot="media" data-uuid="{{ post.getPostInfo().media }}"></div>
+
+    <!-- Vote and Share Component -->
+    <div class="flex items-center justify-between p-4 border-t border-gray-700/50 bg-branddark-600/30">
+        <div class="flex flex-row gap-2">
+            <div data-galleryslot="shareBtn" data-postid="{{ post.id }}" class="w-8 h-8 rounded-full bg-alt hover:bg-alt-600 cursor-pointer flex items-center justify-center transition-colors">
+                <i class="bi bi-share-fill text-brand"></i>
+            </div>
+            <div data-galleryslot="shareLink" class="hidden w-64 p-2 bg-alt border border-alt-600 rounded">
+                <input data-galleryslot="linkInput" type="text" class="w-full p-2 border rounded bg-brand text-gray-200" readonly>
+            </div>
+        </div>
+        <div class="flex items-center justify-between gap-2">
+            <span data-galleryslot="value" class="text-gray-200 font-bold">{{ post.getPostInfo().getValue() }}</span>
+            {% if session_user %}
+                {# The 'value' here is the user's vote value (1, -1, 0) #}
+                <gallery-vote value="{{ user_vote_value|default(0) }}"></gallery-vote>
+            {% else %}
+                <a href="/login" class="w-8 h-8 rounded-full bg-alt hover:bg-alt-600 cursor-pointer flex items-center justify-center transition-colors">
+                    <i class="bi bi-star text-brand"></i>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

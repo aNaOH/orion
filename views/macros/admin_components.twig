@@ -1,0 +1,48 @@
+{# macros/admin_components.twig #}
+
+{% macro table_header(columns) %}
+    <thead>
+      <tr class="bg-[#1B2A49] text-left">
+        {% for col in columns %}
+            <th class="px-4 py-3 font-semibold {{ loop.last ? 'text-right' : '' }}">{{ col }}</th>
+        {% endfor %}
+      </tr>
+    </thead>
+{% endmacro %}
+
+{% macro action_buttons(edit_url, delete_id, delete_name, delete_tooltip = 'Eliminar', edit_tooltip = 'Editar') %}
+    <td class="px-4 py-3 text-right">
+      <a
+        href="{{ edit_url }}"
+        class="text-alt hover:opacity-80 mx-1 tooltip-btn"
+        data-tooltip="{{ edit_tooltip }}"
+      >
+        <i class="bi bi-pencil-square"></i>
+      </a>
+      <button
+        type="button"
+        class="text-red-500 hover:opacity-80 mx-1 tooltip-btn bg-transparent border-none delete-btn"
+        data-tooltip="{{ delete_tooltip }}"
+        data-id="{{ delete_id }}"
+        data-name="{{ delete_name }}"
+      >
+        <i class="bi bi-trash-fill"></i>
+      </button>
+    </td>
+{% endmacro %}
+
+{% macro gradient_chip(color, text, size = 25) %}
+    <gradient-chip
+        base-color="{{ color }}"
+        size="{{ size }}"
+        text="{{ text }}"
+    ></gradient-chip>
+{% endmacro %}
+
+{% macro gradient_square(icon, color, size = 50) %}
+    <gradient-square
+        icon-path="{{ cdn_url('guidetype', icon) }}"
+        base-color="{{ color }}"
+        size="{{ size }}"
+    ></gradient-square>
+{% endmacro %}

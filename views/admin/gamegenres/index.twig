@@ -1,0 +1,27 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = false %}
+{% set panel_title = 'Géneros | Orion Admin Panel' %}
+{% set title = 'Géneros' %}
+{% set new_url = '/admin/gamegenres/new' %}
+{% set new_label = 'Nuevo género' %}
+{% set api_delete_url = '/api/admin/gamegenres/{id}/delete/' %}
+{% set redirect_after_delete = '/admin/gamegenres/' %}
+{% set delete_title = '¿Eliminar género?' %}
+
+{% block table %}
+    {{ ui.table_header(['Nombre', 'Color distintivo (en hexadecimal)', 'Previsualización', 'Acciones']) }}
+    <tbody>
+      {% for genre in gamegenres %}
+      <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+        <td class="px-4 py-3">{{ genre.name }}</td>
+        <td class="px-4 py-3">{{ genre.tint }}</td>
+        <td class="px-4 py-3">
+            {{ ui.gradient_chip(genre.tint, genre.name) }}
+        </td>
+        {{ ui.action_buttons('/admin/gamegenres/' ~ genre.id ~ '/edit/', genre.id, genre.name) }}
+      </tr>
+      {% endfor %}
+    </tbody>
+{% endblock %}

@@ -1,0 +1,237 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Carrito de compra | Orion Store{% endblock %}
+
+{% block content %}
+    <div class="container mx-auto px-6 py-12">
+        <div class="flex items-center gap-4 mb-12">
+            <h1 class="text-4xl font-black text-white italic tracking-tighter uppercase">Carrito de compra</h1>
+            <div class="h-1 flex-grow bg-gradient-to-r from-alt to-transparent rounded-full opacity-50"></div>
+        </div>
+
+        {% if cartItems|length > 0 %}
+            {{ csrf_token('COMMON') }}
+            <div class="flex flex-col lg:flex-row gap-12">
+                <!-- Cart Items -->
+                <div class="flex-grow space-y-6">
+                    <div class="bg-branddark/40 border border-white/5 rounded-3xl p-6 shadow-xl space-y-4">
+                        {% for item in cartItems %}
+                            <div class="flex flex-col sm:flex-row items-center justify-between gap-6 py-4 {% if not loop.last %}border-b border-white/5{% endif %}">
+                                <!-- Game Info -->
+                                <div class="flex items-center gap-6 flex-grow">
+                                    <img src="https://cdn.orion.moonnastd.com/game/thumb/{{ item.id }}" 
+                                         alt="{{ item.title }}" 
+                                         class="aspect-[2.14/1] w-32 rounded-lg shadow-lg object-cover">
+                                    <div class="flex-grow">
+                                        <h3 class="text-xl font-bold text-white">{{ item.title }}</h3>
+                                    </div>
+                                </div>
+
+                                <!-- Price -->
+                                <div class="flex text-right gap-4 items-center">
+                                    {% set discounted = item.base_price - (item.base_price * item.discount) %}
+                                    {% if item.discount > 0 %}
+                                        <div class="flex flex-col text-right leading-tight">
+                                            <span class="text-green-400 text-xs font-black">-{{ (item.discount * 100)|round }}%</span>
+                                            <span class="text-gray-400 line-through text-xs">{{ item.base_price|number_format(2, ',', '.') }}€</span>
+                                            <span class="text-gray-200 font-bold text-lg">{{ discounted|number_format(2, ',', '.') }}€</span>
+                                        </div>
+                                    {% else %}
+                                        <span class="text-gray-200 font-bold text-lg">{{ item.base_price|number_format(2, ',', '.') }}€</span>
+                                    {% endif %}
+
+                                    <!-- Delete Button -->
+                                    <button data-id="{{ item.id }}"
+                                            class="text-gray-500 hover:text-red-500 transition-all delete-item p-2">
+                                        <i class="bi bi-trash-fill text-xl"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <div class="pt-4">
+                        <a href="/store" class="inline-flex items-center gap-2 text-gray-500 hover:text-white font-bold transition-all group uppercase tracking-widest text-sm">
+                            <i class="bi bi-arrow-left group-hover:-translate-x-1 transition-transform"></i>
+                            Seguir comprando
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Summary & Checkout -->
+                <aside class="lg:w-[450px]">
+                    <div class="bg-branddark/80 backdrop-blur-xl border border-white/10 rounded-3xl p-8 sticky top-24 shadow-2xl shadow-black/50 space-y-6">
+                        <h2 class="text-xl font-bold text-white mb-4 flex items-center gap-3 italic">
+                            <i class="bi bi-receipt text-alt"></i> RESUMEN DEL PEDIDO
+                        </h2>
+
+                        <div class="flex justify-between items-end">
+                            <span class="text-gray-400 font-bold uppercase tracking-widest text-xs">Total:</span>
+                            <span class="text-4xl font-black text-alt">
+                                {% if totalPrice > 0 %}
+                                    {{ totalPrice|number_format(2, ',', '.') }}€
+                                {% else %}
+                                    GRATIS
+                                {% endif %}
+                            </span>
+                        </div>
+
+                        {% if totalPrice > 0 %}
+                            <div class="space-y-4">
+                                <div id="billing-element" class="bg-branddark/50 border border-white/5 rounded-2xl p-4 overflow-hidden shadow-inner"></div>
+                                <div id="payment-element" class="bg-branddark/50 border border-white/5 rounded-2xl p-0 overflow-hidden shadow-inner"></div>
+                            </div>
+                        {% endif %}
+
+                        <div class="pt-4">
+                            <button id="pay-btn"
+                                    class="w-full bg-alt hover:bg-alt-600 text-white font-black py-4 px-8 rounded-2xl shadow-xl shadow-alt/20 transition-all active:scale-95 flex items-center justify-center gap-3 group relative overflow-hidden">
+                                <span id="pay-btn-text" class="uppercase tracking-widest">
+                                    {% if totalPrice > 0 %}Pagar ahora{% else %}Obtener gratis{% endif %}
+                                </span>
+                                <span id="pay-btn-spinner" class="hidden animate-spin">
+                                    <i class="bi bi-arrow-repeat text-2xl"></i>
+                                </span>
+                            </button>
+                            
+                            <p class="text-[10px] text-gray-500 text-center mt-4 italic leading-relaxed">
+                                Al confirmar, aceptas las condiciones de venta de la plataforma Orion Store.
+                            </p>
+                        </div>
+
+                        <div class="flex items-center justify-center gap-6 text-white/10 pt-2">
+                            <i class="bi bi-stripe text-3xl"></i>
+                            <i class="bi bi-shield-lock-fill text-2xl"></i>
+                            <i class="bi bi-credit-card-2-front-fill text-2xl"></i>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        {% else %}
+            <div class="bg-branddark/30 rounded-3xl p-32 text-center border border-dashed border-white/10">
+                <div class="w-24 h-24 bg-white/5 rounded-full flex items-center justify-center mx-auto mb-8">
+                    <i class="bi bi-cart-x text-5xl text-white/20"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-white mb-2 italic">TU CARRITO ESTÁ VACÍO</h3>
+                <p class="text-gray-400 mb-10 max-w-sm mx-auto">Parece que aún no has añadido ninguna oferta a tu biblioteca.</p>
+                <a href="/store" class="inline-flex items-center gap-2 px-10 py-4 bg-alt hover:bg-alt-600 text-white font-black rounded-2xl shadow-xl shadow-alt/20 transition-all active:scale-95 uppercase tracking-widest">
+                    Ir a la tienda
+                </a>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="https://js.stripe.com/clover/stripe.js"></script>
+    <script>
+      const total = {{ totalPrice|json_encode }};
+      const userEmail = "{{ user.email }}";
+
+      // Delete item logic
+      document.querySelectorAll('.delete-item').forEach(btn => {
+          btn.addEventListener('click', () => {
+              const token = document.getElementById('tript_token').value;
+              fetch(`/api/cart/${btn.dataset.id}?tript_token=${token}`, { method: "DELETE" })
+                  .then(() => location.reload());
+          });
+      });
+
+      function setPayBtnState(disabled, showSpinner = false) {
+          const btn = document.getElementById('pay-btn');
+          document.getElementById('pay-btn-text').classList.toggle('hidden', showSpinner);
+          document.getElementById('pay-btn-spinner').classList.toggle('hidden', !showSpinner);
+          btn.disabled = disabled;
+      }
+
+      {% if cartItems|length > 0 and totalPrice > 0 %}
+          const stripe = Stripe('{{ stripePublicKey }}');
+          let checkout;
+          let actions;
+          let loadActionsResult;
+
+          document.addEventListener('DOMContentLoaded', async () => {
+              const payBtn = document.getElementById('pay-btn');
+
+              const token = document.getElementById('tript_token').value;
+              const promise = fetch('/api/order', {
+                  method: 'POST',
+                  headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                  body: `tript_token=${token}`
+              })
+              .then((r) => r.json())
+              .then((r) => r.client_secret);
+
+              const appearance = {
+                  theme: 'stripe',
+                  variables: {
+                      colorPrimary: '#FDCB18',
+                      colorBackground: '#1B2A49',
+                      colorText: '#ffffff',
+                      colorDanger: '#df1b41',
+                      fontFamily: 'Inter, system-ui, sans-serif',
+                      spacingUnit: '4px',
+                      borderRadius: '16px',
+                  },
+              };
+
+              checkout = stripe.initCheckout({
+                  clientSecret: promise,
+                  elementsOptions: { appearance },
+              });
+
+              loadActionsResult = await checkout.loadActions();
+              if (loadActionsResult.type === 'success') {
+                  actions = loadActionsResult.actions;
+                  
+                  const paymentElement = checkout.createPaymentElement();
+                  paymentElement.mount("#payment-element");
+                  
+                  const billingAddressElement = checkout.createBillingAddressElement();
+                  billingAddressElement.mount("#billing-element");
+              }
+          });
+      {% endif %}
+
+      document.getElementById('pay-btn').addEventListener('click', async () => {
+          setPayBtnState(true, true);
+
+          if (total === 0) {
+              await fetch('/api/order/save', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                      order: { items: [{% for item in cartItems %}{ game_id: {{ item.id }} }{% if not loop.last %},{% endif %}{% endfor %}] },
+                      email: userEmail 
+                  })
+              });
+              return location.href = "/library";
+          }
+
+          if (loadActionsResult && loadActionsResult.type === 'success') {
+              const { error } = await loadActionsResult.actions.confirm({
+                  redirect: 'if_required'
+              });
+              
+              if (error) {
+                  alert(error.message);
+                  return setPayBtnState(false, false);
+              }
+
+              // Save order after confirmation
+              await fetch('/api/order/save', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({ 
+                      order: { items: [{% for item in cartItems %}{ game_id: {{ item.id }} }{% if not loop.last %},{% endif %}{% endfor %}] },
+                      email: userEmail,
+                      stripe_id: loadActionsResult.actions.getSession().id,
+                      tript_token: document.getElementById('tript_token').value
+                  })
+              });
+
+              location.href = "/library";
+          }
+      });
+    </script>
+{% endblock %}

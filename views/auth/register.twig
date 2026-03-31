@@ -1,0 +1,87 @@
+{% extends 'layouts/base_nomain.twig' %}
+
+{% block title %}Unirse a Orion{% endblock %}
+
+{% block content %}
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <img class="mx-auto h-10 w-auto" src="{{ asset('img/orion-logo.svg') }}" alt="Orion logo">
+    <h2 class="mt-10 text-center text-2xl/9 font-bold tracking-tight text-white-900">Crea tu cuenta</h2>
+  </div>
+
+  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <form class="space-y-6" novalidate id="registerForm">
+      {{ csrf_token('AUTHFORM') }}
+      <div>
+        <label for="email" class="block text-sm/6 font-medium text-white-900">Correo electrónico</label>
+        <div class="mt-2">
+          <input id="emailAddress" name="emailAddress" type="email" autocomplete="email" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+        </div>
+        <span id="emailAddressError" class="mt-2 block text-sm/6 font-medium text-red-500"></span>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between">
+          <label for="password" class="block text-sm/6 font-medium text-white-900">Contraseña</label>
+        </div>
+        <div class="mt-2">
+          <input id="password" name="password" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+        </div>
+        <span id="passwordError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between">
+          <label for="confirmPassword" class="block text-sm/6 font-medium text-white-900">Confirmar contraseña</label>
+        </div>
+        <div class="mt-2">
+          <input id="confirmPassword" name="confirmPassword" type="password" autocomplete="current-password" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+        </div>
+        <span id="confirmPasswordError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+      </div>
+
+      <div>
+        <div class="flex items-center justify-between">
+          <label for="birthdate" class="block text-sm/6 font-medium text-white-900">Fecha de nacimiento</label>
+          <span class="relative group text-alt-600 hover:text-alt-500">
+                ¿Por qué necesitamos esto?
+                <span class="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 hidden group-hover:block bg-black text-white text-xs rounded px-4 py-2 max-w-none w-auto">
+                    En la mayoría de países, se requiere de 14 años para poder registrarse en una red social.
+                </span>
+            </span>
+        </div>
+        <div class="mt-2">
+          <input id="birthdate" name="birthdate" type="date" required class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm/6">
+        </div>
+        <span id="birthdateError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+      </div>
+
+      <div>
+        <div class="flex items-start">
+            <div class="flex items-center h-5">
+                <input id="terms" aria-describedby="terms" type="checkbox" class="w-4 h-4 border border-gray-300 rounded bg-gray-50 focus:ring-3 focus:ring-primary-300 dark:bg-gray-700 dark:border-gray-600 dark:focus:ring-primary-600 dark:ring-offset-gray-800" required="">
+            </div>
+            <div class="ml-3 text-sm">
+                <label for="terms" class="block text-sm/6 font-medium text-white-900">He leído y acepto los <a href="/legal/terms" class="text-alt-600 hover:text-alt-500">términos y condiciones</a> y la <a href="/legal/privacy" class="text-alt-600 hover:text-alt-500">política de privacidad</a></label>
+            </div>
+        </div>
+        <span id="termsError" class="mt-2 block text-sm/6 font-medium text-red-900"></span>
+      </div>
+
+      <div>
+        <button id="submitButton" type="submit" class="flex w-full justify-center rounded-md bg-alt-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-sm hover:bg-alt-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Unirse</button>
+      </div>
+    </form>
+
+    <p class="mt-10 text-center text-sm/6 text-gray-500">
+      ¿Ya tienes una cuenta?
+      <a href="/login" class="font-semibold text-alt-600 hover:text-alt-500">Entra aquí</a>
+    </p>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ asset('js/forms/validator.js') }}"></script>
+<script src="{{ asset('js/forms/register.js') }}"></script>
+{% endblock %}

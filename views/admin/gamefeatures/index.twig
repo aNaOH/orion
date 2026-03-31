@@ -1,0 +1,30 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = false %}
+{% set panel_title = 'Características | Orion Admin Panel' %}
+{% set title = 'Características' %}
+{% set new_url = '/admin/gamefeatures/new' %}
+{% set new_label = 'Nueva característica' %}
+{% set api_delete_url = '/api/admin/gamefeatures/{id}/delete/' %}
+{% set redirect_after_delete = '/admin/gamefeatures/' %}
+{% set delete_title = '¿Eliminar característica?' %}
+
+{% block table %}
+    {{ ui.table_header(['Nombre', 'Color distintivo (en hexadecimal)', 'Previsualización (Cuadrado)', 'Previsualización (Chip)', 'Acciones']) }}
+    <tbody>
+      {% for feature in gamefeatures %}
+      <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+        <td class="px-4 py-3">{{ feature.name }}</td>
+        <td class="px-4 py-3">{{ feature.tint }}</td>
+        <td class="px-4 py-3">
+            {{ ui.gradient_square(feature.icon, feature.tint) }}
+        </td>
+        <td class="px-4 py-3">
+            {{ ui.gradient_chip(feature.tint, feature.name) }}
+        </td>
+        {{ ui.action_buttons('/admin/gamefeatures/' ~ feature.id ~ '/edit/', feature.id, feature.name) }}
+      </tr>
+      {% endfor %}
+    </tbody>
+{% endblock %}

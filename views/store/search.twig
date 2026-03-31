@@ -1,0 +1,155 @@
+{% extends "layouts/base.twig" %}
+
+{% block title %}Resultados de búsqueda | Orion Store{% endblock %}
+
+{% block content %}
+    <script src="{{ asset('js/components/gradientChip.js') }}"></script>
+
+    <!-- Hero Section -->
+    <section id="hero" class="bg-brand-500 text-white py-20 -mt-8 mb-8 shadow-inner">
+        <div class="container mx-auto text-center px-6">
+            <h2 class="text-4xl md:text-5xl font-bold animate__animated animate__fadeInDown">Tienda</h2>
+            <p class="text-lg md:text-xl mt-4">Explora nuestro catálogo completo</p>
+            
+            <form id="searchForm" action="/store/games" method="GET" class="flex items-center space-x-2 p-2 mt-8 rounded-full bg-branddark bg-opacity-75 shadow-md w-full max-w-2xl mx-auto border border-white/10 focus-within:border-alt transition-all">
+                <div class="relative flex-grow">
+                    <input
+                        type="text"
+                        name="search"
+                        id="search"
+                        value="{{ searchQuery }}"
+                        placeholder="Buscar juegos..."
+                        class="w-full bg-transparent text-gray-200 placeholder-text-gray-200/75 px-6 py-3 rounded-full border-none focus:outline-none"
+                    >
+                    <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-white/50">
+                        <i class="bi bi-search text-xl"></i>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <div class="container mx-auto px-6">
+        <div class="flex flex-col lg:flex-row gap-10">
+            <!-- Sidebar Filters -->
+            <aside class="lg:w-64 flex-shrink-0">
+                <form id="filterForm" action="/store/games" method="GET" class="sticky top-24 bg-branddark/50 p-6 rounded-2xl border border-white/5 shadow-xl">
+                    <input type="hidden" name="search" value="{{ searchQuery }}">
+                    
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                <i class="bi bi-controller text-alt"></i> Género
+                            </h3>
+                            <select name="genre" class="w-full rounded-xl bg-branddark text-gray-200 px-4 py-2.5 border border-white/10 focus:border-alt focus:ring-0 transition-all cursor-pointer">
+                                <option value="all">Todos los géneros</option>
+                                {% for genre in genres %}
+                                    <option value="{{ genre.id }}" {{ genre.id == filteredGender ? 'selected' : '' }}>{{ genre.name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <div>
+                            <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                                <i class="bi bi-stars text-alt"></i> Características
+                            </h3>
+                            <div class="space-y-3">
+                                {% for feature in features %}
+                                    <label class="flex items-center group cursor-pointer">
+                                        <div class="relative flex items-center">
+                                            <input type="checkbox" name="features[]" value="{{ feature.id }}" class="peer hidden" {{ feature.id in filteredFeatures ? 'checked' : '' }}>
+                                            <div class="w-5 h-5 border-2 border-white/20 rounded peer-checked:bg-alt peer-checked:border-alt transition-all"></div>
+                                            <i class="bi bi-check absolute text-white opacity-0 peer-checked:opacity-100 left-0.5 top-0 transition-opacity"></i>
+                                        </div>
+                                        <gradient-chip
+                                            base-color="{{ feature.tint }}"
+                                            size="12"
+                                            icon-path="https://cdn.orion.moonnastd.com/game/feature/{{ feature.icon }}"
+                                            text="{{ feature.name }}"
+                                            border-radius="8"
+                                            class="flex-1 ml-3 group-hover:scale-[1.02] transition-transform"
+                                        ></gradient-chip>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-alt hover:bg-alt-600 text-white font-bold py-3 px-6 rounded-xl mt-10 shadow-lg shadow-alt/20 transition-all active:scale-95">
+                        Filtrar
+                    </button>
+                    {% if filteredGender != 'all' or filteredFeatures|length > 0 or searchQuery != '' %}
+                        <a href="/store/games" class="block w-full text-center text-gray-400 hover:text-white text-sm mt-4 transition-colors">
+                            Limpiar filtros
+                        </a>
+                    {% endif %}
+                </form>
+            </aside>
+
+            <!-- Results -->
+            <main class="flex-grow pb-20">
+                <div class="flex items-center justify-between gap-4 mb-8">
+                    <h2 class="text-2xl font-bold text-white">
+                        {% if searchQuery %}
+                            Resultados para "{{ searchQuery }}"
+                        {% else %}
+                            Catálogo de juegos
+                        {% endif %}
+                    </h2>
+                    <div class="h-px flex-grow bg-white/10 hidden sm:block"></div>
+                </div>
+
+                {% if games is defined and games|length > 0 %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8 justify-items-center">
+                        {% for game in games %}
+                            {% if game.is_public %}
+                                {% include 'partials/game_store_card.twig' with {'game': game} %}
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if totalPages > 1 %}
+                        <nav class="mt-16 flex items-center justify-center gap-6">
+                            {% if page > 1 %}
+                                <a href="?page={{ page - 1 }}&search={{ searchQuery }}&genre={{ filteredGender }}&features={{ filteredFeatures|join(',') }}" 
+                                   class="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white hover:bg-alt hover:border-alt transition-all shadow-lg">
+                                    <i class="bi bi-chevron-left"></i>
+                                </a>
+                            {% else %}
+                                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 text-white/20 cursor-not-allowed">
+                                    <i class="bi bi-chevron-left"></i>
+                                </div>
+                            {% endif %}
+
+                            <div class="px-6 py-2 rounded-xl bg-branddark/80 border border-white/10 text-white font-bold">
+                                {{ page }} / {{ totalPages }}
+                            </div>
+
+                            {% if page < totalPages %}
+                                <a href="?page={{ page + 1 }}&search={{ searchQuery }}&genre={{ filteredGender }}&features={{ filteredFeatures|join(',') }}" 
+                                   class="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white hover:bg-alt hover:border-alt transition-all shadow-lg">
+                                    <i class="bi bi-chevron-right"></i>
+                                </a>
+                            {% else %}
+                                <div class="w-12 h-12 flex items-center justify-center rounded-xl bg-white/5 border border-white/5 text-white/20 cursor-not-allowed">
+                                    <i class="bi bi-chevron-right"></i>
+                                </div>
+                            {% endif %}
+                        </nav>
+                    {% endif %}
+                {% else %}
+                    <div class="bg-branddark/30 rounded-3xl p-20 text-center border border-dashed border-white/10">
+                        <i class="bi bi-search text-6xl text-white/10 mb-4 block"></i>
+                        <h3 class="text-2xl font-bold text-white/50">No hemos encontrado nada...</h3>
+                        <p class="text-gray-400 mt-2">Prueba a ajustar los filtros o busca algo diferente.</p>
+                        <a href="/store/games" class="mt-6 inline-block text-alt font-bold hover:underline">Ver todo el catálogo</a>
+                    </div>
+                {% endif %}
+            </main>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ asset('js/storeFiltering.js') }}"></script>
+{% endblock %}

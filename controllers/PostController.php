@@ -57,30 +57,47 @@ class PostController
             return false;
         }
 
-        $GLOBALS["game"] = $game;
-        $GLOBALS["posts"] = Post::getAllByTypeAndGame($type, $gameId);
-
+        $posts = Post::getAllByTypeAndGame($type, $gameId);
         $typeString = "";
+        $titlePrefix = "";
 
         switch ($type) {
             case EPOST_TYPE::POST:
                 $typeString = "posts";
+                $titlePrefix = "Posts";
                 break;
-
             case EPOST_TYPE::GALLERY:
                 $typeString = "gallery";
+                $titlePrefix = "Galería";
+                // Add vote info for gallery cards if logged in
+                if (isset($_SESSION['user'])) {
+                    foreach ($posts as $post) {
+                        $galleryInfo = $post->getPostInfo();
+                        // Use a local variable or cast if needed, but since we use it in Twig, 
+                        // we can pass it as a separate array if we want to avoid dynamic properties, 
+                        // but for now let's just ensure we are using it consistently.
+                        $post->user_vote_value = $galleryInfo->getUserValue($_SESSION['user']['id']);
+                    }
+                }
                 break;
-
             case EPOST_TYPE::GUIDE:
                 $typeString = "guides";
+                $titlePrefix = "Guías";
                 break;
-
             case EPOST_TYPE::GAME_NEWS:
                 $typeString = "news";
+                $titlePrefix = "Noticias";
                 break;
         }
 
-        include "views/community/" . $typeString . "/index.php";
+        ViewController::render('community/list', [
+            'game' => $game,
+            'posts' => $posts,
+            'post_type' => $typeString,
+            'title' => $titlePrefix . " de " . $game->title
+        ]);
+
+        return true;
     }
 
     public static function getPost(int $gameId, EPOST_TYPE $type, int $postId)
@@ -97,69 +114,107 @@ class PostController
             return false;
         }
 
-        $GLOBALS["game"] = $game;
-        $GLOBALS["post"] = $post;
-
         $typeString = "";
+        $data = [
+            'game' => $game,
+            'post' => $post
+        ];
 
         switch ($type) {
-            case EPOST_TYPE::POST:
-                $typeString = "posts";
+            case EPOST_TYPE::POST: $typeString = "posts"; break;
+            case EPOST_TYPE::GALLERY: 
+                $typeString = "gallery"; 
+                if (isset($_SESSION['user'])) {
+                    $galleryInfo = $post->getPostInfo();
+                    $data['user_vote_value'] = $galleryInfo->getUserValue($_SESSION['user']['id']);
+                }
                 break;
-
-            case EPOST_TYPE::GALLERY:
-                $typeString = "gallery";
-                break;
-
-            case EPOST_TYPE::GUIDE:
-                $typeString = "guides";
-                break;
-
-            case EPOST_TYPE::GAME_NEWS:
-                $typeString = "news";
-                break;
+            case EPOST_TYPE::GUIDE: $typeString = "guides"; break;
+            case EPOST_TYPE::GAME_NEWS: $typeString = "news"; break;
         }
 
-        include "views/community/" . $typeString . "/post.php";
+        $data['post_type'] = $typeString;
+
+        ViewController::render('community/post_view', $data);
+
+        return true;
     }
 
-    public static function createPost(int $gameId, EPOST_TYPE $type)
+    public static function showCreateView(int $gameId, string $typeString)
     {
         $game = Game::getById($gameId);
-
         if (is_null($game)) {
             return false;
         }
 
-        $GLOBALS["game"] = $game;
+        $type = EPOST_TYPE::POST;
+        $label = "post";
+        $guideTypes = [];
 
-        $typeString = "";
-
-        switch ($type) {
-            case EPOST_TYPE::POST:
-                $typeString = "posts";
+        switch ($typeString) {
+            case "gallery":
+                $type = EPOST_TYPE::GALLERY;
+                $label = "imagen";
                 break;
-
-            case EPOST_TYPE::GALLERY:
-                $typeString = "gallery";
-                break;
-
-            case EPOST_TYPE::GUIDE:
-                $typeString = "guides";
-                $gTypes = GuideType::getAll();
-                $GLOBALS["guideTypes"] = $gTypes;
+            case "guides":
+                $type = EPOST_TYPE::GUIDE;
+                $label = "guía";
+                $guideTypes = GuideType::getAll();
                 break;
         }
 
-        include "views/community/" . $typeString . "/create.php";
+        ViewController::render('community/create', [
+            'game' => $game,
+            'post_type' => $typeString,
+            'post_type_label' => $label,
+            'guideTypes' => $guideTypes
+        ]);
+
+        return true;
     }
 
     public static function create(
         int $gameId,
+        string $type,
+        string $title,
+        string $body,
+        $token,
+        $guideType = null
+    ) {
+        global $router;
+        FormHelper::ValidateToken($token, "tript_token", ETOKEN_TYPE::USERACTION);
+
+        $postType = EPOST_TYPE::POST;
+        switch ($type) {
+            case "gallery":
+                $postType = EPOST_TYPE::GALLERY;
+                $body = "gm";
+                break;
+            case "guides":
+                $postType = EPOST_TYPE::GUIDE;
+                break;
+        }
+
+        $result = self::internalCreate(
+            intval($gameId),
+            $postType,
+            $title,
+            $body,
+            isset($guideType) ? intval($guideType) : -1,
+        );
+
+        if ($result === false) {
+            $router->trigger404();
+            exit();
+        }
+    }
+
+    private static function internalCreate(
+        int $gameId,
         EPOST_TYPE $type,
         string $title,
         string $body,
-        int $guideType = null,
+        ?int $guideType = null,
     ) {
         $game = Game::getById($gameId);
 
@@ -260,7 +315,35 @@ class PostController
         exit();
     }
 
-    public static function addComment($postId, string $body)
+    public static function postComment($postId, $token, $comment)
+    {
+        global $router;
+        FormHelper::ValidateToken($token, "tript_token", ETOKEN_TYPE::USERACTION);
+
+        $body = trim($comment ?? "");
+        if (strlen($body) == 0) {
+            $body = "El usuario no ha escrito nada...";
+        }
+
+        $result = self::addCommentLogic(intval($postId), $body);
+
+        if ($result === false) {
+            $router->trigger404();
+            exit();
+        }
+
+        $post = Post::getById($postId);
+        $type = "posts";
+        switch ($post->type) {
+            case EPOST_TYPE::GUIDE: $type = "guides"; break;
+            case EPOST_TYPE::GALLERY: $type = "gallery"; break;
+        }
+
+        header("location: /communities/" . strval($post->game_id) . "/" . $type . "/" . strval($post->id));
+        exit();
+    }
+
+    private static function addCommentLogic($postId, string $body)
     {
         $author = null;
 
@@ -281,7 +364,15 @@ class PostController
         return $post->addComment($author->id, $body);
     }
 
-    public static function vote($postId, int $value)
+    public static function postVote($postId, $token, $newValue)
+    {
+        FormHelper::ValidateToken($token, "tript_token", ETOKEN_TYPE::USERACTION);
+        FormHelper::ValidateRequiredField($newValue, "newValue");
+
+        self::handleVote(intval($postId), intval($newValue));
+    }
+
+    private static function handleVote($postId, int $value)
     {
         $voter = null;
 

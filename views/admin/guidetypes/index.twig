@@ -1,0 +1,30 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = false %}
+{% set panel_title = 'Tipos de guía | Orion Admin Panel' %}
+{% set title = 'Tipos de guía' %}
+{% set new_url = '/admin/guidetypes/new' %}
+{% set new_label = 'Nuevo tipo de guía' %}
+{% set api_delete_url = '/api/admin/guidetype/{id}/delete/' %}
+{% set redirect_after_delete = '/admin/guidetypes/' %}
+{% set delete_title = '¿Eliminar tipo de guía?' %}
+
+{% block table %}
+    {{ ui.table_header(['Nombre', 'Color distintivo', 'Previsualización (Cuadrado)', 'Previsualización (Chip)', 'Acciones']) }}
+    <tbody>
+      {% for guidetype in guidetypes %}
+      <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+        <td class="px-4 py-3">{{ guidetype.type }}</td>
+        <td class="px-4 py-3">{{ guidetype.tint }}</td>
+        <td class="px-4 py-3">
+          {{ ui.gradient_square(guidetype.icon, guidetype.tint) }}
+        </td>
+        <td class="px-4 py-3">
+          {{ ui.gradient_chip(guidetype.tint, guidetype.type) }}
+        </td>
+        {{ ui.action_buttons('/admin/guidetypes/' ~ guidetype.id ~ '/edit/', guidetype.id, guidetype.type) }}
+      </tr>
+      {% endfor %}
+    </tbody>
+{% endblock %}
