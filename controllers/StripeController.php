@@ -64,6 +64,75 @@ class StripeController
         ];
     }
 
+    public static function buy($product, $user, $metadata, $from)
+    {
+        \Stripe\Stripe::setApiKey($_ENV["STRIPE_KEY"]);
+
+        $line_items = [];
+        $discounts = [];
+
+        if ($product instanceof Game) {
+            $stripeContent = self::getProductWithPrice($product);
+            $line_items[] = [
+                "price" => $stripeContent["price"],
+                "quantity" => 1,
+            ];
+            if (isset($stripeContent["coupon"])) {
+                $discounts[] = ["coupon" => $stripeContent["coupon"]];
+            }
+        } else {
+            // It's a price ID (string)
+            $line_items[] = [
+                "price" => $product,
+                "quantity" => 1,
+            ];
+        }
+
+        $checkout_session = self::getStripe()->checkout->sessions->create([
+            "customer_email" => $user->email,
+            "line_items" => $line_items,
+            "mode" => "payment",
+            "metadata" => $metadata,
+            "success_url" => "https://" . $_SERVER["HTTP_HOST"] . "/stripe/success?from=" . $from,
+            "cancel_url" => "https://" . $_SERVER["HTTP_HOST"] . "/stripe/cancel",
+            "discounts" => $discounts,
+        ]);
+
+        header("Location: " . $checkout_session->url);
+        exit();
+    }
+
+    public static function buyDevAccount()
+    {
+        if (!isset($_SESSION["user"])) { header("location: /login"); exit(); }
+        $user = User::getById($_SESSION["user"]["id"]);
+
+        if (!is_null($user->getDeveloperInfo())) {
+            header("location: /dev/panel");
+            exit();
+        }
+
+        self::buy($_ENV["STRIPE_DEVACCOUNT_PRICE"], $user, [
+            "user" => $user->id,
+            "developer" => $_GET["devName"] ?? ""
+        ], "developer");
+    }
+
+    public static function buyGame($gameId)
+    {
+        if (!isset($_SESSION["user"])) { header("location: /login"); exit(); }
+        $game = Game::getById($gameId);
+        if (is_null($game)) { header("location: /404"); exit(); }
+
+        $user = User::getById($_SESSION["user"]["id"]);
+        if ($user->hasAdquiredGame($game)) {
+            header("location: /library#game" . strval($game->id));
+            exit();
+        }
+
+        self::buy($game, $user, ["user" => $user->id], "game" . strval($gameId));
+    }
+
     public static function createOrder($user)
     {
         \Stripe\Stripe::setApiKey($_ENV["STRIPE_KEY"]);
@@ -119,6 +188,32 @@ class StripeController
 
         echo json_encode($response);
     }
+
+    public static function createDevAccountSession($user)
+    {
+        \Stripe\Stripe::setApiKey($_ENV["STRIPE_KEY"]);
+
+        $checkout_session = self::getStripe()->checkout->sessions->create([
+            "customer_email" => $user->email,
+            "billing_address_collection" => "required",
+            "line_items" => [["price" => $_ENV["STRIPE_DEVACCOUNT_PRICE"], "quantity" => 1]],
+            "mode" => "payment",
+            "automatic_tax" => ["enabled" => true],
+            "metadata" => ["user" => $user->id],
+            "ui_mode" => "custom",
+            "payment_method_types" => ["card"],
+            "return_url" => "https://example.com/checkout/success",
+        ]);
+
+        header("HTTP/1.1 200 OK");
+        echo json_encode([
+            "status" => "200",
+            "message" => "Checkout session created successfully",
+            "client_secret" => $checkout_session->client_secret,
+        ]);
+        exit();
+    }
+
 
     public static function success()
     {

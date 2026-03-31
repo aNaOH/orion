@@ -140,29 +140,24 @@ class PostController
         return true;
     }
 
-    public static function createPost(int $gameId, EPOST_TYPE $type)
+    public static function showCreateView(int $gameId, string $typeString)
     {
         $game = Game::getById($gameId);
-
         if (is_null($game)) {
             return false;
         }
 
-        $typeString = "";
-        $label = "";
+        $type = EPOST_TYPE::POST;
+        $label = "post";
         $guideTypes = [];
 
-        switch ($type) {
-            case EPOST_TYPE::POST:
-                $typeString = "posts";
-                $label = "post";
-                break;
-            case EPOST_TYPE::GALLERY:
-                $typeString = "gallery";
+        switch ($typeString) {
+            case "gallery":
+                $type = EPOST_TYPE::GALLERY;
                 $label = "imagen";
                 break;
-            case EPOST_TYPE::GUIDE:
-                $typeString = "guides";
+            case "guides":
+                $type = EPOST_TYPE::GUIDE;
                 $label = "guía";
                 $guideTypes = GuideType::getAll();
                 break;
@@ -179,6 +174,42 @@ class PostController
     }
 
     public static function create(
+        int $gameId,
+        string $type,
+        string $title,
+        string $body,
+        $token,
+        $guideType = null
+    ) {
+        global $router;
+        FormHelper::ValidateToken($token, "tript_token", ETOKEN_TYPE::USERACTION);
+
+        $postType = EPOST_TYPE::POST;
+        switch ($type) {
+            case "gallery":
+                $postType = EPOST_TYPE::GALLERY;
+                $body = "gm";
+                break;
+            case "guides":
+                $postType = EPOST_TYPE::GUIDE;
+                break;
+        }
+
+        $result = self::internalCreate(
+            intval($gameId),
+            $postType,
+            $title,
+            $body,
+            isset($guideType) ? intval($guideType) : -1,
+        );
+
+        if ($result === false) {
+            $router->trigger404();
+            exit();
+        }
+    }
+
+    private static function internalCreate(
         int $gameId,
         EPOST_TYPE $type,
         string $title,
@@ -284,7 +315,35 @@ class PostController
         exit();
     }
 
-    public static function addComment($postId, string $body)
+    public static function postComment($postId, $token, $comment)
+    {
+        global $router;
+        FormHelper::ValidateToken($token, "tript_token", ETOKEN_TYPE::USERACTION);
+
+        $body = trim($comment ?? "");
+        if (strlen($body) == 0) {
+            $body = "El usuario no ha escrito nada...";
+        }
+
+        $result = self::addCommentLogic(intval($postId), $body);
+
+        if ($result === false) {
+            $router->trigger404();
+            exit();
+        }
+
+        $post = Post::getById($postId);
+        $type = "posts";
+        switch ($post->type) {
+            case EPOST_TYPE::GUIDE: $type = "guides"; break;
+            case EPOST_TYPE::GALLERY: $type = "gallery"; break;
+        }
+
+        header("location: /communities/" . strval($post->game_id) . "/" . $type . "/" . strval($post->id));
+        exit();
+    }
+
+    private static function addCommentLogic($postId, string $body)
     {
         $author = null;
 
@@ -305,7 +364,15 @@ class PostController
         return $post->addComment($author->id, $body);
     }
 
-    public static function vote($postId, int $value)
+    public static function postVote($postId, $token, $newValue)
+    {
+        FormHelper::ValidateToken($token, "tript_token", ETOKEN_TYPE::USERACTION);
+        FormHelper::ValidateRequiredField($newValue, "newValue");
+
+        self::handleVote(intval($postId), intval($newValue));
+    }
+
+    private static function handleVote($postId, int $value)
     {
         $voter = null;
 

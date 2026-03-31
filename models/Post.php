@@ -21,6 +21,7 @@ class Post
     public EPOST_TYPE $type;
     public ?int $game_id;
     public int $author_id;
+    public ?int $user_vote_value = null;
 
     public function __construct(
         string $title,
@@ -183,7 +184,7 @@ class Post
     public function addComment(int $authorId, string $body): bool
     {
         if (is_null($this->id)) {
-            return null;
+            return false;
         }
         $comment = new Comment($authorId, $this->id, $body);
 
@@ -193,7 +194,7 @@ class Post
     public function getComments(): array
     {
         if (is_null($this->id)) {
-            return null;
+            return [];
         }
         $comments = Comment::getFromPost($this);
 

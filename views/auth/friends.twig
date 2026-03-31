@@ -30,7 +30,7 @@
 
         <!-- Main Content -->
         <div class="w-full md:w-3/4 space-y-8">
-            
+            {{ csrf_token('USERACTION') }}
             <!-- Pending Requests Section -->
             {% if pending_requests|length > 0 %}
             <div class="bg-branddark shadow-lg rounded-xl p-8">
@@ -130,6 +130,9 @@
         $.ajax({
             url: url,
             method: 'POST',
+            data: {
+                tript_token: document.getElementById('tript_token')?.value
+            },
             success: function(response) {
                 location.reload();
             },

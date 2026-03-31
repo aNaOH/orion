@@ -10,6 +10,7 @@
         </div>
 
         {% if cartItems|length > 0 %}
+            {{ csrf_token('COMMON') }}
             <div class="flex flex-col lg:flex-row gap-12">
                 <!-- Cart Items -->
                 <div class="flex-grow space-y-6">
@@ -130,7 +131,8 @@
       // Delete item logic
       document.querySelectorAll('.delete-item').forEach(btn => {
           btn.addEventListener('click', () => {
-              fetch(`/api/cart/${btn.dataset.id}`, { method: "DELETE" })
+              const token = document.getElementById('tript_token').value;
+              fetch(`/api/cart/${btn.dataset.id}?tript_token=${token}`, { method: "DELETE" })
                   .then(() => location.reload());
           });
       });
@@ -151,9 +153,11 @@
           document.addEventListener('DOMContentLoaded', async () => {
               const payBtn = document.getElementById('pay-btn');
 
+              const token = document.getElementById('tript_token').value;
               const promise = fetch('/api/order', {
                   method: 'POST',
-                  headers: {'Content-Type': 'application/json'}
+                  headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                  body: `tript_token=${token}`
               })
               .then((r) => r.json())
               .then((r) => r.client_secret);
@@ -221,7 +225,8 @@
                   body: JSON.stringify({ 
                       order: { items: [{% for item in cartItems %}{ game_id: {{ item.id }} }{% if not loop.last %},{% endif %}{% endfor %}] },
                       email: userEmail,
-                      stripe_id: loadActionsResult.actions.getSession().id 
+                      stripe_id: loadActionsResult.actions.getSession().id,
+                      tript_token: document.getElementById('tript_token').value
                   })
               });
 

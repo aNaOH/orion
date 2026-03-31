@@ -22,7 +22,7 @@ session_start([
 // Create Router instance
 $router = new \Bramus\Router\Router();
 
-$router->get("/", [HomeController::class, "showHome"]);
+$router->get("/", [StorefrontController::class, "showHome"]);
 
 include "routes/routes.php";
 

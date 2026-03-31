@@ -101,7 +101,9 @@ class ViewController
                     getDeleteUrl: (btn) => `{$apiUrl}`.replace('{id}', btn.dataset.id),
                     title: '{$title}',
                     onConfirm: (url) => {
-                      fetch(url, { method: 'DELETE' })
+                      const token = document.getElementById('tript_token')?.value;
+                      const separator = url.includes('?') ? '&' : '?';
+                      fetch(url + separator + 'tript_token=' + token, { method: 'DELETE' })
                         .then(response => {
                           if (response.ok) {
                             window.location.href = '{$redirectUrl}';

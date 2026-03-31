@@ -172,4 +172,34 @@ class GameController
 
         return true;
     }
+
+    public static function apiGetAchievements()
+    {
+        $gameId = $_POST["game"];
+        $achievements = Achievement::getAllByGame($gameId);
+
+        if (count($achievements) == 0) {
+            header("HTTP/1.1 400 Bad Request");
+            echo json_encode(["status" => 400, "message" => "No hay logros para este juego."]);
+            exit();
+        }
+
+        $res = array_map(fn($a) => [
+            "id" => $a->id,
+            "name" => $a->name,
+            "description" => $a->description,
+            "unlockedIMG" => $a->icon,
+            "lockedIMG" => $a->locked_icon,
+            "isSecret" => $a->secret,
+            "type" => $a->type->value,
+            "statID" => $a->stat_id,
+            "statValue" => $a->stat_value,
+        ], $achievements);
+
+        header("HTTP/1.1 200 OK");
+        echo json_encode(["achievements" => $res]);
+        exit();
+    }
 }
+
+

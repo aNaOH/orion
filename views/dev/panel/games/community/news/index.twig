@@ -12,6 +12,7 @@
 {% set delete_title = '¿Eliminar noticia?' %}
 
 {% block table %}
+    {{ csrf_token('DEVACTION', { userID: user.id, gameID: game.id }) }}
     {{ ui.table_header(['Título', 'Categoría', 'Fecha de publicación', 'Fecha de última edición', 'Acciones']) }}
     <tbody>
       {% for new in news %}

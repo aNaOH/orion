@@ -73,6 +73,7 @@
         </div>
     {% elseif user.getDeveloperInfo() == null %}
         <div class="container mx-auto text-center">
+            {{ csrf_token('COMMON') }}
             <h2 class="text-4xl font-bold text-alt mb-4">Publica tus juegos en Orion</h2>
                 <div class="flex flex-col space-y-4 w-[50%] sm:w-full mx-auto">
                 <div class="flex items-center space-x-2 p-2 rounded-full bg-branddark bg-opacity-75 shadow-md w-full mx-auto">
@@ -128,12 +129,14 @@
             const payBtn = document.getElementById('pay-btn');
             const cardElement = document.getElementById('stripe-element');
 
+            const token = document.getElementById('tript_token').value;
             const promise = fetch('/api/dev/pay', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: `tript_token=${token}`
               })
-                .then((r) => r.json())
-                .then((r) => r.client_secret);
+              .then((r) => r.json())
+              .then((r) => r.client_secret);
 
               const appearance = {
                 theme: 'stripe',
@@ -168,7 +171,7 @@
                 await fetch('/api/dev/save', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name: devName.value, stripe_id: loadActionsResult.actions.getSession().id })
+                    body: JSON.stringify({ name: devName.value, stripe_id: loadActionsResult.actions.getSession().id, tript_token: document.getElementById('tript_token').value })
                 });
 
                 setPayBtnState(false, false);
