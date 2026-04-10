@@ -1,0 +1,69 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+
+{% block title %}Gestión de Tickets - Orion Admin{% endblock %}
+
+{% block breadcrumbs %}
+    <li><a href="/admin">Inicio</a></li>
+    <li><span>Tickets</span></li>
+{% endblock %}
+
+{% block header_title %}Centro de Soporte{% endblock %}
+
+{% block header_actions %}
+    {# No actions for now, purely reactive #}
+{% endblock %}
+
+{% block index_content %}
+<div class="overflow-x-auto">
+    <table class="w-full text-left">
+        <thead>
+            <tr class="border-b border-white/5 text-gray-400 text-sm">
+                <th class="px-6 py-4 font-medium uppercase tracking-wider">ID</th>
+                <th class="px-6 py-4 font-medium uppercase tracking-wider">Fecha</th>
+                <th class="px-6 py-4 font-medium uppercase tracking-wider">Tipo</th>
+                <th class="px-6 py-4 font-medium uppercase tracking-wider">Reportero</th>
+                <th class="px-6 py-4 font-medium uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-4 font-medium uppercase tracking-wider text-right">Acciones</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-white/5">
+            {% for ticket in tickets %}
+                <tr class="hover:bg-white/5 transition group">
+                    <td class="px-6 py-4 text-gray-300 font-mono text-sm">#{{ ticket.id }}</td>
+                    <td class="px-6 py-4 text-gray-400 text-sm">{{ ticket.created_at|date("d/m/Y H:i") }}</td>
+                    <td class="px-6 py-4">
+                        <span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs font-bold rounded uppercase">
+                            {{ ticket.type }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-gray-300">{{ ticket.getReporter().username }}</td>
+                    <td class="px-6 py-4">
+                        {% if ticket.status == 0 %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-400/10 text-yellow-400 border border-yellow-400/20">
+                                <i class="bi bi-clock-fill mr-1"></i> Pendiente
+                            </span>
+                        {% elseif ticket.status == 1 %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-400/10 text-green-400 border border-green-400/20">
+                                <i class="bi bi-check-circle-fill mr-1"></i> Aceptado
+                            </span>
+                        {% else %}
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-400/10 text-red-400 border border-red-400/20">
+                                <i class="bi bi-x-circle-fill mr-1"></i> Rechazado
+                            </span>
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="/admin/tickets/{{ ticket.id }}" class="inline-flex items-center px-3 py-1 bg-white/10 hover:bg-alt text-white text-xs font-bold rounded transition group-hover:shadow-lg">
+                            Ver Detalle <i class="bi bi-arrow-right ml-1"></i>
+                        </a>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">No hay tickets registrados.</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

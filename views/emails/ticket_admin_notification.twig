@@ -1,0 +1,17 @@
+{% extends "emails/layout.twig" %}
+
+{% block content %}
+<h1>Nuevo Ticket de Soporte</h1>
+<p>Se ha recibido un nuevo ticket de soporte que requiere revisión administrativa.</p>
+
+<div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #eeeeee;">
+    <p style="margin: 0; font-weight: bold; color: #1B2A49;">Información del Ticket:</p>
+    <p style="margin: 5px 0;"><strong>ID:</strong> #{{ ticket_id }}</p>
+    <p style="margin: 5px 0;"><strong>Tipo:</strong> {{ ticket_type }}</p>
+    <p style="margin: 5px 0;"><strong>Reportado por:</strong> {{ reporter_name }}</p>
+</div>
+
+<p>Puedes ver los detalles y gestionar este ticket desde el panel de administración.</p>
+
+<a href="{{ admin_url }}" class="button">Gestionar Ticket</a>
+{% endblock %}

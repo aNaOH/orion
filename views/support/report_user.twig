@@ -1,0 +1,85 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Reportar a {{ target_user.username }} - Orion{% endblock %}
+
+{% block content %}
+<section id="report-user" class="py-10">
+    <div class="container mx-auto max-w-2xl bg-branddark shadow-lg rounded-xl p-8 border border-white/5">
+        <h1 class="text-3xl font-bold text-gray-100 mb-2">Reportar Usuario</h1>
+        <p class="text-gray-400 mb-8 text-lg">Estás informando sobre una posible infracción por parte de <strong>{{ target_user.username }}</strong>.</p>
+
+        <form id="report-form" class="space-y-6">
+            {{ token_input('USERACTION') | raw }}
+            <input type="hidden" name="reported_id" value="{{ target_user.id }}">
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Motivo del reporte</label>
+                <select name="reason" id="reason" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-alt-500 transition shadow-inner">
+                    <option value="" disabled {{ selected_reason == "" ? 'selected' : '' }}>Selecciona un motivo...</option>
+                    {% for key, label in reasons %}
+                        <option value="{{ key }}" {{ selected_reason == key ? 'selected' : '' }}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Descripción detallada</label>
+                <textarea name="description" id="description" rows="5" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-alt-500 transition shadow-inner placeholder-gray-600" placeholder="Explica por qué estás reportando a este usuario...">{{ description }}</textarea>
+                <p class="mt-2 text-xs text-gray-500">Mínimo 10 caracteres. Proporciona toda la información necesaria para ayudarnos a revisar el reporte.</p>
+            </div>
+
+            <div class="bg-alt-900/10 border border-alt-500/20 rounded-lg p-4 flex items-start space-x-3">
+                <i class="bi bi-info-circle-fill text-alt-500 mt-1"></i>
+                <p class="text-sm text-gray-400 leading-relaxed">
+                    Al enviar este reporte, guardaremos la <strong>información</strong> del perfil actual del usuario (Nombre, MOTD y Foto de Perfil) para nuestra revisión, incluso si el usuario lo cambia posteriormente.
+                </p>
+            </div>
+
+            <div class="pt-4 flex items-center justify-between">
+                <a href="/user/{{ target_user.id }}" class="text-gray-500 hover:text-white transition text-sm font-medium">Cancelar</a>
+                <button type="submit" id="submit-btn" class="px-8 py-3 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg shadow-lg shadow-alt/20 transition transform hover:-translate-y-0.5 active:translate-y-0">
+                    Enviar Reporte
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $('#report-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = $('#submit-btn');
+        const originalText = btn.text();
+        
+        if ($('#reason').val() === null) {
+            alert('Por favor, selecciona un motivo.');
+            return;
+        }
+        
+        if ($('#description').val().length < 10) {
+            alert('Por favor, escribe una descripción más detallada (mín. 10 caracteres).');
+            return;
+        }
+
+        btn.prop('disabled', true).text('Enviando...');
+
+        $.ajax({
+            url: '/api/support/report/user',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                alert('Tu reporte ha sido enviado correctamente. Recibirás un correo de confirmación.');
+                window.location.href = '/user/{{ target_user.id }}';
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                alert('Error: ' + (response ? response.message : 'No se pudo enviar el reporte.'));
+                btn.prop('disabled', false).text(originalText);
+            }
+        });
+    });
+</script>
+{% endblock %}

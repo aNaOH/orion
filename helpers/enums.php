@@ -42,6 +42,7 @@ enum EBUCKET_LOCATION: string
     case GAME_BADGE = "game/badge/";
     case GAME_ACHIEVEMENT = "game/achievement/";
     case GAME_BUILD = "game/build/";
+    case SNAPSHOT = "tickets/snapshots/";
     case NONE = "";
 }
 
