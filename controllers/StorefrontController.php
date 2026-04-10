@@ -6,9 +6,9 @@ require_once "models/Build.php";
 require_once "models/Developer.php";
 require_once "controllers/ViewController.php";
 require_once "controllers/GameController.php";
-require_once "helpers/Order.php";
-require_once "helpers/DownloadToken.php";
-require_once "helpers/S3Helper.php";
+require_once "helpers/OrderHelper.php";
+require_once "helpers/Token.php";
+require_once "helpers/s3.php";
 
 class StorefrontController
 {
@@ -112,7 +112,7 @@ class StorefrontController
             "tint" => $f->tint,
         ], $game->getFeatures());
 
-        $achievements = array_map(function($a) use ($user, $game) {
+        $achievements = array_map(function ($a) use ($user, $game) {
             $unlockedOn = "";
             $has = $user->hasUnlockedAchievement($game->id, $a->id, $unlockedOn);
             return [
@@ -129,14 +129,16 @@ class StorefrontController
             "patchNotes" => $b->patch_notes,
         ], $game->getBuilds());
 
-        echo json_encode(["data" => [
-            "id" => $game->id,
-            "title" => $game->title,
-            "features" => $features,
-            "achievements" => $achievements,
-            "builds" => $builds,
-            "isDeveloper" => $game->getDeveloper()->getOwner()->id == $user->id,
-        ]]);
+        echo json_encode([
+            "data" => [
+                "id" => $game->id,
+                "title" => $game->title,
+                "features" => $features,
+                "achievements" => $achievements,
+                "builds" => $builds,
+                "isDeveloper" => $game->getDeveloper()->getOwner()->id == $user->id,
+            ]
+        ]);
         exit();
     }
 
@@ -184,7 +186,7 @@ class StorefrontController
         $data = DownloadToken::getTokenData($token);
         $game = Game::getById($data["game_id"]);
         $build = ($data["version"] === "latest") ? $game->getLatestBuild() : $game->getBuildVersion($data["version"]);
-        
+
         $file = $build->getFile();
         if (!$file) {
             http_response_code(404);
@@ -195,9 +197,11 @@ class StorefrontController
         $filename = str_replace(" ", "_", $game->title) . "-ver-" . $build->version . ".zip";
         header("Content-Type: " . $file["type"]);
         header('Content-Disposition: attachment; filename="' . $filename . '"');
-        if (!empty($file["size"])) header("Content-Length: " . $file["size"]);
-        
-        if (ob_get_level()) ob_end_clean();
+        if (!empty($file["size"]))
+            header("Content-Length: " . $file["size"]);
+
+        if (ob_get_level())
+            ob_end_clean();
         S3Helper::streamToClient($file);
         exit();
     }
@@ -228,7 +232,7 @@ class StorefrontController
     {
         $games = Game::pickRandom(10);
         $users = User::getCount();
-        $gameList = array_map(fn($g) => [ "id" => $g->id, "title" => $g->title ], $games);
+        $gameList = array_map(fn($g) => ["id" => $g->id, "title" => $g->title], $games);
         echo json_encode(["showcaseGames" => $gameList, "users" => $users]);
         exit();
     }

@@ -351,8 +351,8 @@ class User
         $gameId = $game instanceof Game ? $game->id : $game;
         $achievementId =
             $achievement instanceof Achievement
-                ? $achievement->id
-                : $achievement;
+            ? $achievement->id
+            : $achievement;
         if (!$this->hasUnlockedAchievement($gameId, $achievementId)) {
             if (
                 Connection::doInsert(ORION_DB, "unlocks", [
@@ -390,8 +390,8 @@ class User
         $gameId = $game instanceof Game ? $game->id : $game;
         $achievementId =
             $achievement instanceof Achievement
-                ? $achievement->id
-                : $achievement;
+            ? $achievement->id
+            : $achievement;
         $select = Connection::doSelect(ORION_DB, "unlocks", [
             "achievement_id" => $achievementId,
             "user_id" => $this->id,
@@ -445,8 +445,8 @@ class User
         $gameId = $game instanceof Game ? $game->id : $game;
         $achievementId =
             $achievement instanceof Achievement
-                ? $achievement->id
-                : $achievement;
+            ? $achievement->id
+            : $achievement;
         $select = Connection::doSelect(ORION_DB, "unlocks", [
             "achievement_id" => $achievementId,
             "user_id" => $this->id,
@@ -511,13 +511,13 @@ class User
         $select = Connection::doSelect(ORION_DB, "users_relationship", [
             "user_id1" => $this->id,
             "user_id2" => $user->id,
-            "status" => EUSER_RELATIONSHIP::FRIEND,
+            "status" => EUSER_RELATIONSHIP::FRIEND->value,
         ]);
 
         $selectReverse = Connection::doSelect(ORION_DB, "users_relationship", [
             "user_id1" => $user->id,
             "user_id2" => $this->id,
-            "status" => EUSER_RELATIONSHIP::FRIEND,
+            "status" => EUSER_RELATIONSHIP::FRIEND->value,
         ]);
 
         return count($select) === 1 || count($selectReverse) === 1;
@@ -528,7 +528,7 @@ class User
         $select = Connection::doSelect(ORION_DB, "users_relationship", [
             "user_id1" => $this->id,
             "user_id2" => $user->id,
-            "status" => EUSER_RELATIONSHIP::PENDING,
+            "status" => EUSER_RELATIONSHIP::PENDING->value,
         ]);
 
         return count($select) === 1;
@@ -539,7 +539,7 @@ class User
         $select = Connection::doSelect(ORION_DB, "users_relationship", [
             "user_id1" => $this->id,
             "user_id2" => $user->id,
-            "status" => EUSER_RELATIONSHIP::BLOCKED,
+            "status" => EUSER_RELATIONSHIP::BLOCKED->value,
         ]);
 
         return count($select) === 1;
@@ -550,7 +550,7 @@ class User
         $select = Connection::doSelect(ORION_DB, "users_relationship", [
             "user_id1" => $user->id,
             "user_id2" => $this->id,
-            "status" => EUSER_RELATIONSHIP::PENDING,
+            "status" => EUSER_RELATIONSHIP::PENDING->value,
         ]);
 
         return count($select) === 1;
@@ -561,7 +561,7 @@ class User
         $select = Connection::doSelect(ORION_DB, "users_relationship", [
             "user_id1" => $this->id,
             "user_id2" => $user->id,
-            "status" => EUSER_RELATIONSHIP::BLOCKED,
+            "status" => EUSER_RELATIONSHIP::BLOCKED->value,
         ]);
 
         return count($select) === 1;
@@ -569,22 +569,25 @@ class User
 
     public function sendFriendRequest(User $user): bool
     {
-        if ($this->id === $user->id) return false;
-        if ($this->isFriendWith($user) || $this->isFriendRequestPending($user) || $this->hasPendingFriendRequestFrom($user)) return false;
+        if ($this->id === $user->id)
+            return false;
+        if ($this->isFriendWith($user) || $this->isFriendRequestPending($user) || $this->hasPendingFriendRequestFrom($user))
+            return false;
 
         return (bool) Connection::doInsert(ORION_DB, "users_relationship", [
             "user_id1" => $this->id,
             "user_id2" => $user->id,
-            "status" => EUSER_RELATIONSHIP::PENDING,
+            "status" => EUSER_RELATIONSHIP::PENDING->value,
         ]);
     }
 
     public function acceptFriendRequest(User $user): bool
     {
-        if (!$this->hasPendingFriendRequestFrom($user)) return false;
+        if (!$this->hasPendingFriendRequestFrom($user))
+            return false;
 
         return (bool) Connection::doUpdate(ORION_DB, "users_relationship", [
-            "status" => EUSER_RELATIONSHIP::FRIEND,
+            "status" => EUSER_RELATIONSHIP::FRIEND->value,
         ], [
             "user_id1" => $user->id,
             "user_id2" => $this->id,
@@ -593,18 +596,20 @@ class User
 
     public function declineFriendRequest(User $user): bool
     {
-        if (!$this->hasPendingFriendRequestFrom($user)) return false;
+        if (!$this->hasPendingFriendRequestFrom($user))
+            return false;
 
         return (bool) Connection::doDelete(ORION_DB, "users_relationship", [
             "user_id1" => $user->id,
             "user_id2" => $this->id,
-            "status" => EUSER_RELATIONSHIP::PENDING,
+            "status" => EUSER_RELATIONSHIP::PENDING->value,
         ]);
     }
 
     public function removeFriend(User $user): bool
     {
-        if (!$this->isFriendWith($user)) return false;
+        if (!$this->isFriendWith($user))
+            return false;
 
         return (bool) Connection::customQuery(ORION_DB, "DELETE FROM users_relationship WHERE 
             ((user_id1 = :u1 AND user_id2 = :u2) OR (user_id1 = :u2 AND user_id2 = :u1)) 
@@ -617,8 +622,9 @@ class User
 
     public function blockUser(User $user): bool
     {
-        if ($this->id === $user->id) return false;
-        
+        if ($this->id === $user->id)
+            return false;
+
         // Remove any existing relationship first
         Connection::customQuery(ORION_DB, "DELETE FROM users_relationship WHERE 
             (user_id1 = :u1 AND user_id2 = :u2) OR (user_id1 = :u2 AND user_id2 = :u1)", [
@@ -629,18 +635,19 @@ class User
         return (bool) Connection::doInsert(ORION_DB, "users_relationship", [
             "user_id1" => $this->id,
             "user_id2" => $user->id,
-            "status" => EUSER_RELATIONSHIP::BLOCKED,
+            "status" => EUSER_RELATIONSHIP::BLOCKED->value,
         ]);
     }
 
     public function unblockUser(User $user): bool
     {
-        if (!$this->hasBlocked($user)) return false;
+        if (!$this->hasBlocked($user))
+            return false;
 
         return (bool) Connection::doDelete(ORION_DB, "users_relationship", [
             "user_id1" => $this->id,
             "user_id2" => $user->id,
-            "status" => EUSER_RELATIONSHIP::BLOCKED,
+            "status" => EUSER_RELATIONSHIP::BLOCKED->value,
         ]);
     }
 
@@ -664,7 +671,7 @@ class User
     {
         $select = Connection::doSelect(ORION_DB, "users_relationship", [
             "user_id2" => $this->id,
-            "status" => EUSER_RELATIONSHIP::PENDING,
+            "status" => EUSER_RELATIONSHIP::PENDING->value,
         ]);
 
         $requesters = [];
@@ -676,11 +683,15 @@ class User
 
     public function getFriendshipStatus(User $user): EUSER_RELATIONSHIP
     {
-        if ($this->isFriendWith($user)) return EUSER_RELATIONSHIP::FRIEND;
-        if ($this->isFriendRequestPending($user)) return EUSER_RELATIONSHIP::PENDING;
-        if ($this->hasPendingFriendRequestFrom($user)) return EUSER_RELATIONSHIP::PENDING; // Could distinguish but PENDING is fine
-        if ($this->hasBlocked($user)) return EUSER_RELATIONSHIP::BLOCKED;
-        
+        if ($this->isFriendWith($user))
+            return EUSER_RELATIONSHIP::FRIEND;
+        if ($this->isFriendRequestPending($user))
+            return EUSER_RELATIONSHIP::PENDING;
+        if ($this->hasPendingFriendRequestFrom($user))
+            return EUSER_RELATIONSHIP::PENDING; // Could distinguish but PENDING is fine
+        if ($this->hasBlocked($user))
+            return EUSER_RELATIONSHIP::BLOCKED;
+
         return EUSER_RELATIONSHIP::NONE;
     }
 

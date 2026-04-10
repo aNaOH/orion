@@ -5,7 +5,7 @@ require_once "./models/Game.php";
 require_once "./emails/RegisterEmail.php";
 require_once "./controllers/ViewController.php";
 require_once "./helpers/forms.php";
-require_once "./helpers/DownloadToken.php";
+require_once "./helpers/Token.php";
 
 class UserController
 {
@@ -291,7 +291,7 @@ class UserController
         if (!empty($password)) {
             FormHelper::ValidateRequiredField($currentPassword, "currentPassword");
             FormHelper::ValidateRequiredField($confirmPassword, "confirmPassword");
-            
+
             if (!password_verify($currentPassword, $user->getPassword())) {
                 header("HTTP/1.1 400 Bad Request");
                 echo json_encode(["status" => 400, "message" => "Contraseña actual incorrecta", "field" => "currentPassword"]);
