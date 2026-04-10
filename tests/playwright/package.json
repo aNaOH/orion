@@ -1,0 +1,13 @@
+{
+  "name": "orion-playwright-tests",
+  "version": "1.0.0",
+  "description": "Automated tests for Orion platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.42.0",
+    "typescript": "^5.0.0"
+  }
+}

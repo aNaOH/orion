@@ -1,3 +1,6 @@
 /vendor/
 .env
 /cache/
+/tests/playwright/test-results/
+/tests/playwright/node_modules/
+/tests/playwright/playwright-report/
