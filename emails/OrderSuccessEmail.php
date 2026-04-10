@@ -21,19 +21,16 @@ class OrderSuccessEmail extends Email
 
     protected function getTemplatePath(): string
     {
-        return __DIR__ . "/templates/order_success_email.dmail";
+        return "emails/order_success.twig";
     }
 
     protected function getVariables(): array
     {
         return [
             "user_name" => $this->user->username,
-            "order" => $this->order,
+            "order_id" => $this->order['id'] ?? 'N/A',
+            "items" => $this->order['items'] ?? [],
+            "total" => $this->order['total'] ?? '0.00',
         ];
-    }
-
-    protected function getFonts(): string
-    {
-        return '<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Lexend:wght@100..900&display=swap" rel="stylesheet">';
     }
 }

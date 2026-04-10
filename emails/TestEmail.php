@@ -11,7 +11,7 @@ class TestEmail extends Email
 
     protected function getTemplatePath(): string
     {
-        return __DIR__ . "/templates/test_email.dmail";
+        return "emails/test.twig";
     }
 
     protected function getVariables(): array
@@ -19,10 +19,5 @@ class TestEmail extends Email
         return [
             "user_name" => "Juan",
         ];
-    }
-
-    protected function getFonts(): string
-    {
-        return '<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Lexend:wght@100..900&display=swap" rel="stylesheet">';
     }
 }

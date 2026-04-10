@@ -1,0 +1,18 @@
+{% extends 'emails/layout.twig' %}
+
+{% block content %}
+    <h1>¡Hola {{ user_name }}!</h1>
+    <p>Este es un correo de prueba enviado desde el nuevo sistema de emails de <strong>Orion</strong>.</p>
+    <p>Si estás viendo esto, significa que la configuración SMTP y el motor de plantillas Twig están funcionando correctamente.</p>
+    
+    <div class="divider"></div>
+    
+    <p>Hemos incluido algunas imágenes para probar la incrustación:</p>
+    <div style="text-align: center;">
+        <img src="{{ onlineAsset('https://cdn.orion.moonnastd.com/game/cover/1') }}" alt="Game Cover" style="max-width: 200px; border-radius: 8px;">
+    </div>
+    
+    <p style="text-align: center;">
+        <a href="{{ url('/') }}" class="button">Volver a Orion</a>
+    </p>
+{% endblock %}

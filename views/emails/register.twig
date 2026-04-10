@@ -1,0 +1,15 @@
+{% extends 'emails/layout.twig' %}
+
+{% block content %}
+    <h1>¡Bienvenido a Orion, {{ user_name }}!</h1>
+    <p>Gracias por unirte a nuestra comunidad. Tu cuenta ha sido creada exitosamente con el correo <strong>{{ user_email }}</strong>.</p>
+    <p>Estamos emocionados de tenerte con nosotros. Pulsa el botón de abajo para empezar a explorar los mejores juegos y conectar con otros jugadores.</p>
+    
+    <p style="text-align: center;">
+        <a href="{{ url('/login') }}" class="button">Acceder a mi cuenta</a>
+    </p>
+    
+    <div class="divider"></div>
+    
+    <p>Si no has sido tú quien ha creado esta cuenta, por favor ignora este correo o contacta con nuestro equipo de soporte.</p>
+{% endblock %}

@@ -21,7 +21,7 @@ class DeveloperWelcomeEmail extends Email
 
     protected function getTemplatePath(): string
     {
-        return __DIR__ . "/templates/developer_welcome_email.dmail";
+        return "emails/developer_welcome.twig";
     }
 
     protected function getVariables(): array
@@ -30,10 +30,5 @@ class DeveloperWelcomeEmail extends Email
             "user_name" => $this->user->username,
             "developer_name" => $this->developer->name,
         ];
-    }
-
-    protected function getFonts(): string
-    {
-        return '<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Lexend:wght@100..900&display=swap" rel="stylesheet">';
     }
 }

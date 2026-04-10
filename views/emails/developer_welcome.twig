@@ -1,0 +1,21 @@
+{% extends 'emails/layout.twig' %}
+
+{% block content %}
+    <h1>¡Felicidades, ahora eres Desarrollador en Orion!</h1>
+    <p>Hola {{ user_name }}, estamos encantados de darte la bienvenida al programa de desarrolladores de Orion.</p>
+    <p>A partir de ahora tienes acceso a nuevas herramientas para publicar y gestionar tus propios juegos:</p>
+    <ul>
+        <li>Publicación de juegos ilimitada</li>
+        <li>Estadísticas de ventas en tiempo real</li>
+        <li>Gestión de comunidad y feedback</li>
+        <li>Acceso anticipado a APIs de desarrollo</li>
+    </ul>
+    
+    <p style="text-align: center;">
+        <a href="{{ url('/dev') }}" class="button">Ir al Panel de Desarrollador</a>
+    </p>
+    
+    <div class="divider"></div>
+    
+    <p>Si tienes alguna pregunta sobre cómo empezar, consulta nuestra <a href="{{ url('/docs/dev') }}">documentación para desarrolladores</a>.</p>
+{% endblock %}

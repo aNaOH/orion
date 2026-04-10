@@ -19,18 +19,14 @@ class RegisterEmail extends Email
 
     protected function getTemplatePath(): string
     {
-        return __DIR__ . "/templates/register_email.dmail";
+        return "emails/register.twig";
     }
 
     protected function getVariables(): array
     {
         return [
             "user_name" => $this->user->username,
+            "user_email" => $this->user->email ?? $this->to,
         ];
-    }
-
-    protected function getFonts(): string
-    {
-        return '<link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Lexend:wght@100..900&display=swap" rel="stylesheet">';
     }
 }

@@ -20,10 +20,7 @@ abstract class Email
 
         $this->to = $to;
         $this->subject = $this->getSubject();
-        $this->body = $this->renderBody(
-            $this->getTemplatePath(),
-            $this->getVariables(),
-        );
+        // Body will be rendered on send or via getHtml to ensure variables are set
     }
 
     abstract protected function getSubject(): string;
@@ -34,261 +31,138 @@ abstract class Email
         return [];
     }
 
-    protected function getFonts(): string
-    {
-        return "";
-    }
-
     /** Previsualizar HTML final */
     public function getHtml(): string
     {
-        return $this->renderBody(
-            $this->getTemplatePath(),
-            $this->getVariables(),
-        );
+        return $this->renderBody();
+    }
+
+    /** Resuelve el MIME type de un archivo intentando usar mime_content_type (fileinfo) con fallback manual */
+    private function guessMime(string $filepath): string
+    {
+        if (function_exists('mime_content_type') && file_exists($filepath)) {
+            $mime = @mime_content_type($filepath);
+            if ($mime) {
+                return $mime;
+            }
+        }
+
+        $mimes = [
+            'jpg'  => 'image/jpeg', 'jpeg' => 'image/jpeg',
+            'png'  => 'image/png',  'gif'  => 'image/gif',
+            'webp' => 'image/webp', 'svg'  => 'image/svg+xml',
+            'ico'  => 'image/x-icon',
+            'pdf'  => 'application/pdf',
+            'txt'  => 'text/plain', 'html' => 'text/html',
+            'css'  => 'text/css',   'js'   => 'application/javascript',
+        ];
+        $ext = strtolower(pathinfo($filepath, PATHINFO_EXTENSION));
+        return $mimes[$ext] ?? 'application/octet-stream';
     }
 
     /** Adjuntar imagen local con CID */
-    protected function asset(string $path): string
+    public function emailAsset(string $path): string
     {
         $fullPath = __DIR__ . "/../" . ltrim($path, "/");
         if (!file_exists($fullPath)) {
-            throw new RuntimeException("Archivo no encontrado: $fullPath");
+            if (str_starts_with($path, "/assets/")) {
+                $fullPath = __DIR__ . "/../" . ltrim($path, "/");
+            } else {
+                $fullPath = __DIR__ . "/../assets/" . ltrim($path, "/");
+            }
+        }
+
+        if (!file_exists($fullPath)) {
+            return $path;
         }
 
         $content = file_get_contents($fullPath);
         if ($content === false || $content === "") {
-            throw new RuntimeException("No se pudo leer: $fullPath");
+            return $path;
         }
 
         $filename = basename($fullPath) ?: "asset_" . uniqid();
-        $cid = "cid_" . md5($fullPath . microtime(true));
-
-        $mime = mime_content_type($fullPath) ?: "application/octet-stream";
+        $cid      = "cid_" . md5($fullPath . microtime(true));
+        $mime     = $this->guessMime($fullPath);
 
         $this->attachments[] = [
-            "cid" => $cid,
+            "cid"      => $cid,
             "filename" => $filename,
-            "content" => $content,
-            "mime" => $mime,
-            "inline" => true,
+            "content"  => $content,
+            "mime"     => $mime,
+            "inline"   => true,
         ];
 
         return "cid:$cid";
     }
 
     /** Adjuntar imagen remota con CID */
-    protected function onlineAsset(string $url): string
+    public function emailOnlineAsset(string $url): string
     {
         if (!preg_match("#^https?://#", $url)) {
-            $url = $this->url($url);
+            $url = $this->emailUrl($url);
         }
 
         $content = @file_get_contents($url);
 
         if ($content === false || $content === "") {
-            throw new RuntimeException("No se pudo descargar $url");
+            return $url;
         }
 
-        $filename =
-            basename(parse_url($url, PHP_URL_PATH)) ?:
-            "image_" . uniqid() . ".jpg";
-        $cid = "cid_" . md5($url . microtime(true));
-
-        $ext = pathinfo($filename, PATHINFO_EXTENSION);
-        $mime = $ext
-            ? mime_content_type("dummy.$ext")
-            : "application/octet-stream";
+        $filename = basename(parse_url($url, PHP_URL_PATH)) ?: "image_" . uniqid() . ".jpg";
+        $cid      = "cid_" . md5($url . microtime(true));
+        $mime     = $this->guessMime($filename);
 
         $this->attachments[] = [
-            "cid" => $cid,
+            "cid"      => $cid,
             "filename" => $filename,
-            "content" => $content,
-            "mime" => $mime,
-            "inline" => true,
+            "content"  => $content,
+            "mime"     => $mime,
+            "inline"   => true,
         ];
 
         return "cid:$cid";
     }
 
     /** Genera URL absoluta */
-    protected function url(string $path): string
+    public function emailUrl(string $path): string
     {
         $base = $_ENV["APP_URL"] ?? "http://localhost";
         return rtrim($base, "/") . "/" . ltrim($path, "/");
     }
 
-    /** Renderiza el template HTML */
-    protected function renderBody(
-        string $templatePath,
-        array $variables,
-    ): string {
-        if (!file_exists($templatePath)) {
-            throw new RuntimeException(
-                "Plantilla no encontrada: $templatePath",
-            );
-        }
-
-        $html = file_get_contents($templatePath);
-
-        // Reemplazo simple
-        foreach ($variables as $key => $value) {
-            if (is_scalar($value)) {
-                $html = str_replace("{{{$key}}}", (string) $value, $html);
-            }
-        }
-
-        // Lógica
-        $html = $this->processLogic($html, $variables);
-
-        // Funciones
-        $html = $this->processFunctions($html);
-
-        // CSS
-        $cssPath = __DIR__ . "/email.css";
-        $styles = file_exists($cssPath) ? file_get_contents($cssPath) : "";
-
-        $fonts = $this->getFonts();
-
-        if (stripos($html, "<head>") === false) {
-            $html = "<html><head>$fonts<style>$styles</style></head><body>$html</body></html>";
-        } else {
-            $html = preg_replace(
-                "/<head>(.*?)<\/head>/is",
-                "<head>$1$fonts<style>$styles</style></head>",
-                $html,
-            );
-        }
-
-        return $html;
-    }
-
-    /** Resolución de variables complejas */
-    protected function resolveVariable(string $expression, array $variables)
+    /** Renderiza el template HTML usando Twig */
+    protected function renderBody(): string
     {
-        $parts = preg_split("/\./", $expression);
-        $value = $variables;
 
-        foreach ($parts as $part) {
-            if (preg_match('/^([a-zA-Z0-9_]+)\[([0-9]+)\]$/', $part, $m)) {
-                $prop = $m[1];
-                $index = $m[2];
+        $loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/../views');
+        $twig = new \Twig\Environment($loader, [
+            'cache' => false, // No cache for emails to avoid issues with dynamic inline attachments
+            'debug' => true,
+        ]);
 
-                if (isset($value[$prop][$index])) {
-                    $value = $value[$prop][$index];
-                } else {
-                    return "";
-                }
+        // Add custom functions for emails
+        $twig->addFunction(new \Twig\TwigFunction('asset', [$this, 'emailAsset']));
+        $twig->addFunction(new \Twig\TwigFunction('onlineAsset', [$this, 'emailOnlineAsset']));
+        $twig->addFunction(new \Twig\TwigFunction('url', [$this, 'emailUrl']));
 
-                continue;
-            }
+        $template = $this->getTemplatePath();
 
-            if (is_array($value) && isset($value[$part])) {
-                $value = $value[$part];
-                continue;
-            }
-
-            if (is_object($value) && isset($value->$part)) {
-                $value = $value->$part;
-                continue;
-            }
-
-            return "";
+        if (!str_ends_with($template, '.twig')) {
+            $template .= '.twig';
         }
 
-        return $value;
+        try {
+            return $twig->render($template, $this->getVariables());
+        } catch (\Exception $e) {
+            throw new RuntimeException("Error rendering email template [$template]: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
+        }
     }
 
-    /** FOREACH, IF y variables */
-    protected function processLogic(string $html, array $variables): string
-    {
-        // FOREACH
-        $html = preg_replace_callback(
-            "/\{\{\s*foreach\s+([a-zA-Z0-9_]+)\s+as\s+([a-zA-Z0-9_]+)(?::([a-zA-Z0-9_]+))?\s*\}\}(.*?)\{\{\s*endforeach\s*\}\}/is",
-            function ($m) use ($variables) {
-                [$full, $listName, $itemName, $indexName, $content] = $m;
-
-                if (
-                    !isset($variables[$listName]) ||
-                    !is_iterable($variables[$listName])
-                ) {
-                    return "";
-                }
-
-                $output = "";
-                $i = 0;
-
-                foreach ($variables[$listName] as $value) {
-                    $block = $content;
-
-                    if (is_scalar($value)) {
-                        $block = str_replace(
-                            "{{{$itemName}}}",
-                            (string) $value,
-                            $block,
-                        );
-                    }
-
-                    if ($indexName) {
-                        $block = str_replace("{{{$indexName}}}", $i, $block);
-                    }
-
-                    $output .= $block;
-                    $i++;
-                }
-
-                return $output;
-            },
-            $html,
-        );
-
-        // IF
-        $html = preg_replace_callback(
-            "/\{\{\s*if\s+([a-zA-Z0-9_]+)\s*\}\}(.*?)\{\{\s*endif\s*\}\}/is",
-            function ($m) use ($variables) {
-                return !empty($variables[$m[1]]) ? $m[2] : "";
-            },
-            $html,
-        );
-
-        // Variables complejas
-        $html = preg_replace_callback(
-            "/\{\{\s*([a-zA-Z0-9_]+(?:[.\[][a-zA-Z0-9_()\]]+)+)\s*\}\}/",
-            fn($m) => $this->resolveVariable($m[1], $variables),
-            $html,
-        );
-
-        return $html;
-    }
-
-    /** Procesa asset(), onlineAsset() y url() */
-    protected function processFunctions(string $html): string
-    {
-        $html = preg_replace_callback(
-            '/\{\{\s*asset\(\'([^\']+)\'\)\s*\}\}/',
-            fn($m) => $this->asset($m[1]),
-            $html,
-        );
-
-        $html = preg_replace_callback(
-            '/\{\{\s*onlineAsset\(\'([^\']+)\'\)\s*\}\}/',
-            fn($m) => $this->onlineAsset($m[1]),
-            $html,
-        );
-
-        $html = preg_replace_callback(
-            '/\{\{\s*url\(\'([^\']+)\'\)\s*\}\}/',
-            fn($m) => $this->url($m[1]),
-            $html,
-        );
-
-        return $html;
-    }
-
-    /** Envío SMTP propio */
+    /** Envío SMTP */
     public function send(): bool
     {
-        return true;
+        $this->body = $this->renderBody();
         $this->validateBeforeSend();
 
         $mail = new PHPMailer(true);
@@ -296,21 +170,26 @@ abstract class Email
         try {
             // Configuración SMTP
             $mail->isSMTP();
-            $mail->Host = $_ENV["SMTP_HOST"];
+            $mail->Host = $_ENV["SMTP_HOST"] ?? 'localhost';
             $mail->SMTPAuth = true;
-            $mail->Username = $_ENV["SMTP_USER"];
-            $mail->Password = $_ENV["SMTP_PASSWORD"];
+            $mail->Username = $_ENV["SMTP_USER"] ?? '';
+            $mail->Password = $_ENV["SMTP_PASSWORD"] ?? '';
             $mail->Port = intval($_ENV["SMTP_PORT"] ?? 587);
-            $mail->SMTPSecure =
-                $_ENV["SMTP_SECURE"] ?? PHPMailer::ENCRYPTION_STARTTLS;
+
+            $secure = $_ENV["SMTP_SECURE"] ?? 'tls';
+            if ($secure === 'ssl') {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            } else {
+                $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;
+            }
 
             // Remitente
-            $mail->setFrom($_ENV["EMAIL_FROM"], "Orion");
+            $mail->setFrom($_ENV["EMAIL_FROM"] ?? 'no-reply@orion.com', "Orion");
 
             // Destinatario
             $mail->addAddress($this->to);
 
-            // Inline attachments
+            // Inline attachments (Images)
             foreach ($this->attachments as $att) {
                 if ($att["inline"]) {
                     $mail->addStringEmbeddedImage(
@@ -324,6 +203,7 @@ abstract class Email
             }
 
             $mail->isHTML(true);
+            $mail->CharSet = 'UTF-8';
             $mail->Subject = $this->subject;
             $mail->Body = $this->body;
             $mail->AltBody = strip_tags($this->body);

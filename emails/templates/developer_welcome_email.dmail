@@ -1,7 +1,0 @@
-<div class="container">
-    <h1 class="title">¡Ya eres un desarrollador {{user_name}}!</h1>
-    <h1 class="title">¡Empieza a publicar {{developer_name}}!</h1>
-
-    <!-- Enlace dinámico -->
-    <a href="{{url('/dev/panel')}}">Accede a tu panel</a>
-</div>
