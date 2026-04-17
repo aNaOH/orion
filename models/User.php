@@ -194,8 +194,8 @@ class User
     // Profile picture URL getter
     public function getProfilePicURL(): string
     {
-        return "https://cdn.orion.moonnastd.com/profile/" .
-            ($this->profile_pic ?? "default");
+        return "https://cdn.orion.moonnastd.com/user/profile_pic/" .
+            ($this->profile_pic ?? "default.png");
     }
 
     // Relationship with Developer

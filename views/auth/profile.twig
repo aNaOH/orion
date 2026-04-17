@@ -26,6 +26,7 @@
             </a>
           </div>
         {% else %}
+        {{ token_input('USERACTION') | raw }}
           <div class="mt-6 flex flex-wrap gap-2 items-center">
             {% if has_blocked %}
                 <button onclick="friendAction('unblock', {{ target_user.id }})" class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-500 transition">
@@ -107,9 +108,12 @@
 
         if (confirmMsg && !confirm(confirmMsg)) return;
 
+        let token = $("#tript_token").val();
+
         $.ajax({
             url: url,
             method: 'POST',
+            data: { tript_token: token },
             success: function(response) {
                 location.reload();
             },
