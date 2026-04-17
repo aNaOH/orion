@@ -82,8 +82,8 @@ class SupportController
 
         // 2. Capture Snapshot & Image
         $profilePicKey = $targetUser->profile_pic;
-        $snapshotPicKey = "snapshot_" . $ticket->id . "_" . ($profilePicKey ?? "default");
-        
+        $snapshotPicKey = $profilePicKey ? "snapshot_" . $ticket->id . "_" . $profilePicKey : "default.png";
+
         if ($profilePicKey) {
             S3Helper::copy(EBUCKET_LOCATION::PROFILE_PIC, $profilePicKey, EBUCKET_LOCATION::SNAPSHOT, $snapshotPicKey);
         }

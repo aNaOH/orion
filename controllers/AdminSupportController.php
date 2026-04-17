@@ -39,7 +39,7 @@ class AdminSupportController
     public static function apiUpdateStatus()
     {
         FormHelper::ValidateToken($_POST["tript_token"] ?? "", "tript_token", ETOKEN_TYPE::COMMON);
-        
+
         $id = $_POST["id"] ?? null;
         $status = $_POST["status"] ?? null;
         $adminComment = $_POST["admin_comment"] ?? null;
@@ -58,7 +58,7 @@ class AdminSupportController
             exit();
         }
 
-        $ticket->status = (int)$status;
+        $ticket->status = (int) $status;
         $ticket->admin_comment = $adminComment;
         $ticket->save();
 

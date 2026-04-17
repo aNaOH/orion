@@ -54,7 +54,7 @@ class Ticket
         $sql = "SELECT * FROM tickets ORDER BY created_at DESC";
         $stmt = Connection::customQuery(ORION_DB, $sql);
         $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        
+
         $tickets = [];
         foreach ($data as $row) {
             $tickets[] = new Ticket(
