@@ -4,6 +4,8 @@ require_once "./models/User.php";
 require_once "./models/Ticket.php";
 require_once "./models/TicketReportUser.php";
 require_once "./models/TicketAppeal.php";
+require_once "./models/TicketGeneral.php";
+require_once "./models/TicketLoginRecovery.php";
 require_once "./models/UserSuspension.php";
 require_once "./emails/TicketResponseEmail.php";
 require_once "./emails/UserSuspendedEmail.php";
@@ -42,10 +44,27 @@ class AdminSupportController
             }
         }
 
+        $general = null;
+        if ($ticket->type === "general") {
+            $general = TicketGeneral::getByTicketId($ticket->id);
+        }
+
+        $recovery = null;
+        $target_user = null;
+        if ($ticket->type === "login_recovery") {
+            $recovery = TicketLoginRecovery::getByTicketId($ticket->id);
+            if ($recovery) {
+                $target_user = $recovery->getTargetUser();
+            }
+        }
+
         ViewController::render('admin/support/detail', [
             'ticket' => $ticket,
             'report' => $report,
             'appeal' => $appeal,
+            'general' => $general,
+            'recovery' => $recovery,
+            'target_user' => $target_user,
             'original_suspension' => $original_suspension,
             'reporter' => $ticket->getReporter(),
             'reported_user' => $report ? $report->getReportedUser() : null,
@@ -64,6 +83,8 @@ class AdminSupportController
         $moderationAction = $_POST["moderation_action"] ?? "none";
         $suspensionReason = trim($_POST["suspension_reason"] ?? "");
         $suspensionUntil = $_POST["suspension_until"] ?? null;
+        $newEmail = $_POST["new_email"] ?? null;
+        $resetPassword = isset($_POST["reset_password"]) && $_POST["reset_password"] === "on";
 
         FormHelper::ValidateRequiredField($id, "id");
         FormHelper::ValidateRequiredField($status, "status");
@@ -130,13 +151,25 @@ class AdminSupportController
             }
         }
 
-        // If it's an accepted appeal, lift the suspension
-        if ($ticket->type === 'appeal' && (int)$status === 1) {
-            if ($appeal) {
-                $suspension = $appeal->getSuspension();
-                if ($suspension && $suspension->is_active) {
-                    $suspension->is_active = false;
-                    $suspension->save();
+        // If it's an accepted login recovery, perform the requested actions
+        if ($ticket->type === 'login_recovery' && (int)$status === 1) {
+            $recovery = TicketLoginRecovery::getByTicketId($ticket->id);
+            if ($recovery) {
+                $targetUser = $recovery->getTargetUser();
+                if ($targetUser) {
+                    if ($newEmail && trim($newEmail) !== "" && $newEmail !== $targetUser->email) {
+                        FormHelper::ValidateEmailField($newEmail, "new_email");
+                        // Check if email already exists
+                        if (User::getByEmail($newEmail) === null) {
+                            $targetUser->email = trim($newEmail);
+                        }
+                    }
+                    if ($resetPassword) {
+                        $newPass = bin2hex(random_bytes(4)); // 8 chars
+                        $targetUser->password = password_hash($newPass, PASSWORD_BCRYPT);
+                        $adminComment .= "\n\n[SISTEMA]: Se ha generado una nueva contraseña: " . $newPass;
+                    }
+                    $targetUser->save();
                 }
             }
         }

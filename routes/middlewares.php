@@ -1,7 +1,38 @@
 <?php
 
-require_once "controllers/UserController.php";
 require_once "models/User.php";
+require_once "controllers/UserController.php";
+
+$router->before("GET|POST", "/.*", function () {
+    $requestPath = parse_url($_SERVER["REQUEST_URI"] ?? "", PHP_URL_PATH) ?? "";
+
+    // Allow static assets
+    if (strpos($requestPath, "/assets/") === 0 || strpos($requestPath, "/vendor/") === 0) {
+        return;
+    }
+
+    // Allowed paths for suspended users
+    $allowedPaths = [
+        "/suspended",
+        "/support/appeal",
+        "/support/appeal/api/create",
+        "/legal/community-guidelines",
+        "/logout",
+        "/login" // Allow login to see they are suspended if they try to relog
+    ];
+
+    if (in_array($requestPath, $allowedPaths)) {
+        return;
+    }
+
+    if (isset($_SESSION["user"])) {
+        $user = User::getById($_SESSION["user"]["id"]);
+        if ($user && $user->getActiveSuspension()) {
+            header("location: /suspended");
+            exit();
+        }
+    }
+});
 
 $router->before("GET|POST", "/admin(/.*)?", function () {
     if (isset($_SESSION["user"])) {

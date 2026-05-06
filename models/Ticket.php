@@ -70,6 +70,27 @@ class Ticket
         return $tickets;
     }
 
+    public static function getByUserId(int $userId): array
+    {
+        $sql = "SELECT * FROM tickets WHERE user_id = :user_id ORDER BY created_at DESC";
+        $stmt = Connection::customQuery(ORION_DB, $sql, ["user_id" => $userId]);
+        $data = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+        $tickets = [];
+        foreach ($data as $row) {
+            $tickets[] = new Ticket(
+                $row["user_id"],
+                $row["type"],
+                $row["status"],
+                $row["admin_comment"],
+                $row["id"],
+                $row["created_at"],
+                $row["updated_at"]
+            );
+        }
+        return $tickets;
+    }
+
     public function save(): bool
     {
         $data = [

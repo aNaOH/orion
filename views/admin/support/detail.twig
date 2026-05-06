@@ -44,11 +44,23 @@
                         <i class="bi bi-person-fill mr-2 text-alt"></i> Información del Reportero
                     </h2>
                     <div class="flex items-center space-x-4">
-                        <img src="{{ profile_pic(reporter) }}" class="w-12 h-12 rounded-full object-cover">
-                        <div>
-                            <p class="text-white font-bold">{{ reporter.username }}</p>
-                            <p class="text-gray-500 text-sm">{{ reporter.email }}</p>
-                        </div>
+                        {% if reporter %}
+                            <img src="{{ profile_pic(reporter) }}" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <p class="text-white font-bold">{{ reporter.username }}</p>
+                                <p class="text-gray-500 text-sm">{{ reporter.email }}</p>
+                            </div>
+                        {% elseif general and general.guest_email %}
+                            <div class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
+                                <i class="bi bi-person-ghost text-2xl text-gray-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-bold">Invitado</p>
+                                <p class="text-gray-500 text-sm">{{ general.guest_email }}</p>
+                            </div>
+                        {% else %}
+                            <p class="text-gray-500 italic text-sm">Información de contacto no disponible.</p>
+                        {% endif %}
                     </div>
                 </div>
 
@@ -158,6 +170,59 @@
                             </div>
                         </div>
                     {% endif %}
+                {% elseif ticket.type == "login_recovery" %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-key-fill mr-2 text-yellow-400"></i> Recuperación de Acceso
+                        </h2>
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase">Email de Contacto</label>
+                                    <p class="text-white font-semibold">{{ recovery.contact_email }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase">Cuenta Objetivo</label>
+                                    {% if target_user %}
+                                        <div class="flex items-center space-x-3 mt-1">
+                                            <img src="{{ profile_pic(target_user) }}" class="w-8 h-8 rounded-full">
+                                            <p class="text-white">{{ target_user.username }} ({{ target_user.email }})</p>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-red-400 italic">No se ha podido identificar la cuenta automáticamente.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Mensaje del Usuario</label>
+                                <div class="bg-brand-900 p-6 rounded-lg border border-white/5 shadow-inner">
+                                    <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">{{ recovery.message }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif ticket.type == "general" %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-info-circle-fill mr-2 text-blue-400"></i> Detalles de la Consulta
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase">Categoría</label>
+                                <p class="text-gray-200 font-semibold">{{ general.getCategoryLabel() }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase">Asunto</label>
+                                <p class="text-gray-200">{{ general.subject }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Mensaje del Usuario</label>
+                            <div class="bg-brand-900 p-6 rounded-lg border border-white/5 shadow-inner">
+                                <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">{{ general.message }}</p>
+                            </div>
+                        </div>
+                    </div>
                 {% endif %}
             </div>
 
@@ -251,6 +316,32 @@
                                         En tu horario local será: <span id="server-time-value"></span>
                                     </p>
                                 </div>
+                            {% elseif ticket.type == 'login_recovery' %}
+                                <div id="recovery-actions-wrapper" class="space-y-4 pt-2">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Acciones de Recuperación</label>
+                                    
+                                    <div class="p-4 rounded-lg bg-brand-900 border border-white/5">
+                                        <label class="flex items-center cursor-pointer group">
+                                            <div class="relative inline-flex items-center">
+                                                <input type="checkbox" name="reset_password" class="sr-only peer">
+                                                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-alt"></div>
+                                            </div>
+                                            <span class="ml-3 text-sm font-medium text-gray-300 group-hover:text-white transition-colors">Generar nueva contraseña</span>
+                                        </label>
+                                        <p class="mt-2 text-[10px] text-gray-500 italic">Se generará una clave aleatoria y se añadirá al comentario de resolución.</p>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Nuevo correo de cuenta (Opcional)</label>
+                                        <input
+                                            type="email"
+                                            name="new_email"
+                                            value="{{ target_user ? target_user.email : '' }}"
+                                            class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
+                                            placeholder="ejemplo@correo.com"
+                                        >
+                                    </div>
+                                </div>
                             {% endif %}
 
                             <div>
@@ -292,8 +383,10 @@
         
         if (isAccepted) {
             $('#moderation-wrapper').slideDown(200);
+            $('#recovery-actions-wrapper').slideDown(200);
         } else {
             $('#moderation-wrapper').slideUp(200);
+            $('#recovery-actions-wrapper').slideUp(200);
         }
 
         const isSuspending = isAccepted && moderationAction !== 'none';

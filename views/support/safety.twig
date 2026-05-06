@@ -1,0 +1,118 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Seguridad y Reportes - Orion{% endblock %}
+
+{% block content %}
+<div class="py-12 animate__animated animate__fadeIn max-w-5xl mx-auto">
+    <div class="mb-12">
+        <nav class="flex mb-8" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/support" class="text-gray-400 hover:text-white transition-colors flex items-center">
+                        <i class="bi bi-house-door-fill mr-2"></i>
+                        Soporte
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="bi bi-chevron-right text-gray-600 text-xs mx-2"></i>
+                        <span class="text-gray-200 font-semibold">Seguridad y Reportes</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+        
+        <h1 class="text-4xl font-bold text-white mb-4">Seguridad y Reportes</h1>
+        <p class="text-gray-400 text-lg">Tu seguridad es nuestra prioridad. Aprende cómo proteger tu cuenta y cómo ayudarnos a mantener Orion como un lugar seguro para todos.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+        <!-- Account Safety Section -->
+        <div class="bg-branddark/50 border border-white/5 rounded-3xl p-8 hover:border-alt/20 transition-all duration-300">
+            <div class="w-16 h-16 bg-alt/10 rounded-2xl flex items-center justify-center mb-6">
+                <i class="bi bi-shield-lock-fill text-3xl text-alt"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-6">Protege tu cuenta</h2>
+            <ul class="space-y-4">
+                <li class="flex items-start">
+                    <i class="bi bi-check2-circle text-alt mt-1 mr-3 flex-shrink-0"></i>
+                    <p class="text-gray-400"><strong class="text-gray-200">Contraseña robusta:</strong> Usa combinaciones de letras, números y símbolos. Evita usar la misma contraseña en otros sitios.</p>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-check2-circle text-alt mt-1 mr-3 flex-shrink-0"></i>
+                    <p class="text-gray-400"><strong class="text-gray-200">Verificación en dos pasos:</strong> Activa el 2FA desde los ajustes de tu perfil para añadir una capa extra de seguridad.</p>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-check2-circle text-alt mt-1 mr-3 flex-shrink-0"></i>
+                    <p class="text-gray-400"><strong class="text-gray-200">Cuidado con el Phishing:</strong> Orion nunca te pedirá tu contraseña por correo electrónico o mensajes directos.</p>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Reporting Section -->
+        <div class="bg-branddark/50 border border-white/5 rounded-3xl p-8 hover:border-red-500/20 transition-all duration-300">
+            <div class="w-16 h-16 bg-red-500/10 rounded-2xl flex items-center justify-center mb-6">
+                <i class="bi bi-flag-fill text-3xl text-red-500"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-white mb-6">Cómo reportar</h2>
+            <ul class="space-y-4">
+                <li class="flex items-start">
+                    <i class="bi bi-info-circle text-red-400 mt-1 mr-3 flex-shrink-0"></i>
+                    <p class="text-gray-400"><strong class="text-gray-200">Desde el perfil:</strong> Puedes reportar a cualquier usuario directamente desde su página de perfil usando el botón "Reportar".</p>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-info-circle text-red-400 mt-1 mr-3 flex-shrink-0"></i>
+                    <p class="text-gray-400"><strong class="text-gray-200">Tipos de reporte:</strong> Nombre ofensivo, comportamiento inadecuado, spam o suplantación de identidad.</p>
+                </li>
+                <li class="flex items-start">
+                    <i class="bi bi-info-circle text-red-400 mt-1 mr-3 flex-shrink-0"></i>
+                    <p class="text-gray-400"><strong class="text-gray-200">Privacidad:</strong> Los reportes son totalmente anónimos. El usuario reportado nunca sabrá quién envió la queja.</p>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Community Guidelines Card -->
+    <div class="bg-brand-900/40 border border-white/5 rounded-3xl p-10 flex flex-col lg:flex-row items-center gap-10">
+        <div class="lg:w-2/3">
+            <h2 class="text-3xl font-bold text-white mb-4">Normas de la Comunidad</h2>
+            <p class="text-gray-400 text-lg mb-6 leading-relaxed">
+                Para asegurar que Orion sea un espacio divertido y acogedor para todos, hemos establecido unas pautas de convivencia que todos los usuarios deben seguir. El incumplimiento de estas normas puede resultar en sanciones temporales o permanentes.
+            </p>
+            <div class="flex flex-wrap gap-4">
+                <a href="/legal/community-guidelines" class="px-6 py-3 bg-white/5 hover:bg-white/10 text-white font-semibold rounded-xl border border-white/10 transition-colors">
+                    Leer Normas Completas
+                </a>
+                <a href="/support/create" class="px-6 py-3 bg-alt/10 hover:bg-alt/20 text-alt font-semibold rounded-xl border border-alt/20 transition-colors">
+                    Duda sobre una norma
+                </a>
+            </div>
+        </div>
+        <div class="lg:w-1/3 flex justify-center">
+            <div class="relative">
+                <div class="absolute -inset-4 bg-alt/20 blur-3xl rounded-full"></div>
+                <i class="bi bi-book-half text-[120px] text-alt relative z-10"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- Sanciones Section -->
+    <div class="mt-16">
+        <h2 class="text-3xl font-bold text-white mb-8">¿Qué pasa después de un reporte?</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="p-6 bg-branddark/30 rounded-2xl border border-white/5">
+                <h3 class="text-xl font-bold text-gray-200 mb-3">1. Revisión</h3>
+                <p class="text-gray-500 text-sm">Nuestro equipo de moderación revisa el reporte manualmente, incluyendo capturas del estado de la cuenta en ese momento.</p>
+            </div>
+            <div class="p-6 bg-branddark/30 rounded-2xl border border-white/5">
+                <h3 class="text-xl font-bold text-gray-200 mb-3">2. Resolución</h3>
+                <p class="text-gray-500 text-sm">Se decide si el reporte es válido. Si lo es, se aplica una medida disciplinaria proporcional a la gravedad.</p>
+            </div>
+            <div class="p-6 bg-branddark/30 rounded-2xl border border-white/5">
+                <h3 class="text-xl font-bold text-gray-200 mb-3">3. Notificación</h3>
+                <p class="text-gray-500 text-sm">Tanto el reportero como el infractor reciben una notificación con el resultado del proceso (sin revelar identidades).</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -4,6 +4,7 @@ require_once "./models/User.php";
 require_once "./models/Ticket.php";
 require_once "./models/TicketReportUser.php";
 require_once "./models/TicketAppeal.php";
+require_once "./models/TicketGeneral.php";
 require_once "./helpers/s3.php";
 require_once "./emails/TicketCreatedEmail.php";
 require_once "./emails/TicketAdminNotificationEmail.php";
@@ -28,6 +29,124 @@ class SupportController
             exit();
         }
         return $user;
+    }
+
+    public static function index()
+    {
+        $user = self::getLoggedUser();
+        ViewController::render('support/index', [
+            'user' => $user
+        ]);
+    }
+
+    public static function showFAQ()
+    {
+        $user = self::getLoggedUser();
+        ViewController::render('support/faq', [
+            'user' => $user
+        ]);
+    }
+
+    public static function showSafety()
+    {
+        $user = self::getLoggedUser();
+        ViewController::render('support/safety', [
+            'user' => $user
+        ]);
+    }
+
+    public static function showUserTickets()
+    {
+        $user = self::getLoggedUser();
+        if (!$user) {
+            header("location: /login?to=" . urlencode($_SERVER['REQUEST_URI']));
+            exit();
+        }
+
+        $tickets = Ticket::getByUserId($user->id);
+
+        ViewController::render('support/tickets', [
+            'user' => $user,
+            'tickets' => $tickets
+        ]);
+    }
+
+    public static function showCreateTicket()
+    {
+        $user = self::getLoggedUser();
+        ViewController::render('support/create', [
+            'user' => $user,
+            'categories' => TicketGeneral::getCategories()
+        ]);
+    }
+
+    public static function apiCreateTicket()
+    {
+        $user = self::getLoggedUser(); // Don't exit if not logged in
+        FormHelper::ValidateToken($_POST["tript_token"] ?? "", "tript_token", ETOKEN_TYPE::USERACTION);
+
+        $category = $_POST["category"] ?? null;
+        $subject = $_POST["subject"] ?? null;
+        $message = $_POST["message"] ?? null;
+        $guestEmail = $_POST["guest_email"] ?? null;
+
+        if (!$user) {
+            FormHelper::ValidateRequiredField($guestEmail, "guest_email");
+            FormHelper::ValidateEmailField($guestEmail, "guest_email");
+            // If guest, only allow login_issue
+            if ($category !== 'login_issue') {
+                header("HTTP/1.1 403 Forbidden");
+                echo json_encode(["status" => 403, "message" => "Como invitado, solo puedes crear tickets por problemas de inicio de sesión."]);
+                exit();
+            }
+        }
+
+        FormHelper::ValidateRequiredField($category, "category");
+        FormHelper::ValidateRequiredField($subject, "subject");
+        FormHelper::ValidateRequiredField($message, "message");
+        FormHelper::ValidateAllowedValue($category, TicketGeneral::getAllowedCategoryKeys(), "category", "Selecciona una categoría válida.");
+        FormHelper::ValidateMinChars(trim($subject), 5, "subject");
+        FormHelper::ValidateMaxChars(trim($subject), 100, "subject");
+        FormHelper::ValidateMinChars(trim($message), 20, "message");
+        FormHelper::ValidateMaxChars(trim($message), 5000, "message");
+
+        // 1. Create base Ticket
+        $type = ($category === 'login_issue') ? "login_recovery" : "general";
+        $ticket = new Ticket($user ? $user->id : null, $type);
+        $ticket->save();
+
+        // 2. Create specific Ticket details
+        if ($type === "login_recovery") {
+            require_once "models/TicketLoginRecovery.php";
+            // For recovery, we can try to find the target user if they mentioned it in the subject or message
+            // But better to add a field for it. For now, we'll just save it as recovery.
+            $recoveryTicket = new TicketLoginRecovery($ticket->id, $guestEmail ?? ($user ? $user->email : ""), trim($message));
+            
+            // Basic heuristic: if the subject is a username or email that exists
+            $targetUser = User::getByUsername(trim($subject)) ?? User::getByEmail(trim($subject));
+            if ($targetUser) {
+                $recoveryTicket->target_user_id = $targetUser->id;
+            }
+            
+            $recoveryTicket->save();
+        } else {
+            $generalTicket = new TicketGeneral($ticket->id, $category, trim($subject), trim($message), $guestEmail);
+            $generalTicket->save();
+        }
+
+        // 3. Notify Admins
+        $admins = User::all();
+        foreach ($admins as $admin) {
+            if ($admin->role === EUSER_TYPE::ADMIN) {
+                try {
+                    $adminEmail = new TicketAdminNotificationEmail($admin->email, $ticket, $user);
+                    $adminEmail->send();
+                } catch (Exception $e) {}
+            }
+        }
+
+        echo json_encode(["status" => 200, "message" => "Tu ticket ha sido creado correctamente.", "ticket_id" => $ticket->id]);
+        exit();
     }
 
     public static function showReportUser($reportedUserId)
