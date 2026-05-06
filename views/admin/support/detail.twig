@@ -52,6 +52,35 @@
                     </div>
                 </div>
 
+                {% if reported_user %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-person-badge-fill mr-2 text-red-400"></i> Usuario reportado
+                        </h2>
+                        <div class="flex items-center space-x-4">
+                            <img src="{{ profile_pic(reported_user) }}" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <p class="text-white font-bold">{{ reported_user.username }}</p>
+                                <p class="text-gray-500 text-sm">{{ reported_user.email }}</p>
+                            </div>
+                        </div>
+
+                        {% if active_suspension %}
+                            <div class="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+                                <p class="font-semibold">Este usuario ya tiene una suspensión activa.</p>
+                                <p class="mt-1">
+                                    {% if active_suspension.ends_at %}
+                                        Vigente hasta el {{ active_suspension.ends_at|date("d/m/Y H:i") }}.
+                                    {% else %}
+                                        La suspensión es indefinida.
+                                    {% endif %}
+                                </p>
+                                <p class="mt-1"><strong>Motivo:</strong> {{ active_suspension.reason }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
                 <!-- Report Content -->
                 {% if ticket.type == "report_user" %}
                     <div class="bg-branddark rounded-xl p-6 border border-white/5">
@@ -61,7 +90,7 @@
                         <div class="space-y-4">
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase">Motivo</label>
-                                <p class="text-gray-200">{{ report.reason }}</p>
+                                <p class="text-gray-200">{{ report.getReasonLabel() }}</p>
                             </div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 uppercase">Descripción</label>
@@ -123,9 +152,40 @@
                                 </div>
                             </div>
 
+                            <div id="moderation-wrapper">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Medida adicional</label>
+                                <select name="moderation_action" id="moderation_action" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner">
+                                    <option value="none">Aceptar sin suspensión</option>
+                                    <option value="suspend_temp">Suspensión temporal</option>
+                                    <option value="suspend_indef">Suspensión indefinida</option>
+                                </select>
+                            </div>
+
+                            <div id="suspension-reason-wrapper" class="hidden">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Motivo visible de la suspensión</label>
+                                <input
+                                    type="text"
+                                    name="suspension_reason"
+                                    id="suspension_reason"
+                                    value="{{ report.getReasonLabel() }}"
+                                    class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
+                                    placeholder="Ej. Suplantación de identidad"
+                                >
+                            </div>
+
+                            <div id="suspension-until-wrapper" class="hidden">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Fin de la suspensión temporal</label>
+                                <input
+                                    type="datetime-local"
+                                    name="suspension_until"
+                                    id="suspension_until"
+                                    class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
+                                >
+                            </div>
+
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Comentario para el usuario</label>
-                                <textarea name="admin_comment" rows="4" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner" placeholder="Explica el motivo de la resolución..."></textarea>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Comentario para el usuario reportante</label>
+                                <textarea name="admin_comment" rows="4" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner" placeholder="Explica el motivo de la resolución o la medida aplicada..."></textarea>
                             </div>
 
                             <button type="submit" id="submit-btn" class="w-full py-3 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg transition shadow-lg shadow-alt/20">
@@ -152,15 +212,49 @@
 
 {% block scripts %}
 <script>
+    function toggleSuspensionFields() {
+        const status = $('input[name="status"]:checked').val();
+        const moderationAction = $('#moderation_action').val();
+        const allowSuspension = status == '1';
+        const suspensionFieldsVisible = allowSuspension && moderationAction !== 'none';
+        const temporaryVisible = allowSuspension && moderationAction === 'suspend_temp';
+
+        $('#moderation-wrapper').toggleClass('hidden', !allowSuspension);
+        $('#suspension-reason-wrapper').toggleClass('hidden', !suspensionFieldsVisible);
+        $('#suspension-until-wrapper').toggleClass('hidden', !temporaryVisible);
+    }
+
+    $('#moderation_action').on('change', toggleSuspensionFields);
+    $('input[name="status"]').on('change', toggleSuspensionFields);
+    toggleSuspensionFields();
+
     $('#resolve-form').on('submit', function(e) {
         e.preventDefault();
         
         const btn = $('#submit-btn');
         const status = $('input[name="status"]:checked').val();
         const comment = $('textarea[name="admin_comment"]').val();
+        const moderationAction = $('#moderation_action').val();
+        const suspensionReason = $('#suspension_reason').val();
+        const suspensionUntil = $('#suspension_until').val();
         
         if (status == 2 && comment.length < 5) {
             alert('Por favor, indica un motivo para el rechazo.');
+            return;
+        }
+
+        if (status == 1 && moderationAction !== 'none' && suspensionReason.trim().length < 3) {
+            alert('Indica un motivo visible para la suspensión.');
+            return;
+        }
+
+        if (status == 1 && moderationAction !== 'none' && comment.trim().length < 5) {
+            alert('Explica el motivo de la medida aplicada al usuario.');
+            return;
+        }
+
+        if (status == 1 && moderationAction === 'suspend_temp' && !suspensionUntil) {
+            alert('Indica cuándo termina la suspensión temporal.');
             return;
         }
 
@@ -176,7 +270,8 @@
                 location.reload();
             },
             error: function(xhr) {
-                alert('Error al actualizar ticket');
+                const response = xhr.responseJSON;
+                alert(response && response.message ? response.message : 'Error al actualizar ticket');
                 btn.prop('disabled', false).text('Resolver Ticket');
             }
         });

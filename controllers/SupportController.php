@@ -6,6 +6,7 @@ require_once "./models/TicketReportUser.php";
 require_once "./helpers/s3.php";
 require_once "./emails/TicketCreatedEmail.php";
 require_once "./emails/TicketAdminNotificationEmail.php";
+require_once "./helpers/forms.php";
 
 class SupportController
 {
@@ -44,13 +45,7 @@ class SupportController
 
         ViewController::render('support/report_user', [
             'target_user' => $targetUser,
-            'reasons' => [
-                'name' => 'Nombre ofensivo',
-                'motd' => 'MOTD ofensivo',
-                'avatar' => 'Foto de perfil ofensiva',
-                'spam' => 'Spam',
-                'impersonation' => 'Suplantación de identidad'
-            ],
+            'reasons' => TicketReportUser::getReasons(),
             'selected_reason' => $_GET['reason'] ?? '',
             'description' => $_GET['description'] ?? ''
         ]);
@@ -68,6 +63,10 @@ class SupportController
         FormHelper::ValidateRequiredField($reportedId, "reported_id");
         FormHelper::ValidateRequiredField($reason, "reason");
         FormHelper::ValidateRequiredField($description, "description");
+        FormHelper::ValidateAllowedValue($reason, TicketReportUser::getAllowedReasonKeys(), "reason", "Selecciona un motivo de reporte válido.");
+        FormHelper::ValidateMinChars(trim($description), 10, "description");
+        FormHelper::ValidateMaxChars(trim($description), 2000, "description");
+        FormHelper::ValidateNotSameValue($reportedId, $user->id, "reported_id", "No puedes reportarte a ti mismo.");
 
         $targetUser = User::getById($reportedId);
         if (!$targetUser) {
@@ -75,6 +74,13 @@ class SupportController
             echo json_encode(["status" => 404, "message" => "Usuario reportado no encontrado"]);
             exit();
         }
+
+        FormHelper::ValidateBusinessRule(
+            !TicketReportUser::hasPendingDuplicate($user->id, $targetUser->id, $reason),
+            "Ya tienes un reporte pendiente contra este usuario por este motivo.",
+            "reason",
+            409
+        );
 
         // 1. Create base Ticket
         $ticket = new Ticket($user->id, "report_user");
@@ -95,7 +101,7 @@ class SupportController
         ];
 
         // 3. Create Specific Report
-        $report = new TicketReportUser($ticket->id, $targetUser->id, $reason, $description, $snapshot);
+        $report = new TicketReportUser($ticket->id, $targetUser->id, $reason, trim($description), $snapshot);
         $report->save();
 
         // 4. Send Emails

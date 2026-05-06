@@ -1,0 +1,86 @@
+{% extends 'layouts/admin.twig' %}
+
+{% set is_dev_panel = true %}
+{% set title = 'Nuevo juego | Orion Dev Panel' %}
+{% set panel_title = title %}
+
+{% block content %}
+  <div class="container mx-auto px-4">
+    <form id="newGameForm" class="mx-auto max-w-lg space-y-6">
+      <div class="relative">
+        <input
+          type="text"
+          id="title"
+          name="title"
+          placeholder=" "
+          class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
+        />
+        <label
+          for="title"
+          class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+        >
+          Título
+        </label>
+        <div id="titleError" class="hidden mt-1 text-sm text-red-500"></div>
+      </div>
+
+      <div class="relative">
+        <input
+          type="text"
+          id="shortDescription"
+          name="shortDescription"
+          placeholder=" "
+          class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
+        />
+        <label
+          for="shortDescription"
+          class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+        >
+          Descripción corta
+        </label>
+        <div id="shortDescriptionError" class="hidden mt-1 text-sm text-red-500"></div>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <input
+          id="asEditor"
+          name="asEditor"
+          type="checkbox"
+          class="h-4 w-4 accent-alt focus:ring-alt"
+        />
+        <label for="asEditor" class="font-medium text-gray-300">¿Eres la editora?</label>
+      </div>
+
+      <div id="developerNameContainer" class="relative hidden">
+        <input
+          type="text"
+          id="developerName"
+          name="developerName"
+          placeholder=" "
+          class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
+        />
+        <label
+          for="developerName"
+          class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+        >
+          Desarrollador
+        </label>
+        <div id="developerNameError" class="hidden mt-1 text-sm text-red-500"></div>
+      </div>
+
+      <button
+        id="submitButton"
+        type="submit"
+        class="flex w-full items-center justify-center gap-2 rounded-lg bg-alt px-6 py-3 font-medium text-[#1B2A49] transition disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-90"
+      >
+        <span>Crear</span>
+        <i id="spinner" class="bi bi-arrow-repeat hidden animate-spin"></i>
+      </button>
+    </form>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ asset('js/forms/validator.js') }}"></script>
+  <script src="{{ asset('js/forms/dev/game.js') }}"></script>
+{% endblock %}

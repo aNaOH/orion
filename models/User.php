@@ -3,6 +3,7 @@
 require_once "./models/Badge.php";
 require_once "./models/Developer.php";
 require_once "./models/Game.php";
+require_once "./models/UserSuspension.php";
 
 class User
 {
@@ -705,6 +706,20 @@ class User
                 "profile_pic" => $this->profile_pic,
             ]
             : [];
+    }
+
+    public function getActiveSuspension(): ?UserSuspension
+    {
+        if (!isset($this->id)) {
+            return null;
+        }
+
+        return UserSuspension::getActiveByUserId($this->id);
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->getActiveSuspension() !== null;
     }
 
     public static function getCount()

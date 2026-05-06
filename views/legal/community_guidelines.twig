@@ -1,0 +1,51 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Normas de la comunidad - Orion{% endblock %}
+
+{% block content %}
+<div class="p-5 max-w-4xl mx-auto">
+    <h1 class="font-bold text-3xl">Normas de la comunidad</h1>
+    <p class="text-gray-400 mt-2">Actualizado el 2026-05-06</p>
+
+    <div class="mt-6 space-y-4 text-gray-200 leading-7">
+        <p>Orion quiere ser un espacio seguro para compartir, jugar y relacionarse. Estas normas explican qué comportamientos esperamos de la comunidad y qué consecuencias puede haber cuando se incumplen.</p>
+        <p>El uso de Orion implica respetar estas normas, además de nuestros <a href="/legal/terms" class="text-alt hover:underline">términos y condiciones</a>.</p>
+    </div>
+
+    <h2 class="font-bold text-2xl mt-8">1. Respeto y trato entre usuarios</h2>
+    <p class="mt-3">No está permitido acosar, insultar, humillar, amenazar o degradar a otras personas. Tampoco se permite el hostigamiento reiterado ni la incitación al odio por motivos personales, sociales, culturales, religiosos, étnicos, de género o similares.</p>
+
+    <h2 class="font-bold text-2xl mt-8">2. Spam, fraude y abuso de la plataforma</h2>
+    <p class="mt-3">No se permite el envío de spam, publicidad engañosa, estafas, intentos de phishing, manipulación fraudulenta de usuarios o cualquier actividad destinada a obtener beneficios de forma deshonesta dentro de Orion.</p>
+
+    <h2 class="font-bold text-2xl mt-8">3. Suplantación de identidad</h2>
+    <p class="mt-3">No puedes hacerte pasar por otra persona, equipo, estudio, marca o entidad. Esto incluye nombres de usuario, mensajes de perfil, imágenes o cualquier otro elemento diseñado para confundir a la comunidad sobre tu identidad real.</p>
+
+    <h2 class="font-bold text-2xl mt-8">4. Contenido ofensivo o inapropiado</h2>
+    <p class="mt-3">No está permitido publicar, mostrar o mantener contenido claramente ofensivo, violento, sexual explícito, discriminatorio o inapropiado para la comunidad, incluyendo nombres de usuario, avatares, mensajes de perfil y otras áreas visibles.</p>
+
+    <h2 class="font-bold text-2xl mt-8">5. Uso responsable del sistema de reportes</h2>
+    <p class="mt-3">Los reportes deben usarse de buena fe. No se permite reportar falsamente a otros usuarios, enviar denuncias repetitivas sin base o utilizar el sistema como mecanismo de acoso, presión o represalia.</p>
+
+    <h2 class="font-bold text-2xl mt-8">6. Consecuencias del incumplimiento</h2>
+    <p class="mt-3">Cuando detectemos una infracción, podremos aplicar medidas como la desestimación de contenido, restricciones de funciones, rechazo o aceptación de reportes, suspensión temporal o suspensión indefinida de la cuenta, según la gravedad y reincidencia del caso.</p>
+
+    <h2 class="font-bold text-2xl mt-8">7. Revisión y aplicación</h2>
+    <p class="mt-3">Las decisiones de moderación se basan en la información disponible en el momento de la revisión, incluyendo snapshots y evidencias asociadas a los reportes. Orion se reserva el derecho de actuar para proteger a la comunidad y la integridad del servicio.</p>
+    
+    {% if suspended_notice %}
+        <div class="mt-8 border border-red-500/30 bg-red-500/10 rounded-lg p-4 text-red-200">
+            Tu cuenta tiene una restricción activa. Revisa también el correo enviado por Orion para conocer el motivo y la duración exacta de la medida aplicada.
+        </div>
+    {% endif %}
+    
+    <div class="mt-8 rounded-xl border border-white/10 bg-branddark p-6">
+        <h2 class="font-bold text-xl">¿Tienes dudas?</h2>
+        <p class="mt-3 text-gray-300">Si necesitas revisar el marco general del servicio, consulta también nuestra sección legal completa.</p>
+        <div class="mt-4 flex flex-wrap gap-3">
+            <a href="/legal/terms" class="px-4 py-2 bg-alt text-white rounded-lg hover:opacity-90 transition">Términos y condiciones</a>
+            <a href="/legal/privacy" class="px-4 py-2 border border-white/10 text-gray-200 rounded-lg hover:bg-white/5 transition">Política de privacidad</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -16,7 +16,7 @@ class TicketAdminNotificationEmail extends Email
 
     protected function getSubject(): string
     {
-        return "[ADMIN] Nuevo ticket de soporte #" . $this->ticket->id;
+        return "[ADMIN] Nuevo reporte pendiente #" . $this->ticket->id;
     }
 
     protected function getTemplatePath(): string

@@ -34,3 +34,25 @@ CREATE TABLE IF NOT EXISTS `ticket_report_user` (
     FOREIGN KEY (`reported_user_id`) REFERENCES `users` (`id`)
     ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `user_suspensions` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT NOT NULL,
+  `ticket_id` INT DEFAULT NULL,
+  `reason` VARCHAR(255) NOT NULL,
+  `admin_comment` TEXT DEFAULT NULL,
+  `starts_at` DATETIME NOT NULL,
+  `ends_at` DATETIME DEFAULT NULL,
+  `is_active` TINYINT(1) NOT NULL DEFAULT '1',
+  `created_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `fk_user_suspensions_user_id` (`user_id`),
+  KEY `fk_user_suspensions_ticket_id` (`ticket_id`),
+  CONSTRAINT `fk_user_suspensions_user_id`
+    FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_user_suspensions_ticket_id`
+    FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`)
+    ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB;

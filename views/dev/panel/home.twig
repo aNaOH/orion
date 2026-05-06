@@ -1,0 +1,22 @@
+{% extends 'layouts/admin.twig' %}
+
+{% set is_dev_panel = true %}
+{% set title = 'Inicio | Orion Dev Panel' %}
+{% set panel_title = title %}
+
+{% block content %}
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+    <div class="rounded-2xl border border-branddark-500 bg-brand-800 p-5 shadow-lg transition hover:border-alt-500">
+      <h4 class="mb-2 text-sm text-gray-300">Juegos</h4>
+      <p class="text-4xl font-bold text-alt-400">{{ developer.getGames()|length }}</p>
+    </div>
+    <div class="rounded-2xl border border-branddark-500 bg-brand-800 p-5 shadow-lg transition hover:border-alt-500">
+      <h4 class="mb-2 text-sm text-gray-300">Ingresos (últimos 30 días)</h4>
+      <p class="text-4xl font-bold text-alt-400">0 €</p>
+    </div>
+    <div class="rounded-2xl border border-branddark-500 bg-brand-800 p-5 shadow-lg transition hover:border-alt-500">
+      <h4 class="mb-2 text-sm text-gray-300">Reportes en la comunidad</h4>
+      <p class="text-4xl font-bold text-alt-400">0</p>
+    </div>
+  </div>
+{% endblock %}

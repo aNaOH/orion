@@ -171,9 +171,12 @@ abstract class Email
             // Configuración SMTP
             $mail->isSMTP();
             $mail->Host = $_ENV["SMTP_HOST"] ?? 'localhost';
-            $mail->SMTPAuth = true;
-            $mail->Username = $_ENV["SMTP_USER"] ?? '';
-            $mail->Password = $_ENV["SMTP_PASSWORD"] ?? '';
+            $smtpAuthEnabled = !isset($_ENV["SMTP_AUTH"]) || filter_var($_ENV["SMTP_AUTH"], FILTER_VALIDATE_BOOLEAN);
+            $mail->SMTPAuth = $smtpAuthEnabled;
+            if ($smtpAuthEnabled) {
+                $mail->Username = $_ENV["SMTP_USER"] ?? '';
+                $mail->Password = $_ENV["SMTP_PASSWORD"] ?? '';
+            }
             $mail->Port = intval($_ENV["SMTP_PORT"] ?? 587);
 
             $secure = $_ENV["SMTP_SECURE"] ?? 'tls';
@@ -223,11 +226,15 @@ abstract class Email
     {
         $required = [
             "SMTP_HOST",
-            "SMTP_USER",
-            "SMTP_PASSWORD",
             "SMTP_PORT",
             "EMAIL_FROM",
         ];
+
+        $smtpAuthEnabled = !isset($_ENV["SMTP_AUTH"]) || filter_var($_ENV["SMTP_AUTH"], FILTER_VALIDATE_BOOLEAN);
+        if ($smtpAuthEnabled) {
+            $required[] = "SMTP_USER";
+            $required[] = "SMTP_PASSWORD";
+        }
 
         foreach ($required as $key) {
             if (empty($_ENV[$key])) {

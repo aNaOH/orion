@@ -16,8 +16,8 @@ class TicketResponseEmail extends Email
 
     protected function getSubject(): string
     {
-        $statusStr = $this->ticket->status == 1 ? "Aceptado" : "Rechazado";
-        return "Respuesta a tu reporte - Ticket #" . $this->ticket->id . " [" . $statusStr . "]";
+        $statusStr = $this->ticket->status == 1 ? "revisado" : "rechazado";
+        return "Actualización sobre tu reporte en Orion - Ticket #" . $this->ticket->id . " [" . ucfirst($statusStr) . "]";
     }
 
     protected function getTemplatePath(): string

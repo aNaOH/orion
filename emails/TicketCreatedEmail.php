@@ -16,7 +16,7 @@ class TicketCreatedEmail extends Email
 
     protected function getSubject(): string
     {
-        return "Hemos recibido tu reporte - Ticket #" . $this->ticket->id;
+        return "Hemos recibido tu reporte en Orion - Ticket #" . $this->ticket->id;
     }
 
     protected function getTemplatePath(): string

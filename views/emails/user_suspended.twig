@@ -1,0 +1,30 @@
+{% extends "emails/layout.twig" %}
+
+{% block content %}
+<h1>Tu cuenta ha sido suspendida</h1>
+<p>Hola, {{ user_name }}.</p>
+<p>Tras una revisión de moderación, hemos aplicado una suspensión a tu cuenta de Orion por un incumplimiento de nuestras normas de la comunidad.</p>
+
+<div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #eeeeee;">
+    <p style="margin: 0 0 10px 0; font-weight: bold; color: #1B2A49;">Detalles de la suspensión</p>
+    <p style="margin: 6px 0;"><strong>Motivo:</strong> {{ reason }}</p>
+    <p style="margin: 6px 0;"><strong>Inicio:</strong> {{ starts_at|date("d/m/Y H:i") }}</p>
+    <p style="margin: 6px 0;">
+        <strong>Duración:</strong>
+        {% if is_indefinite %}
+            Indefinida
+        {% else %}
+            Temporal hasta el {{ ends_at|date("d/m/Y H:i") }}
+        {% endif %}
+    </p>
+    {% if admin_comment %}
+        <p style="margin: 16px 0 0 0; font-weight: bold; color: #1B2A49;">Explicación del equipo</p>
+        <p style="margin: 6px 0 0 0; white-space: pre-wrap;">{{ admin_comment }}</p>
+    {% endif %}
+</div>
+
+<p>Mientras la suspensión esté activa no podrás iniciar sesión ni realizar acciones en la plataforma.</p>
+<p>Te recomendamos revisar nuestras normas de la comunidad para entender mejor qué comportamientos no están permitidos y cómo evitar nuevas sanciones.</p>
+
+<a href="{{ guidelines_url }}" class="button">Ver normas de la comunidad</a>
+{% endblock %}
