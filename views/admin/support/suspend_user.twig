@@ -1,0 +1,220 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block title %}Suspender a {{ target_user.username }} - Orion Admin{% endblock %}
+
+{% block content %}
+<section class="py-10">
+    <div class="container mx-auto px-4 max-w-2xl">
+        <div class="mb-8">
+            <a href="/profile/{{ target_user.id }}" class="text-gray-500 hover:text-white transition text-sm flex items-center mb-2">
+                <i class="bi bi-arrow-left mr-1"></i> Volver al perfil
+            </a>
+            <a href="/admin/users" class="text-gray-500 hover:text-white transition text-sm flex items-center mb-2">
+                <i class="bi bi-arrow-left mr-1"></i> Volver a usuarios
+            </a>
+            <h1 class="text-3xl font-bold text-gray-100">Suspender Usuario</h1>
+            <p class="text-gray-400 mt-2">Aplicando medida disciplinaria a <strong>{{ target_user.username }}</strong>.</p>
+        </div>
+
+        <div class="bg-branddark rounded-xl p-8 border border-white/5 shadow-2xl">
+            <div class="flex items-center space-x-4 mb-8 pb-6 border-b border-white/5">
+                <img src="{{ profile_pic(target_user) }}" class="w-16 h-16 rounded-full object-cover border-2 border-alt/30">
+                <div>
+                    <p class="text-white font-bold text-xl">{{ target_user.username }}</p>
+                    <p class="text-gray-500 text-sm">{{ target_user.email }}</p>
+                </div>
+            </div>
+
+            {% if active_suspension %}
+                <div class="mb-8 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+                    <p class="font-semibold flex items-center">
+                        <i class="bi bi-exclamation-octagon-fill mr-2"></i>
+                        Este usuario ya tiene una suspensión activa.
+                    </p>
+                    <p class="mt-1">
+                        {% if active_suspension.ends_at %}
+                            Vigente hasta el <span class="local-date" data-timestamp="{{ active_suspension.ends_at|date('c') }}">
+                                {{ active_suspension.ends_at|date("d/m/Y H:i") }} ({{ server_timezone }})
+                            </span>.
+                        {% else %}
+                            La suspensión es indefinida.
+                        {% endif %}
+                    </p>
+                    <p class="mt-1"><strong>Motivo:</strong> {{ active_suspension.reason }}</p>
+                    <button onclick="unsuspendUser({{ target_user.id }}, '{{ target_user.username }}')" class="mt-4 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-400 text-xs font-bold rounded-lg border border-green-500/30 transition flex items-center">
+                        <i class="bi bi-shield-fill-check mr-2"></i> Levantar suspensión ahora
+                    </button>
+                </div>
+            {% endif %}
+
+            <form id="suspend-form" class="space-y-6">
+                {{ token_input('COMMON') | raw }}
+                <input type="hidden" name="user_id" value="{{ target_user.id }}">
+                
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wider">Tipo de suspensión</label>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="cursor-pointer">
+                            <input type="radio" name="moderation_action" value="suspend_temp" class="hidden peer" checked>
+                            <div class="text-center p-4 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-yellow-600/20 peer-checked:border-yellow-600 peer-checked:text-yellow-500 transition">
+                                <i class="bi bi-clock-history block text-xl mb-1"></i>
+                                Temporal
+                            </div>
+                        </label>
+                        <label class="cursor-pointer">
+                            <input type="radio" name="moderation_action" value="suspend_indef" class="hidden peer">
+                            <div class="text-center p-4 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-red-600/20 peer-checked:border-red-600 peer-checked:text-red-500 transition">
+                                <i class="bi bi-infinity block text-xl mb-1"></i>
+                                Indefinida
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="suspension-until-wrapper">
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wider">Fin de la suspensión (Hora del Servidor / UTC)</label>
+                    <input
+                        type="datetime-local"
+                        name="suspension_until"
+                        id="suspension_until"
+                        class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-alt-500 transition shadow-inner"
+                    >
+                    <p id="server-time-preview" class="mt-2 text-[10px] text-alt-400 italic hidden">
+                        <i class="bi bi-clock mr-1"></i> 
+                        En tu horario local será: <span id="server-time-value"></span>
+                    </p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wider">Motivo público</label>
+                    <input
+                        type="text"
+                        name="suspension_reason"
+                        id="suspension_reason"
+                        class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-alt-500 transition shadow-inner"
+                        placeholder="Ej. Incumplimiento de las normas de la comunidad"
+                        required
+                    >
+                    <p class="mt-1 text-[10px] text-gray-600 italic">Este motivo será visible para el usuario cuando intente entrar.</p>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2 tracking-wider">Comentario interno / Justificación</label>
+                    <textarea name="admin_comment" rows="4" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-alt-500 transition shadow-inner" placeholder="Explica detalladamente por qué se aplica esta sanción..." required></textarea>
+                </div>
+
+                <button type="submit" id="submit-btn" class="w-full py-4 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg transition shadow-xl shadow-alt/20 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center">
+                    <i class="bi bi-shield-lock-fill mr-2"></i> Confirmar Suspensión
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function unsuspendUser(userId, username) {
+        const reason = prompt(`¿Por qué quieres quitar la suspensión a ${username}?\nIndica un motivo para enviarle en el correo:`);
+        if (reason === null) return;
+        if (reason.trim().length < 5) {
+            alert('Debes indicar un motivo válido (mín. 5 caracteres).');
+            return;
+        }
+        $.ajax({
+            url: '/admin/users/api/unsuspend',
+            method: 'POST',
+            data: {
+                user_id: userId,
+                reason: reason,
+                tript_token: '{{ csrf_token('COMMON') | raw }}'.match(/value="([^"]+)"/)[1]
+            },
+            success: function(response) {
+                alert('Suspensión revocada correctamente.');
+                location.reload();
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                alert('Error: ' + (response && response.message ? response.message : 'No se pudo revocar la suspensión.'));
+            }
+        });
+    }
+
+    function updateServerTimePreview() {
+        const val = $('#suspension_until').val();
+        const preview = $('#server-time-preview');
+        const valueSpan = $('#server-time-value');
+
+        if (val) {
+            // Interpret input as UTC
+            const m = moment.utc(val);
+            if (m.isValid()) {
+                // Show Local
+                valueSpan.text(m.local().format('DD/MM/YYYY HH:mm'));
+                preview.slideDown(200);
+                return;
+            }
+        }
+        preview.slideUp(200);
+    }
+
+    $('#suspension_until').on('input change', updateServerTimePreview);
+
+    function toggleUntilField() {
+        const action = $('input[name="moderation_action"]:checked').val();
+        if (action === 'suspend_temp') {
+            $('#suspension-until-wrapper').slideDown(200);
+        } else {
+            $('#suspension-until-wrapper').slideUp(200);
+            updateServerTimePreview();
+        }
+    }
+
+    $('input[name="moderation_action"]').on('change', toggleUntilField);
+    $(document).ready(toggleUntilField);
+
+    $('#suspend-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = $('#submit-btn');
+        const action = $('input[name="moderation_action"]:checked').val();
+        const until = $('#suspension_until').val();
+        const reason = $('#suspension_reason').val();
+        const comment = $('textarea[name="admin_comment"]').val();
+
+        if (action === 'suspend_temp' && !until) {
+            alert('Por favor, indica una fecha de finalización para la suspensión temporal.');
+            return;
+        }
+
+        if (reason.trim().length < 3) {
+            alert('Por favor, indica un motivo válido (mín. 3 caracteres).');
+            return;
+        }
+
+        if (comment.trim().length < 5) {
+            alert('Por favor, proporciona una justificación para la sanción (mín. 5 caracteres).');
+            return;
+        }
+
+        if (!confirm('¿Estás seguro de que quieres suspender a este usuario? Esta acción es inmediata.')) return;
+
+        btn.prop('disabled', true).html('<i class="bi bi-hourglass-split animate-spin mr-2"></i> Procesando...');
+
+        $.ajax({
+            url: '/admin/users/api/suspend',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                alert('Usuario suspendido correctamente.');
+                window.location.href = '/profile/{{ target_user.id }}';
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                alert('Error: ' + (response && response.message ? response.message : 'No se pudo aplicar la suspensión.'));
+                btn.prop('disabled', false).html('<i class="bi bi-shield-lock-fill mr-2"></i> Confirmar Suspensión');
+            }
+        });
+    });
+</script>
+{% endblock %}

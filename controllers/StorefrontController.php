@@ -227,6 +227,14 @@ class StorefrontController
         ViewController::render('legal/refund', ['title' => 'Política de reembolso y devoluciones de Orion']);
     }
 
+    public static function showCommunityGuidelines()
+    {
+        ViewController::render('legal/community_guidelines', [
+            'title' => 'Normas de la comunidad de Orion',
+            'suspended_notice' => isset($_GET["suspended"]) && $_GET["suspended"] == "1",
+        ]);
+    }
+
     // --- Legacy/Utility API (from HomeController) ---
     public static function apiRandomGames()
     {

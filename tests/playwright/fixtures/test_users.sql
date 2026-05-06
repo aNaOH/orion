@@ -1,0 +1,9 @@
+INSERT INTO `users` (`id`, `email`, `username`, `password`, `birthdate`, `role`, `profile_pic`, `motd`, `badge_id`, `created_at`, `is_archived`) VALUES
+    (100, 'test.reporter.form@orion.local', 'ReporteFormulario', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '1998-01-10', 0, NULL, 'Usuario de pruebas para formularios', NULL, '2026-01-01 10:00:00', 0),
+    (101, 'test.reporter.self@orion.local', 'ReporteSelf', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '1997-02-11', 0, NULL, 'Usuario de pruebas para autoreporte', NULL, '2026-01-01 10:01:00', 0),
+    (102, 'test.reporter.duplicate@orion.local', 'ReporteDuplicado', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '1996-03-12', 0, NULL, 'Usuario de pruebas para duplicados', NULL, '2026-01-01 10:02:00', 0),
+    (103, 'test.reporter.validation@orion.local', 'ReporteValidacion', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '1995-04-13', 0, NULL, 'Usuario de pruebas para validaciones', NULL, '2026-01-01 10:03:00', 0),
+    (104, 'test.reporter.adminflow@orion.local', 'ReporteAdminFlow', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '1994-05-14', 0, NULL, 'Usuario de pruebas para flujo admin', NULL, '2026-01-01 10:04:00', 0),
+    (110, 'test.reported.spam@orion.local', 'ObjetivoSpam', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '1993-06-15', 0, NULL, 'Enviando spam masivo', NULL, '2026-01-01 10:10:00', 0),
+    (111, 'test.reported.identity@orion.local', 'Orion Oficial 2', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '1992-07-16', 0, NULL, 'Cuenta sospechosa', NULL, '2026-01-01 10:11:00', 0),
+    (112, 'test.reported.avatar@orion.local', 'AvatarOfensivo', '$2y$10$rHY66BW.lSKkU0P8485kreEg4114dyiXPiFD4NePMkSS1polkNV6C', '1991-08-17', 0, NULL, 'Avatar a revisar', NULL, '2026-01-01 10:12:00', 0);

@@ -264,9 +264,15 @@ class Connection {
         try {
             $stmt = $dbConn->prepare($sql);
             
-            // Enlazar valores a los marcadores de posición "?"
+            // Enlazar valores a los marcadores de posición "?" o nombres ":nombre"
             foreach ($params as $index => $value) {
-                $stmt->bindValue($index + 1, $value); // El índice es 1-based para bindValue
+                if (is_int($index)) {
+                    $stmt->bindValue($index + 1, $value); // El índice es 1-based para bindValue
+                } else {
+                    // Si el índice es una cadena, lo usamos como parámetro con nombre
+                    $paramName = (strpos($index, ':') === 0) ? $index : ":$index";
+                    $stmt->bindValue($paramName, $value);
+                }
             }
 
             $stmt->execute();

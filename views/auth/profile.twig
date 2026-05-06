@@ -26,6 +26,7 @@
             </a>
           </div>
         {% else %}
+        {{ token_input('USERACTION') | raw }}
           <div class="mt-6 flex flex-wrap gap-2 items-center">
             {% if has_blocked %}
                 <button onclick="friendAction('unblock', {{ target_user.id }})" class="px-4 py-2 bg-gray-600 text-white font-semibold rounded-lg shadow-lg hover:bg-gray-500 transition">
@@ -55,16 +56,27 @@
                     <button onclick="friendAction('request', {{ target_user.id }})" class="px-4 py-2 bg-alt text-gray-200 font-semibold rounded-lg shadow-lg hover:bg-alt-400 transition">
                       <i class="bi bi-person-plus-fill mr-1"></i> Enviar solicitud
                     </button>
-                {% endif %}
-                
-                <button onclick="friendAction('block', {{ target_user.id }})" class="ml-2 py-1 px-2 text-gray-600 hover:text-red-500 transition text-xs flex items-center">
-                  <i class="bi bi-slash-circle mr-1"></i> Bloquear
-                </button>
+                <div class="flex items-center ml-2 border-l border-white/10 pl-2">
+                    <a href="/support/report/user/{{ target_user.id }}" class="py-1 px-2 text-gray-600 hover:text-yellow-500 transition text-xs flex items-center">
+                      <i class="bi bi-exclamation-triangle-fill mr-1"></i> Reportar
+                    </a>
+                    
+                    <button onclick="friendAction('block', {{ target_user.id }})" class="ml-1 py-1 px-2 text-gray-600 hover:text-red-500 transition text-xs flex items-center">
+                      <i class="bi bi-slash-circle mr-1"></i> Bloquear
+                    </button>
+
+                    {% if is_admin %}
+                    <a href="/admin/users/{{ target_user.id }}/suspend" class="ml-1 py-1 px-2 text-red-500/50 hover:text-red-500 transition text-xs flex items-center border-l border-white/5 pl-2">
+                      <i class="bi bi-shield-lock-fill mr-1"></i> Suspender
+                    </a>
+                    {% endif %}
+                </div>
             {% endif %}
           </div>
         {% endif %}
-      </div>
+      {% endif %}
     </div>
+  </div>
 
     <!-- Profile Details -->
     <div class="mt-10">
@@ -102,9 +114,12 @@
 
         if (confirmMsg && !confirm(confirmMsg)) return;
 
+        let token = $("#tript_token").val();
+
         $.ajax({
             url: url,
             method: 'POST',
+            data: { tript_token: token },
             success: function(response) {
                 location.reload();
             },

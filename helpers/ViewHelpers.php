@@ -21,6 +21,8 @@ class ViewHelpers
             'has_order' => false,
             'cart_items' => [],
             'cart_total' => 0,
+            'server_time' => date('c'),
+            'server_timezone' => date('T'),
         ];
 
         // If user is logged in, fetch full user object and role flags

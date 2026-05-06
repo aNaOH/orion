@@ -1,0 +1,148 @@
+{% extends 'layouts/admin.twig' %}
+
+{% set is_dev_panel = true %}
+{% set title = 'Editar logro ' ~ achievement.name ~ ' | Orion Dev Panel' %}
+{% set panel_title = title %}
+
+{% block content %}
+  <div id="edit-achievement" class="tab-pane block">
+    <form id="editAchievementForm" class="space-y-6">
+      {{ csrf_token('DEVACTION', { userID: user.id, gameID: game.id }) }}
+      <input type="hidden" name="game" value="{{ game.id }}">
+      <input type="hidden" name="achievement" value="{{ achievement.id }}">
+
+      <div class="relative">
+        <input
+          type="text"
+          id="name"
+          name="name"
+          value="{{ achievement.name }}"
+          class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
+        />
+        <label
+          for="name"
+          class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+        >
+          Nombre
+        </label>
+        <div class="invalid-feedback mt-1 text-sm text-red-400" id="nameError"></div>
+      </div>
+
+      <div class="relative">
+        <input
+          type="text"
+          id="description"
+          name="description"
+          value="{{ achievement.description }}"
+          class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
+        />
+        <label
+          for="description"
+          class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+        >
+          Descripción
+        </label>
+        <div class="invalid-feedback mt-1 text-sm text-red-400" id="descriptionError"></div>
+      </div>
+
+      <div>
+        <label for="type" class="mb-2 block font-medium text-gray-300">Tipo</label>
+        <select
+          id="type"
+          name="type"
+          class="w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 py-3 text-gray-200 outline-none focus:border-alt focus:ring-2 focus:ring-alt"
+        >
+          <option value="0" {% if achievement.type == constant('EACHIEVEMENT_TYPE::TRIGGERED') %}selected{% endif %}>Por activación</option>
+          <option value="1" {% if achievement.type == constant('EACHIEVEMENT_TYPE::STAT') %}selected{% endif %}>Por estadística</option>
+        </select>
+        <div class="invalid-feedback mt-1 text-sm text-red-400" id="typeError"></div>
+      </div>
+
+      <div id="statContainer" class="hidden">
+        <label for="stat" class="mb-2 block font-medium text-gray-300">Estadística asociada</label>
+        <select
+          id="stat"
+          name="stat"
+          class="w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 py-3 text-gray-200 outline-none focus:border-alt focus:ring-2 focus:ring-alt"
+        >
+          <option value="-1">Selecciona una estadística</option>
+          {% for stat in stats %}
+            <option value="{{ stat.id }}" {% if stat.id == achievement.stat_id %}selected{% endif %}>{{ stat.name }}</option>
+          {% endfor %}
+        </select>
+        <div class="invalid-feedback mt-1 text-sm text-red-400" id="statError"></div>
+      </div>
+
+      <div>
+        <div class="flex items-center gap-2">
+          <input
+            id="secret"
+            name="secret"
+            type="checkbox"
+            {% if achievement.secret %}checked{% endif %}
+            class="h-4 w-4 rounded border-gray-600 bg-gray-700 focus:border-alt focus:ring-2 focus:ring-alt"
+          >
+          <label for="secret" class="font-medium text-gray-300">¿Es secreto?</label>
+        </div>
+        <div class="invalid-feedback mt-1 text-sm text-red-400" id="secretError"></div>
+      </div>
+
+      <div>
+        <label for="icon" class="mb-2 block font-medium text-gray-300">Icono (64x64 PNG)</label>
+        <file-upload
+          id="icon"
+          name="icon"
+          accept-image="true"
+          accept-video="false"
+          min-image-width="64"
+          max-image-width="64"
+          min-image-height="64"
+          max-image-height="64"
+          max-image-size="1MB"
+          image-type="png"
+        ></file-upload>
+        <div class="invalid-feedback mt-1 text-sm text-red-400" id="iconError"></div>
+      </div>
+
+      <div>
+        <label for="lockedIcon" class="mb-2 block font-medium text-gray-300">Icono bloqueado (opcional, 64x64 PNG)</label>
+        <file-upload
+          id="lockedIcon"
+          name="lockedIcon"
+          accept-image="true"
+          accept-video="false"
+          min-image-width="64"
+          max-image-width="64"
+          min-image-height="64"
+          max-image-height="64"
+          max-image-size="1MB"
+          image-type="png"
+        ></file-upload>
+        <div class="invalid-feedback mt-1 text-sm text-red-400" id="lockedIconError"></div>
+      </div>
+
+      <div class="mt-6 flex flex-col gap-3">
+        <button
+          id="submitButton"
+          type="submit"
+          class="flex w-full items-center justify-center gap-2 rounded-lg bg-alt px-6 py-3 font-medium text-[#1B2A49] transition hover:opacity-90"
+        >
+          <i class="bi bi-arrow-repeat hidden animate-spin" id="spinnerAchievement"></i>
+          <span>Actualizar logro</span>
+        </button>
+      </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ asset('js/components/fileUpload.js') }}"></script>
+  <script src="{{ asset('js/forms/dev/getStoreID.js') }}"></script>
+  <script src="{{ asset('js/forms/validator.js') }}"></script>
+  <script src="{{ asset('js/forms/dev/achievement-edit.js') }}"></script>
+  <script>
+    if (document.getElementById("type").value === "1") {
+      document.getElementById("statContainer").classList.remove("hidden");
+    }
+  </script>
+{% endblock %}

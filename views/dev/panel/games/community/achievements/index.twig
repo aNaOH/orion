@@ -1,0 +1,45 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = true %}
+{% set panel_title = 'Logros para ' ~ game.title ~ ' | Orion Dev Panel' %}
+{% set title = 'Logros para ' ~ game.title %}
+{% set back_url = '/dev/panel/games/' ~ game.id ~ '/community/' %}
+{% set new_url = '/dev/panel/games/' ~ game.id ~ '/community/achievements/new' %}
+{% set new_label = 'Nuevo logro' %}
+{% set api_delete_url = '/api/dev/achievement/' ~ game.id ~ '/{id}/delete/' %}
+{% set redirect_after_delete = '/dev/panel/games/' ~ game.id ~ '/community/achievements/' %}
+{% set delete_title = '¿Eliminar logro?' %}
+
+{% block table %}
+  {{ ui.table_header(['ID', 'Nombre', 'Descripción', 'Tipo', 'Estadística asociada', '¿Secreto?', 'Icono', 'Icono (bloqueado)', 'Acciones']) }}
+  <tbody>
+    {% for achievement in achievements %}
+      <tr class="border-t border-gray-700 transition hover:bg-[#1f2937]">
+        <td class="px-4 py-3 text-center">{{ achievement.id }}</td>
+        <td class="px-4 py-3">{{ achievement.name }}</td>
+        <td class="px-4 py-3">{{ achievement.description }}</td>
+        <td class="px-4 py-3">
+          {{ achievement.type == constant('EACHIEVEMENT_TYPE::TRIGGERED') ? 'Por activación' : 'Por estadística' }}
+        </td>
+        <td class="px-4 py-3">
+          {{ achievement.type == constant('EACHIEVEMENT_TYPE::STAT') and achievement.stat_id is not null ? achievement.stat_id : 'No' }}
+        </td>
+        <td class="px-4 py-3">{{ achievement.secret ? 'Si' : 'No' }}</td>
+        <td class="px-4 py-3">
+          <img
+            src="{{ cdn_url('game/achievement', achievement.icon) }}"
+            alt="Ícono para el logro de {{ game.title }} '{{ achievement.name }}'"
+          >
+        </td>
+        <td class="px-4 py-3">
+          <img
+            src="{{ cdn_url('game/achievement', achievement.locked_icon) }}"
+            alt="Ícono bloqueado para el logro de {{ game.title }} '{{ achievement.name }}'"
+          >
+        </td>
+        {{ ui.action_buttons('/dev/panel/games/' ~ game.id ~ '/community/achievements/' ~ achievement.id ~ '/edit/', achievement.id, achievement.name) }}
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}

@@ -1,0 +1,485 @@
+{% extends 'layouts/admin.twig' %}
+
+{% block title %}Ticket #{{ ticket.id }} - Orion Admin{% endblock %}
+
+{% block content %}
+<section class="py-10">
+    <div class="container mx-auto px-4">
+        <!-- Header -->
+        <div class="flex items-center justify-between mb-8">
+            <div>
+                <a href="/admin/tickets" class="text-gray-500 hover:text-white transition text-sm flex items-center mb-2">
+                    <i class="bi bi-arrow-left mr-1"></i> Volver al listado
+                </a>
+                <h1 class="text-3xl font-bold text-gray-100 flex items-center">
+                    Ticket #{{ ticket.id }} 
+                    <span class="ml-4 uppercase text-sm bg-blue-500/20 text-blue-400 px-3 py-1 rounded-full border border-blue-500/30">
+                        {{ ticket.type }}
+                    </span>
+                </h1>
+            </div>
+            <div>
+                {% if ticket.status == 0 %}
+                    <span class="px-4 py-2 bg-yellow-400/10 text-yellow-400 border border-yellow-400/20 rounded-lg text-sm font-bold flex items-center">
+                        <i class="bi bi-clock-fill mr-2"></i> PENDIENTE
+                    </span>
+                {% elseif ticket.status == 1 %}
+                    <span class="px-4 py-2 bg-green-400/10 text-green-400 border border-green-400/20 rounded-lg text-sm font-bold flex items-center">
+                        <i class="bi bi-check-circle-fill mr-2"></i> ACEPTADO
+                    </span>
+                {% else %}
+                    <span class="px-4 py-2 bg-red-400/10 text-red-400 border border-red-400/20 rounded-lg text-sm font-bold flex items-center">
+                        <i class="bi bi-x-circle-fill mr-2"></i> RECHAZADO
+                    </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Left Side: Details -->
+            <div class="lg:col-span-2 space-y-8">
+                <!-- Reporter Info -->
+                <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                    <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                        <i class="bi bi-person-fill mr-2 text-alt"></i> Información del Reportero
+                    </h2>
+                    <div class="flex items-center space-x-4">
+                        {% if reporter %}
+                            <img src="{{ profile_pic(reporter) }}" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <p class="text-white font-bold">{{ reporter.username }}</p>
+                                <p class="text-gray-500 text-sm">{{ reporter.email }}</p>
+                            </div>
+                        {% elseif general and general.guest_email %}
+                            <div class="w-12 h-12 rounded-full bg-gray-700 flex items-center justify-center">
+                                <i class="bi bi-person-ghost text-2xl text-gray-400"></i>
+                            </div>
+                            <div>
+                                <p class="text-white font-bold">Invitado</p>
+                                <p class="text-gray-500 text-sm">{{ general.guest_email }}</p>
+                            </div>
+                        {% else %}
+                            <p class="text-gray-500 italic text-sm">Información de contacto no disponible.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if reported_user %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-person-badge-fill mr-2 text-red-400"></i> Usuario reportado
+                        </h2>
+                        <div class="flex items-center space-x-4">
+                            <img src="{{ profile_pic(reported_user) }}" class="w-12 h-12 rounded-full object-cover">
+                            <div>
+                                <p class="text-white font-bold">{{ reported_user.username }}</p>
+                                <p class="text-gray-500 text-sm">{{ reported_user.email }}</p>
+                            </div>
+                        </div>
+
+                        {% if active_suspension %}
+                            <div class="mt-4 rounded-lg border border-red-500/20 bg-red-500/10 p-4 text-sm text-red-200">
+                                <p class="font-semibold">Este usuario ya tiene una suspensión activa.</p>
+                                <p class="mt-1">
+                                    {% if active_suspension.ends_at %}
+                                        Vigente hasta el <span class="local-date" data-timestamp="{{ active_suspension.ends_at|date('c') }}">
+                                            {{ active_suspension.ends_at|date("d/m/Y H:i") }} ({{ server_timezone }})
+                                        </span>.
+                                    {% else %}
+                                        La suspensión es indefinida.
+                                    {% endif %}
+                                </p>
+                                <p class="mt-1"><strong>Motivo:</strong> {{ active_suspension.reason }}</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
+
+                <!-- Report Content -->
+                {% if ticket.type == "report_user" %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-exclamation-triangle-fill mr-2 text-red-500"></i> Contenido del Reporte
+                        </h2>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase">Motivo</label>
+                                <p class="text-gray-200">{{ report.getReasonLabel() }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase">Descripción</label>
+                                <p class="text-gray-300 whitespace-pre-wrap mt-1 bg-brand-900 p-4 rounded-lg border border-white/5">{{ report.description }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Snapshot -->
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-camera-fill mr-2 text-blue-400"></i> Snapshot en el momento del reporte
+                        </h2>
+                        <div class="bg-brand-900 rounded-xl p-6 border border-white/10">
+                            <div class="flex items-center space-x-6">
+                                <div class="w-24 h-24 rounded-full overflow-hidden border-4 border-alt/30">
+                                    <img src="{{ snapshot_pic(report) }}" alt="Snapshot Avatar" class="w-full h-full object-cover">
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl font-bold text-white">{{ report.snapshot.username }}</h3>
+                                    <p class="text-gray-400 italic text-lg">{{ report.snapshot.motd ?: "Sin mensaje personalizado." }}</p>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="mt-4 text-xs text-gray-500 italic">
+                            <i class="bi bi-info-circle mr-1"></i> Estos datos quedaron congelados al momento de crear el reporte.
+                        </p>
+                    </div>
+                {% elseif ticket.type == "appeal" %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-chat-left-dots-fill mr-2 text-alt"></i> Mensaje de Apelación
+                        </h2>
+                        <div class="bg-brand-900 p-6 rounded-lg border border-white/5 shadow-inner">
+                            <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">{{ appeal.message }}</p>
+                        </div>
+                    </div>
+
+                    {% if original_suspension %}
+                        <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                            <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                                <i class="bi bi-exclamation-octagon-fill mr-2 text-red-500"></i> Suspensión Apelada
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase">Motivo Público</label>
+                                        <p class="text-gray-200 font-semibold">{{ original_suspension.reason }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase">Estado Actual</label>
+                                        {% if original_suspension.is_active %}
+                                            <span class="text-green-500 font-bold text-sm">ACTIVA</span>
+                                        {% else %}
+                                            <span class="text-gray-500 font-bold text-sm italic">REVOCADA / EXPIRADA</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase">Comentario del Moderador</label>
+                                    <p class="text-gray-400 italic mt-1 bg-brand-900/50 p-3 rounded border border-white/5">"{{ original_suspension.admin_comment }}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% elseif ticket.type == "login_recovery" %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-key-fill mr-2 text-yellow-400"></i> Recuperación de Acceso
+                        </h2>
+                        <div class="space-y-6">
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase">Email de Contacto</label>
+                                    <p class="text-white font-semibold">{{ recovery.contact_email }}</p>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase">Cuenta Objetivo</label>
+                                    {% if target_user %}
+                                        <div class="flex items-center space-x-3 mt-1">
+                                            <img src="{{ profile_pic(target_user) }}" class="w-8 h-8 rounded-full">
+                                            <p class="text-white">{{ target_user.username }} ({{ target_user.email }})</p>
+                                        </div>
+                                    {% else %}
+                                        <p class="text-red-400 italic">No se ha podido identificar la cuenta automáticamente.</p>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Mensaje del Usuario</label>
+                                <div class="bg-brand-900 p-6 rounded-lg border border-white/5 shadow-inner">
+                                    <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">{{ recovery.message }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% elseif ticket.type == "general" %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-info-circle-fill mr-2 text-blue-400"></i> Detalles de la Consulta
+                        </h2>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase">Categoría</label>
+                                <p class="text-gray-200 font-semibold">{{ general.getCategoryLabel() }}</p>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase">Asunto</label>
+                                <p class="text-gray-200">{{ general.subject }}</p>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Mensaje del Usuario</label>
+                            <div class="bg-brand-900 p-6 rounded-lg border border-white/5 shadow-inner">
+                                <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">{{ general.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Right Side: Action Panel -->
+            <div class="space-y-8">
+                <div class="bg-branddark rounded-xl p-6 border border-white/5 sticky top-8">
+                    <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                        <i class="bi bi-shield-check mr-2 text-alt"></i> Resolución
+                    </h2>
+                    
+                    {% if ticket.status == 0 %}
+                        <form id="resolve-form" class="space-y-4">
+                            {{ token_input('COMMON') | raw }}
+                            <input type="hidden" name="id" value="{{ ticket.id }}">
+                            
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Acción de Resolución</label>
+                                <div class="grid grid-cols-2 gap-3">
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="status" value="1" class="hidden peer" checked>
+                                        <div class="text-center p-4 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-green-600/20 peer-checked:border-green-600 peer-checked:text-green-500 transition shadow-sm hover:border-white/20">
+                                            <i class="bi bi-check-circle block text-xl mb-1"></i>
+                                            {{ ticket.type == 'appeal' ? 'Aceptar Apelación' : 'Aceptar' }}
+                                        </div>
+                                    </label>
+                                    <label class="cursor-pointer">
+                                        <input type="radio" name="status" value="2" class="hidden peer">
+                                        <div class="text-center p-4 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-red-600/20 peer-checked:border-red-600 peer-checked:text-red-500 transition shadow-sm hover:border-white/20">
+                                            <i class="bi bi-x-circle block text-xl mb-1"></i>
+                                            Rechazar
+                                        </div>
+                                    </label>
+                                </div>
+                                {% if ticket.type == 'appeal' %}
+                                    <p class="mt-3 text-[10px] text-gray-500 italic flex items-center">
+                                        <i class="bi bi-info-circle mr-2 text-alt"></i> Aceptar la apelación revocará automáticamente la suspensión.
+                                    </p>
+                                {% endif %}
+                            </div>
+
+                            {% if ticket.type == 'report_user' %}
+                                <div id="moderation-wrapper">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Medida disciplinaria</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="moderation_action" value="none" class="hidden peer" checked>
+                                            <div class="flex items-center px-4 py-3 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-brand-700 peer-checked:border-white/30 peer-checked:text-white transition">
+                                                <i class="bi bi-slash-circle mr-3"></i>
+                                                <span class="text-sm">Ninguna / Solo advertencia</span>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="moderation_action" value="suspend_temp" class="hidden peer">
+                                            <div class="flex items-center px-4 py-3 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-yellow-600/20 peer-checked:border-yellow-600 peer-checked:text-yellow-500 transition">
+                                                <i class="bi bi-clock-history mr-3"></i>
+                                                <span class="text-sm">Suspensión Temporal</span>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="moderation_action" value="suspend_indef" class="hidden peer">
+                                            <div class="flex items-center px-4 py-3 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-red-600/20 peer-checked:border-red-600 peer-checked:text-red-500 transition">
+                                                <i class="bi bi-infinity mr-3"></i>
+                                                <span class="text-sm">Suspensión Indefinida</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <div id="suspension-reason-wrapper" class="hidden">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Motivo público</label>
+                                    <input
+                                        type="text"
+                                        name="suspension_reason"
+                                        id="suspension_reason"
+                                        value="{{ report.getReasonLabel() }}"
+                                        class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
+                                        placeholder="Ej. Comportamiento inadecuado"
+                                    >
+                                </div>
+
+                                <div id="suspension-until-wrapper" class="hidden">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Fin de la suspensión (Hora del Servidor / UTC)</label>
+                                    <input
+                                        type="datetime-local"
+                                        name="suspension_until"
+                                        id="suspension_until"
+                                        class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
+                                    >
+                                    <p id="server-time-preview" class="mt-2 text-[10px] text-alt-400 italic hidden">
+                                        <i class="bi bi-clock mr-1"></i> 
+                                        En tu horario local será: <span id="server-time-value"></span>
+                                    </p>
+                                </div>
+                            {% elseif ticket.type == 'login_recovery' %}
+                                <div id="recovery-actions-wrapper" class="space-y-4 pt-2">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Acciones de Recuperación</label>
+                                    
+                                    <div class="p-4 rounded-lg bg-brand-900 border border-white/5">
+                                        <label class="flex items-center cursor-pointer group">
+                                            <div class="relative inline-flex items-center">
+                                                <input type="checkbox" name="reset_password" class="sr-only peer">
+                                                <div class="w-11 h-6 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-alt"></div>
+                                            </div>
+                                            <span class="ml-3 text-sm font-medium text-gray-300 group-hover:text-white transition-colors">Generar nueva contraseña</span>
+                                        </label>
+                                        <p class="mt-2 text-[10px] text-gray-500 italic">Se generará una clave aleatoria y se añadirá al comentario de resolución.</p>
+                                    </div>
+
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Nuevo correo de cuenta (Opcional)</label>
+                                        <input
+                                            type="email"
+                                            name="new_email"
+                                            value="{{ target_user ? target_user.email : '' }}"
+                                            class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
+                                            placeholder="ejemplo@correo.com"
+                                        >
+                                    </div>
+                                </div>
+                            {% endif %}
+
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Comentario de Resolución</label>
+                                <textarea name="admin_comment" rows="4" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner" placeholder="Explica el motivo de esta resolución..."></textarea>
+                            </div>
+
+                            <button type="submit" id="submit-btn" class="w-full py-4 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg transition shadow-xl shadow-alt/20 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center">
+                                <i class="bi bi-check-all text-xl mr-2"></i> Procesar Resolución
+                            </button>
+                        </form>
+                    {% else %}
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase">Comentario de Resolución</label>
+                                <p class="text-gray-300 mt-1 italic">"{{ ticket.admin_comment ?: "Sin comentarios adicionales." }}"</p>
+                            </div>
+                            <div class="pt-4 text-xs text-gray-500">
+                                Resuelto el <span class="local-date" data-timestamp="{{ ticket.updated_at|date('c') }}">
+                                    {{ ticket.updated_at|date("d/m/Y H:i") }}
+                                </span>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function toggleSuspensionFields() {
+        const status = $('input[name="status"]:checked').val();
+        const moderationAction = $('input[name="moderation_action"]:checked').val();
+        
+        const isAccepted = status === '1';
+        
+        if (isAccepted) {
+            $('#moderation-wrapper').slideDown(200);
+            $('#recovery-actions-wrapper').slideDown(200);
+        } else {
+            $('#moderation-wrapper').slideUp(200);
+            $('#recovery-actions-wrapper').slideUp(200);
+        }
+
+        const isSuspending = isAccepted && moderationAction !== 'none';
+        if (isSuspending) {
+            $('#suspension-reason-wrapper').slideDown(200);
+        } else {
+            $('#suspension-reason-wrapper').slideUp(200);
+        }
+
+        const isTemporary = isAccepted && moderationAction === 'suspend_temp';
+        if (isTemporary) {
+            $('#suspension-until-wrapper').slideDown(200);
+        } else {
+            $('#suspension-until-wrapper').slideUp(200);
+        }
+    }
+
+    function updateServerTimePreview() {
+        const val = $('#suspension_until').val();
+        const preview = $('#server-time-preview');
+        const valueSpan = $('#server-time-value');
+
+        if (val) {
+            // We interpret the input value as UTC
+            const m = moment.utc(val);
+            if (m.isValid()) {
+                // We show the local conversion
+                valueSpan.text(m.local().format('DD/MM/YYYY HH:mm'));
+                preview.slideDown(200);
+                return;
+            }
+        }
+        preview.slideUp(200);
+    }
+
+    $('#suspension_until').on('input change', updateServerTimePreview);
+
+    $('input[name="moderation_action"]').on('change', function() {
+        toggleSuspensionFields();
+        updateServerTimePreview();
+    });
+    $('input[name="status"]').on('change', toggleSuspensionFields);
+    $(document).ready(function() {
+        toggleSuspensionFields();
+    });
+
+    $('#resolve-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = $('#submit-btn');
+        const status = $('input[name="status"]:checked').val();
+        const comment = $('textarea[name="admin_comment"]').val();
+        const moderationAction = $('input[name="moderation_action"]:checked').val();
+        const suspensionReason = $('#suspension_reason').val();
+        const suspensionUntil = $('#suspension_until').val();
+        
+        if (status == 2 && comment.trim().length < 5) {
+            alert('Por favor, indica un motivo para el rechazo (mínimo 5 caracteres).');
+            return;
+        }
+
+        if (status == 1 && moderationAction && moderationAction !== 'none') {
+            if (suspensionReason && suspensionReason.trim().length < 3) {
+                alert('Indica un motivo visible para la suspensión.');
+                return;
+            }
+            if (comment.trim().length < 5) {
+                alert('Explica el motivo de la medida aplicada al usuario.');
+                return;
+            }
+            if (moderationAction === 'suspend_temp' && !suspensionUntil) {
+                alert('Indica cuándo termina la suspensión temporal.');
+                return;
+            }
+        }
+
+        if (!confirm('¿Estás seguro de resolver este ticket?')) return;
+
+        btn.prop('disabled', true).html('<i class="bi bi-hourglass-split animate-spin mr-2"></i> Procesando...');
+
+        $.ajax({
+            url: '/admin/tickets/api/update',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                location.reload();
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                alert(response && response.message ? response.message : 'Error al actualizar ticket');
+                btn.prop('disabled', false).html('<i class="bi bi-check-all text-xl mr-2"></i> Procesar Resolución');
+            }
+        });
+    });
+</script>
+{% endblock %}

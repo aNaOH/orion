@@ -1,0 +1,116 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Crear Ticket de Soporte - Orion{% endblock %}
+
+{% block content %}
+<div class="py-12 animate__animated animate__fadeIn max-w-3xl mx-auto">
+    <div class="mb-10">
+        <nav class="flex mb-4" aria-label="Breadcrumb">
+            <ol class="inline-flex items-center space-x-1 md:space-x-3">
+                <li class="inline-flex items-center">
+                    <a href="/support" class="text-gray-400 hover:text-white transition-colors flex items-center">
+                        <i class="bi bi-house-door-fill mr-2"></i>
+                        Soporte
+                    </a>
+                </li>
+                <li>
+                    <div class="flex items-center">
+                        <i class="bi bi-chevron-right text-gray-600 text-xs mx-2"></i>
+                        <span class="text-gray-200 font-semibold">Nuevo Ticket</span>
+                    </div>
+                </li>
+            </ol>
+        </nav>
+        <h1 class="text-4xl font-bold text-white mb-2">Contactar con Soporte</h1>
+        <p class="text-gray-400 text-lg">Cuéntanos en qué podemos ayudarte y nuestro equipo te responderá lo antes posible.</p>
+    </div>
+
+    <div class="bg-branddark/50 border border-white/5 shadow-2xl rounded-3xl p-8 backdrop-blur-md">
+        <form id="create-ticket-form" class="space-y-6">
+            {{ token_input('USERACTION') | raw }}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {% if not user %}
+                <div class="md:col-span-2">
+                    <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Email de contacto</label>
+                    <input type="email" name="guest_email" id="guest_email" class="w-full bg-brand border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-alt transition shadow-inner placeholder-gray-600" placeholder="tu@email.com" required>
+                    <p class="mt-2 text-[10px] text-gray-500 italic">Usaremos este email para responder a tu solicitud de inicio de sesión.</p>
+                </div>
+                {% endif %}
+
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Categoría</label>
+                    <select name="category" id="category" class="w-full bg-brand border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-alt transition shadow-inner appearance-none cursor-pointer" required>
+                        <option value="" disabled selected>Selecciona una categoría</option>
+                        {% for key, label in categories %}
+                            {% if user or key == 'login_issue' %}
+                                <option value="{{ key }}" {{ (not user and key == 'login_issue') ? 'selected' : '' }}>{{ label }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    {% if not user %}
+                        <p class="mt-2 text-[10px] text-amber-500/80 italic">Como invitado, solo puedes abrir tickets por problemas de inicio de sesión.</p>
+                    {% endif %}
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Asunto</label>
+                    <input type="text" name="subject" id="subject" class="w-full bg-brand border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-alt transition shadow-inner placeholder-gray-600" placeholder="Resumen del problema" required>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Mensaje Detallado</label>
+                <textarea name="message" id="message" rows="8" class="w-full bg-brand border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-alt transition shadow-inner placeholder-gray-600" placeholder="Explica tu situación con el mayor detalle posible..." required></textarea>
+                <p class="mt-2 text-xs text-gray-500">Mínimo 20 caracteres. Incluye cualquier información que consideres relevante.</p>
+            </div>
+
+            <div class="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 flex items-start space-x-3">
+                <i class="bi bi-info-circle-fill text-blue-500 mt-1"></i>
+                <p class="text-sm text-gray-400 leading-relaxed">
+                    Nuestro equipo suele responder en un plazo de 24 a 48 horas laborales. Recibirás una notificación por correo electrónico cuando tu ticket sea actualizado.
+                </p>
+            </div>
+
+            <div class="pt-4 flex items-center justify-between">
+                <a href="/support" class="text-gray-500 hover:text-white transition text-sm font-medium">Cancelar</a>
+                <button type="submit" id="submit-btn" class="px-10 py-4 bg-alt hover:bg-alt-400 text-white font-bold rounded-xl shadow-lg shadow-alt/20 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center">
+                    Enviar Ticket
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $('#create-ticket-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = $('#submit-btn');
+        const message = $('#message').val();
+        
+        if (message.trim().length < 20) {
+            alert('Por favor, escribe un mensaje más detallado (mín. 20 caracteres).');
+            return;
+        }
+
+        btn.prop('disabled', true).html('<i class="bi bi-hourglass-split animate-spin mr-2"></i> Enviando...');
+
+        $.ajax({
+            url: '/support/create/api',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                alert('Tu ticket ha sido creado correctamente. Puedes seguir su estado en "Mis Solicitudes".');
+                window.location.href = '/support/tickets';
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                alert('Error: ' + (response ? response.message : 'No se pudo crear el ticket.'));
+                btn.prop('disabled', false).text('Enviar Ticket');
+            }
+        });
+    });
+</script>
+{% endblock %}

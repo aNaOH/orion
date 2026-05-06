@@ -18,6 +18,31 @@ class UserController
         return User::getById($_SESSION["user"]["id"]);
     }
 
+    public static function ensureUserIsNotSuspended(User $user, bool $jsonResponse = true): void
+    {
+        $activeSuspension = $user->getActiveSuspension();
+        if (!$activeSuspension) {
+            return;
+        }
+
+        $message = $activeSuspension->isIndefinite()
+            ? "Tu cuenta está suspendida de forma indefinida. Revisa tu correo y las normas de la comunidad."
+            : "Tu cuenta está suspendida hasta " . $activeSuspension->ends_at . ". Revisa tu correo y las normas de la comunidad.";
+
+        if ($jsonResponse) {
+            header("HTTP/1.1 403 Forbidden");
+            echo json_encode([
+                "status" => 403,
+                "message" => $message,
+                "field" => "account",
+            ]);
+            exit();
+        }
+
+        header("location: /suspended");
+        exit();
+    }
+
     private static function getLoggedUserOrExit()
     {
         $user = self::getLoggedUser();
@@ -26,6 +51,7 @@ class UserController
             echo json_encode(["status" => 401, "message" => "User not logged in"]);
             exit();
         }
+        self::ensureUserIsNotSuspended($user);
         return $user;
     }
 
@@ -47,6 +73,26 @@ class UserController
             exit();
         }
         ViewController::renderFromController('auth/login', ['title' => 'Entrar a Orion']);
+    }
+
+    public static function showSuspended()
+    {
+        $user = self::getLoggedUser();
+        if (!$user) {
+            header("location: /login");
+            exit();
+        }
+
+        $suspension = $user->getActiveSuspension();
+        if (!$suspension) {
+            header("location: /");
+            exit();
+        }
+
+        ViewController::renderFromController('auth/suspended', [
+            'title' => 'Cuenta Suspendida',
+            'suspension' => $suspension
+        ]);
     }
 
     public static function logout()
@@ -85,6 +131,7 @@ class UserController
             header("location: /login");
             exit();
         }
+        self::ensureUserIsNotSuspended($user, false);
 
         ViewController::renderFromController('auth/library', [
             'title' => 'Tu biblioteca en Orion'
@@ -99,6 +146,7 @@ class UserController
             header("location: /");
             exit();
         }
+        self::ensureUserIsNotSuspended($user, false);
 
         $game = Game::getById($gameid);
         if (is_null($game) || !$user->hasAdquiredGame($game)) {
@@ -135,6 +183,7 @@ class UserController
             header("location: /login");
             exit();
         }
+        self::ensureUserIsNotSuspended($user, false);
 
         ViewController::renderFromController('auth/profileEdit', [
             'title' => 'Editar perfil de Orion'
@@ -184,6 +233,7 @@ class UserController
             header("location: /login");
             exit();
         }
+        self::ensureUserIsNotSuspended($user, false);
 
         ViewController::renderFromController('auth/friends', [
             'friends' => $user->getFriends(),
@@ -217,6 +267,20 @@ class UserController
         }
 
         $_SESSION["user"] = $user->toSessionArray();
+
+        $activeSuspension = $user->getActiveSuspension();
+        if ($activeSuspension) {
+            header("HTTP/1.1 403 Forbidden");
+            echo json_encode([
+                "status" => 403,
+                "message" => $activeSuspension->isIndefinite()
+                    ? "Tu cuenta está suspendida de forma indefinida. Consulta tu correo y las normas de la comunidad."
+                    : "Tu cuenta está suspendida hasta " . $activeSuspension->ends_at . ". Consulta tu correo y las normas de la comunidad.",
+                "field" => "account"
+            ]);
+            exit();
+        }
+
         echo json_encode(["status" => 200, "message" => "Login successful"]);
         exit();
     }

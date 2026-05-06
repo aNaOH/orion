@@ -40,6 +40,20 @@ class ViewController
                 return $user->getProfilePicURL();
             }));
 
+            // snapshot_pic(report) → snapshot URL
+            self::$twig->addFunction(new \Twig\TwigFunction('snapshot_pic', function ($report): string {
+                $snapshot = $report->snapshot;
+                $filename = $snapshot['profile_pic'] ?? 'default.png';
+                
+                // If it starts with 'snapshot_', it belongs to the official snapshots folder
+                if (strpos($filename, 'snapshot_') === 0) {
+                    return 'https://cdn.orion.moonnastd.com/tickets/snapshots/' . $filename;
+                }
+                
+                // Otherwise, it was the default picture at the time
+                return 'https://cdn.orion.moonnastd.com/user/profile_pic/' . $filename;
+            }));
+
             // user_handle(user) → user->getHandle()
             self::$twig->addFunction(new \Twig\TwigFunction('user_handle', function ($user): string {
                 return $user->getHandle();

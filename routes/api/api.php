@@ -29,6 +29,7 @@ $router->mount("/api", function () use ($router) {
     include "routes/api/dev.php";
     include "routes/api/library.php";
     include "routes/api/game.php";
+    include "routes/api/support.php";
 
     $router->mount("/friends", function () use ($router) {
         $router->post("/request/(\d+)", 'UserController::apiSendFriendRequest');

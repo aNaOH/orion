@@ -26,6 +26,13 @@ abstract class Email
     abstract protected function getSubject(): string;
     abstract protected function getTemplatePath(): string;
 
+    /** Texto de previsualización (snippet) */
+    protected function getPreheader(): string
+    {
+        return "";
+    }
+
+
     protected function getVariables(): array
     {
         return [];
@@ -153,7 +160,10 @@ abstract class Email
         }
 
         try {
-            return $twig->render($template, $this->getVariables());
+            $variables = $this->getVariables();
+            $variables['preheader'] = $this->getPreheader();
+            return $twig->render($template, $variables);
+
         } catch (\Exception $e) {
             throw new RuntimeException("Error rendering email template [$template]: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
         }
@@ -171,9 +181,12 @@ abstract class Email
             // Configuración SMTP
             $mail->isSMTP();
             $mail->Host = $_ENV["SMTP_HOST"] ?? 'localhost';
-            $mail->SMTPAuth = true;
-            $mail->Username = $_ENV["SMTP_USER"] ?? '';
-            $mail->Password = $_ENV["SMTP_PASSWORD"] ?? '';
+            $smtpAuthEnabled = !isset($_ENV["SMTP_AUTH"]) || filter_var($_ENV["SMTP_AUTH"], FILTER_VALIDATE_BOOLEAN);
+            $mail->SMTPAuth = $smtpAuthEnabled;
+            if ($smtpAuthEnabled) {
+                $mail->Username = $_ENV["SMTP_USER"] ?? '';
+                $mail->Password = $_ENV["SMTP_PASSWORD"] ?? '';
+            }
             $mail->Port = intval($_ENV["SMTP_PORT"] ?? 587);
 
             $secure = $_ENV["SMTP_SECURE"] ?? 'tls';
@@ -206,7 +219,9 @@ abstract class Email
             $mail->CharSet = 'UTF-8';
             $mail->Subject = $this->subject;
             $mail->Body = $this->body;
-            $mail->AltBody = strip_tags($this->body);
+            $cleanBody = preg_replace('/<(style|script)\b[^>]*>.*?<\/\1>/is', '', $this->body);
+            $mail->AltBody = trim(strip_tags($cleanBody));
+
 
             $mail->send();
             return true;
@@ -223,11 +238,15 @@ abstract class Email
     {
         $required = [
             "SMTP_HOST",
-            "SMTP_USER",
-            "SMTP_PASSWORD",
             "SMTP_PORT",
             "EMAIL_FROM",
         ];
+
+        $smtpAuthEnabled = !isset($_ENV["SMTP_AUTH"]) || filter_var($_ENV["SMTP_AUTH"], FILTER_VALIDATE_BOOLEAN);
+        if ($smtpAuthEnabled) {
+            $required[] = "SMTP_USER";
+            $required[] = "SMTP_PASSWORD";
+        }
 
         foreach ($required as $key) {
             if (empty($_ENV[$key])) {

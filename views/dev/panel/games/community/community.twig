@@ -1,0 +1,62 @@
+{% extends 'layouts/admin.twig' %}
+
+{% set is_dev_panel = true %}
+{% set title = 'Editar comunidad para ' ~ game.title ~ ' | Orion Dev Panel' %}
+{% set panel_title = title %}
+
+{% block content %}
+  <div>
+    <div class="mb-8 flex items-center justify-between">
+      <h1 class="text-xl font-semibold text-alt">Editar comunidad para {{ game.title }}</h1>
+      <a href="/dev/panel/games/" class="text-gray-400 transition hover:text-alt">Volver</a>
+    </div>
+
+    <div class="mb-12 grid grid-cols-1 gap-8 md:grid-cols-3">
+      <div class="group rounded-2xl border border-[#1B2A49]/60 bg-[#1B2A49]/50 p-6 text-center shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-[#1B2A49]/70 hover:shadow-2xl">
+        <i class="bi bi-trophy-fill mb-3 text-4xl text-alt transition-transform duration-200 group-hover:scale-110"></i>
+        <h3 class="mb-4 text-lg font-semibold text-alt">Logros</h3>
+        <p class="mb-6 text-sm text-gray-300">
+          Crea, edita y elimina logros para que los jugadores puedan desbloquearlos dentro del juego.
+        </p>
+        <a
+          href="/dev/panel/games/{{ game.id }}/community/achievements"
+          class="inline-flex w-full items-center justify-center rounded-lg bg-alt px-4 py-2 text-center font-medium text-[#1B2A49] transition hover:scale-[1.02] hover:bg-yellow-400"
+        >Gestionar logros</a>
+      </div>
+
+      <div class="group rounded-2xl border border-[#1B2A49]/60 bg-[#1B2A49]/50 p-6 text-center shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-[#1B2A49]/70 hover:shadow-2xl">
+        <i class="bi bi-trophy mb-3 text-4xl text-alt transition-transform duration-200 group-hover:scale-110"></i>
+        <h3 class="mb-4 text-lg font-semibold text-alt">Tablas de Clasificación</h3>
+        <p class="mb-6 text-sm text-gray-300">
+          Crea tablas usando las estadísticas del juego para comparar puntuaciones entre jugadores.
+        </p>
+        <a
+          href="/dev/panel/games/{{ game.id }}/community/leaderboards"
+          class="inline-flex w-full items-center justify-center rounded-lg bg-alt px-4 py-2 text-center font-medium text-[#1B2A49] transition hover:scale-[1.02] hover:bg-yellow-400"
+        >Gestionar tablas</a>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 gap-8 md:grid-cols-2">
+      <div class="group rounded-2xl border border-[#1B2A49]/60 bg-[#1B2A49]/50 p-6 shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:bg-[#1B2A49]/70 hover:shadow-2xl">
+        <div class="flex flex-col items-center text-center">
+          <i class="bi bi-megaphone-fill mb-3 text-4xl text-alt transition-transform duration-200 group-hover:scale-110"></i>
+          <h3 class="mb-4 text-lg font-semibold text-alt">Noticias</h3>
+          <p class="mb-6 text-sm text-gray-300">
+            Publica noticias o actualizaciones importantes sobre tu juego.
+          </p>
+          <div class="flex w-full flex-col gap-3 sm:flex-row">
+            <a
+              href="/dev/panel/games/{{ game.id }}/community/news"
+              class="inline-flex flex-1 items-center justify-center rounded-lg bg-alt px-4 py-2 text-center font-medium text-[#1B2A49] transition hover:scale-[1.02] hover:bg-yellow-400"
+            >Gestionar noticias</a>
+            <a
+              href="/communities/{{ game.id }}/news"
+              class="inline-flex flex-1 items-center justify-center rounded-lg border border-alt px-4 py-2 text-center font-medium text-alt transition hover:scale-[1.02] hover:bg-alt hover:text-[#1B2A49]"
+            >Ver noticias</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

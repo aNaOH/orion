@@ -18,4 +18,6 @@ include('routes/api/api.php');
 
 include('routes/stripe/stripe.php');
 
+include('routes/support.php');
+
 include('routes/middlewares.php');

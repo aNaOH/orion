@@ -1,0 +1,114 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% block title %}Gestión de Usuarios - Orion Admin{% endblock %}
+
+{% set is_dev_panel = false %}
+{% set panel_title = 'Usuarios | Orion Admin Panel' %}
+{% set title = 'Usuarios Registrados' %}
+
+{% block breadcrumbs %}
+    <li><a href="/admin">Inicio</a></li>
+    <li><span>Usuarios</span></li>
+{% endblock %}
+
+{% block table %}
+    {{ ui.table_header(['Usuario', 'Email', 'Rol', 'Fecha Registro', 'Estado', 'Acciones']) }}
+    <tbody class="divide-y divide-white/5">
+        {% for u in users %}
+            {% set active_suspension = u.getActiveSuspension() %}
+            <tr class="hover:bg-white/5 transition group">
+                <td class="px-6 py-4">
+                    <div class="flex items-center space-x-3">
+                        <img src="{{ profile_pic(u) }}" class="w-10 h-10 rounded-full object-cover border border-white/10">
+                        <div>
+                            <p class="text-gray-200 font-bold text-sm">{{ u.username }}</p>
+                            <p class="text-[10px] text-gray-500 font-mono uppercase tracking-tighter">{{ user_handle(u) }}</p>
+                        </div>
+                    </div>
+                </td>
+                <td class="px-6 py-4 text-gray-400 text-sm">{{ u.email }}</td>
+                <td class="px-6 py-4">
+                    {% if u.role.value == 1 %}
+                        <span class="px-2 py-0.5 bg-red-500/10 text-red-400 text-[10px] font-bold rounded uppercase border border-red-500/20">Admin</span>
+                    {% elseif u.getDeveloperInfo() %}
+                        <span class="px-2 py-0.5 bg-purple-500/10 text-purple-400 text-[10px] font-bold rounded uppercase border border-purple-500/20">Dev</span>
+                    {% else %}
+                        <span class="px-2 py-0.5 bg-blue-500/10 text-blue-400 text-[10px] font-bold rounded uppercase border border-blue-500/20">Usuario</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-gray-400 text-sm">
+                    <span class="local-date" data-timestamp="{{ u.created_at|date('c') }}">
+                        {{ u.created_at|date("d/m/Y") }}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    {% if active_suspension %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-500 border border-red-500/20 uppercase">
+                            <i class="bi bi-shield-fill-x mr-1"></i> Suspendido
+                        </span>
+                    {% else %}
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-500/10 text-green-500 border border-green-500/20 uppercase">
+                            <i class="bi bi-shield-fill-check mr-1"></i> Activo
+                        </span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-right">
+                    <div class="flex items-center justify-end space-x-2">
+                        <a href="/profile/{{ u.id }}" class="p-2 text-gray-400 hover:text-white transition" title="Ver Perfil">
+                            <i class="bi bi-person-fill"></i>
+                        </a>
+                        {% if active_suspension %}
+                            <button onclick="unsuspendUser({{ u.id }}, '{{ u.username }}')" class="p-2 text-green-400 hover:text-green-300 transition" title="Quitar Suspensión">
+                                <i class="bi bi-shield-fill-check"></i>
+                            </button>
+                        {% else %}
+                            <a href="/admin/users/{{ u.id }}/suspend" class="p-2 text-red-400 hover:text-red-300 transition" title="Suspender">
+                                <i class="bi bi-hammer"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6" class="px-6 py-10 text-center text-gray-500 italic">No hay usuarios registrados.</td>
+            </tr>
+        {% endfor %}
+    </tbody>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    function unsuspendUser(userId, username) {
+        const reason = prompt(`¿Por qué quieres quitar la suspensión a ${username}?\nIndica un motivo para enviarle en el correo:`);
+        
+        if (reason === null) return; // Cancelled
+        
+        if (reason.trim().length < 5) {
+            alert('Debes indicar un motivo válido (mín. 5 caracteres).');
+            return;
+        }
+
+        const token = $('#tript_token').val(); // Assuming tript_token is available via layout or base
+
+        $.ajax({
+            url: '/admin/users/api/unsuspend',
+            method: 'POST',
+            data: {
+                user_id: userId,
+                reason: reason,
+                tript_token: '{{ csrf_token('COMMON') | raw }}'.match(/value="([^"]+)"/)[1]
+            },
+            success: function(response) {
+                alert('Suspensión revocada y correo enviado.');
+                location.reload();
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                alert('Error: ' + (response && response.message ? response.message : 'No se pudo revocar la suspensión.'));
+            }
+        });
+    }
+</script>
+{% endblock %}

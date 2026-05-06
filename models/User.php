@@ -3,6 +3,7 @@
 require_once "./models/Badge.php";
 require_once "./models/Developer.php";
 require_once "./models/Game.php";
+require_once "./models/UserSuspension.php";
 
 class User
 {
@@ -48,6 +49,28 @@ class User
     }
 
     // Get by ID
+    public static function getAll(): array
+    {
+        $users = Connection::doSelect(ORION_DB, self::$table);
+        $result = [];
+        foreach ($users as $user) {
+            $result[] = new User(
+                $user["email"],
+                $user["username"],
+                $user["password"],
+                $user["birthdate"],
+                $user["role"],
+                $user["profile_pic"],
+                $user["motd"],
+                $user["badge_id"],
+                $user["id"],
+                $user["created_at"],
+                (bool) $user["is_archived"],
+            );
+        }
+        return $result;
+    }
+
     public static function getById(int $id): ?User
     {
         $user = Connection::doSelect(ORION_DB, self::$table, ["id" => $id]);
@@ -194,8 +217,8 @@ class User
     // Profile picture URL getter
     public function getProfilePicURL(): string
     {
-        return "https://cdn.orion.moonnastd.com/profile/" .
-            ($this->profile_pic ?? "default");
+        return "https://cdn.orion.moonnastd.com/user/profile_pic/" .
+            ($this->profile_pic ?? "default.png");
     }
 
     // Relationship with Developer
@@ -705,6 +728,20 @@ class User
                 "profile_pic" => $this->profile_pic,
             ]
             : [];
+    }
+
+    public function getActiveSuspension(): ?UserSuspension
+    {
+        if (!isset($this->id)) {
+            return null;
+        }
+
+        return UserSuspension::getActiveByUserId($this->id);
+    }
+
+    public function isSuspended(): bool
+    {
+        return $this->getActiveSuspension() !== null;
     }
 
     public static function getCount()

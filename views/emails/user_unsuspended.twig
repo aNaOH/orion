@@ -1,0 +1,23 @@
+{% extends "emails/layout.twig" %}
+
+{% block content %}
+<h1>Tu cuenta ha sido reactivada</h1>
+<p>Hola, {{ user_name }}.</p>
+<p>Nos complace informarte que la suspensión de tu cuenta de Orion ha sido retirada.</p>
+
+<div style="background-color: #f0fff4; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #c6f6d5;">
+    <p style="margin: 0 0 10px 0; font-weight: bold; color: #22543d;">Motivo de la reactivación</p>
+    <p style="margin: 0; color: #2f855a;">{{ reason }}</p>
+</div>
+
+<p>Ya puedes volver a iniciar sesión y disfrutar de todas las funcionalidades de la plataforma.</p>
+<p>Te recordamos la importancia de seguir nuestras normas de la comunidad para asegurar una buena experiencia para todos los usuarios.</p>
+
+<div style="text-align: center; margin-top: 30px;">
+    <a href="{{ site_url }}/auth/login" class="button">Iniciar sesión en Orion</a>
+</div>
+
+<p style="margin-top: 30px; font-size: 12px; color: #718096;">
+    Si tienes alguna duda, puedes contactar con nuestro equipo de soporte.
+</p>
+{% endblock %}

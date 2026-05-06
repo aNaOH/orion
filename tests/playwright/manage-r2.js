@@ -1,71 +1,203 @@
-const ACCOUNT_ID = process.env.CLOUDFLARE_ACCOUNT_ID;
-const API_TOKEN = process.env.CLOUDFLARE_API_TOKEN;
-const BUCKET_NAME = process.env.CLOUDFLARE_R2_BUCKET_NAME || 'orion-test-automation';
+const {
+  S3Client,
+  HeadBucketCommand,
+  CreateBucketCommand,
+  DeleteBucketCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
+} = require('@aws-sdk/client-s3');
 
-if (!ACCOUNT_ID || !API_TOKEN) {
-  console.error('Missing CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN');
-  process.exit(1);
+function getClient() {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID;
+  const accessKeyId = process.env.CLOUDFLARE_R2_TOKEN;
+  const secretAccessKey = process.env.CLOUDFLARE_R2_TOKEN_SECRET;
+
+  if (!accountId || !accessKeyId || !secretAccessKey) {
+    throw new Error('Missing CLOUDFLARE_ACCOUNT_ID, CLOUDFLARE_R2_TOKEN or CLOUDFLARE_R2_TOKEN_SECRET');
+  }
+
+  return new S3Client({
+    region: 'auto',
+    endpoint: `https://${accountId}.r2.cloudflarestorage.com`,
+    credentials: {
+      accessKeyId,
+      secretAccessKey,
+    },
+  });
 }
 
-async function createBucket() {
-  console.log(`Creating R2 bucket: ${BUCKET_NAME}...`);
+function getBucketName() {
+  return process.env.CLOUDFLARE_R2_BUCKET_NAME || 'orion-test-automation';
+}
+
+async function bucketExists() {
   try {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/r2/buckets`,
-      {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ name: BUCKET_NAME }),
-      }
-    );
-    const data = await response.json();
-    if (data.success) {
-      console.log('Bucket created successfully.');
-    } else if (data.errors && data.errors.some(e => e.code === 10003)) {
-      console.log('Bucket already exists.');
-    } else {
-      console.error('Error creating bucket:', JSON.stringify(data.errors));
-      process.exit(1);
-    }
+    await getClient().send(new HeadBucketCommand({ Bucket: getBucketName() }));
+    return true;
   } catch (error) {
-    console.error('Failed to connect to Cloudflare API:', error);
-    process.exit(1);
+    return false;
   }
 }
 
-async function deleteBucket() {
-  console.log(`Deleting R2 bucket: ${BUCKET_NAME}...`);
-  try {
-    const response = await fetch(
-      `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/r2/buckets/${BUCKET_NAME}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${API_TOKEN}`,
-        },
-      }
-    );
-    const data = await response.json();
-    if (data.success) {
-      console.log('Bucket deleted successfully.');
-    } else {
-      console.error('Error deleting bucket:', JSON.stringify(data.errors));
-      process.exit(1);
-    }
-  } catch (error) {
-    console.error('Failed to connect to Cloudflare API:', error);
-    process.exit(1);
-  }
+async function status() {
+  const exists = await bucketExists();
+  const objectCount = exists ? await countObjects() : 0;
+
+  return {
+    status: 200,
+    bucket: getBucketName(),
+    exists,
+    objectCount,
+  };
 }
 
-const action = process.argv[2];
-if (action === 'create') {
-  createBucket();
-} else if (action === 'delete') {
-  deleteBucket();
-} else {
-  console.log('Usage: node manage-r2.js [create|delete]');
+async function create() {
+  if (await bucketExists()) {
+    return {
+      status: 200,
+      bucket: getBucketName(),
+      message: 'El bucket de pruebas ya existe.',
+    };
+  }
+
+  await getClient().send(new CreateBucketCommand({ Bucket: getBucketName() }));
+  return {
+    status: 200,
+    bucket: getBucketName(),
+    message: 'Bucket de pruebas creado correctamente.',
+  };
 }
+
+async function countObjects() {
+  const client = getClient();
+  let continuationToken;
+  let count = 0;
+
+  do {
+    const response = await client.send(new ListObjectsV2Command({
+      Bucket: getBucketName(),
+      ContinuationToken: continuationToken,
+    }));
+
+    count += (response.Contents || []).length;
+    continuationToken = response.NextContinuationToken;
+  } while (continuationToken);
+
+  return count;
+}
+
+async function empty() {
+  if (!(await bucketExists())) {
+    return {
+      status: 404,
+      bucket: getBucketName(),
+      message: 'El bucket de pruebas no existe.',
+      deletedObjects: 0,
+    };
+  }
+
+  const client = getClient();
+  let continuationToken;
+  let deletedObjects = 0;
+
+  do {
+    const response = await client.send(new ListObjectsV2Command({
+      Bucket: getBucketName(),
+      ContinuationToken: continuationToken,
+    }));
+
+    const objects = (response.Contents || []).map((item) => ({ Key: item.Key }));
+    if (objects.length > 0) {
+      await client.send(new DeleteObjectsCommand({
+        Bucket: getBucketName(),
+        Delete: {
+          Objects: objects,
+          Quiet: true,
+        },
+      }));
+      deletedObjects += objects.length;
+    }
+
+    continuationToken = response.NextContinuationToken;
+  } while (continuationToken);
+
+  return {
+    status: 200,
+    bucket: getBucketName(),
+    message: 'Bucket de pruebas vaciado correctamente.',
+    deletedObjects,
+  };
+}
+
+async function remove() {
+  if (!(await bucketExists())) {
+    return {
+      status: 200,
+      bucket: getBucketName(),
+      message: 'El bucket de pruebas ya no existe.',
+    };
+  }
+
+  const objectCount = await countObjects();
+  if (objectCount > 0) {
+    const error = new Error('El bucket contiene objetos. Vacíalo antes de borrarlo.');
+    error.status = 409;
+    throw error;
+  }
+
+  await getClient().send(new DeleteBucketCommand({ Bucket: getBucketName() }));
+  return {
+    status: 200,
+    bucket: getBucketName(),
+    message: 'Bucket de pruebas eliminado correctamente.',
+  };
+}
+
+async function recreate() {
+  if (await bucketExists()) {
+    await empty();
+    await getClient().send(new DeleteBucketCommand({ Bucket: getBucketName() }));
+  }
+
+  await getClient().send(new CreateBucketCommand({ Bucket: getBucketName() }));
+  return {
+    status: 200,
+    bucket: getBucketName(),
+    message: 'Bucket de pruebas recreado correctamente.',
+  };
+}
+
+const actions = {
+  status,
+  create,
+  empty,
+  delete: remove,
+  recreate,
+};
+
+async function runAction(action) {
+  const handler = actions[action];
+  if (!handler) {
+    throw new Error('Usage: node manage-r2.js [status|create|empty|delete|recreate]');
+  }
+
+  const result = await handler();
+  console.log(JSON.stringify(result, null, 2));
+  return result;
+}
+
+if (require.main === module) {
+  runAction(process.argv[2]).catch((error) => {
+    console.error(error.message || error);
+    process.exit(error.status || 1);
+  });
+}
+
+module.exports = {
+  status,
+  create,
+  empty,
+  delete: remove,
+  recreate,
+  runAction,
+};

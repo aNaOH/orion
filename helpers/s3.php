@@ -92,6 +92,32 @@ class S3Helper
             : self::simpleUpload($key, $body, $contentType, $sourceFile);
     }
 
+    /**
+     * Copia un objeto interno en S3/R2.
+     */
+    public static function copy(
+        EBUCKET_LOCATION $sourceLocation,
+        string $sourceName,
+        EBUCKET_LOCATION $destLocation,
+        string $destName
+    ): bool {
+        $sourceKey = $sourceLocation->value . $sourceName;
+        $destKey = $destLocation->value . $destName;
+        $bucket = self::getBucketName();
+
+        try {
+            self::getClient()->copyObject([
+                "Bucket" => $bucket,
+                "Key" => $destKey,
+                "CopySource" => "{$bucket}/{$sourceKey}",
+            ]);
+            return true;
+        } catch (AwsException $e) {
+            error_log("S3Helper copy error: " . $e->getMessage());
+            return false;
+        }
+    }
+
     // ── Download ───────────────────────────────────────────────────────────
 
     /**

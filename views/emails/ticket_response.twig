@@ -1,0 +1,30 @@
+{% extends "emails/layout.twig" %}
+
+{% block content %}
+<h1>Actualización de tu reporte</h1>
+<p>Hola, {{ user_name }}. Tenemos una actualización sobre el reporte con ID #{{ ticket_id }}.</p>
+
+<div style="background-color: #f9f9f9; padding: 20px; border-radius: 8px; margin: 20px 0; border: 1px solid #eeeeee;">
+    <p style="margin: 0; font-weight: bold; color: #1B2A49;">Estado del Ticket:</p>
+    <p style="margin: 5px 0;"><strong>Resultado:</strong> 
+        {% if status == 1 %}
+            <span style="color: #28a745; font-weight: bold;">REVISADO Y ACEPTADO</span>
+        {% else %}
+            <span style="color: #dc3545; font-weight: bold;">RECHAZADO</span>
+        {% endif %}
+    </p>
+    
+    {% if admin_comment %}
+        <p style="margin: 20px 0 0 0; font-weight: bold; color: #1B2A49;">Comentario de Administración:</p>
+        <p style="margin: 5px 0; white-space: pre-wrap;">{{ admin_comment }}</p>
+    {% endif %}
+</div>
+
+{% if status == 1 %}
+    <p>Gracias por tu colaboración para mantener Orion como un lugar seguro para todos. Cuando corresponda, aplicaremos las medidas oportunas según nuestras políticas internas.</p>
+{% else %}
+    <p>Si tienes alguna duda sobre esta resolución, puedes ponerte en contacto con nosotros.</p>
+{% endif %}
+
+<a href="{{ url('/') }}" class="button">Volver a Orion</a>
+{% endblock %}

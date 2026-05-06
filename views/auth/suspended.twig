@@ -1,0 +1,78 @@
+{% extends 'layouts/base_nomain.twig' %}
+
+{% block title %}Cuenta Suspendida - Orion{% endblock %}
+
+{% block content %}
+<div class="flex min-h-full flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="flex justify-center">
+        <div class="rounded-full bg-red-100 p-4">
+            <svg class="h-12 w-12 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+            </svg>
+        </div>
+    </div>
+    <h2 class="mt-6 text-center text-3xl font-extrabold tracking-tight text-white">Acceso Restringido</h2>
+    <p class="mt-2 text-center text-sm text-gray-400">
+      Tu cuenta ha sido suspendida por incumplir las normas de la comunidad.
+    </p>
+  </div>
+
+  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
+    <div class="bg-gray-800/50 backdrop-blur-sm border border-gray-700 rounded-xl p-8 shadow-2xl">
+      <div class="space-y-6">
+        <div>
+          <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider">Motivo de la suspensión</h3>
+          <p class="mt-2 text-lg text-white font-semibold">
+            {{ suspension.reason }}
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-gray-400 uppercase tracking-wider">Duración</h3>
+          <p class="mt-2 text-lg text-white">
+            {% if suspension.ends_at %}
+                Hasta el <span class="local-date font-semibold text-alt-400" data-timestamp="{{ suspension.ends_at|date('c') }}">
+                    {{ suspension.ends_at|date('d/m/Y H:i') }} ({{ server_timezone }})
+                </span>
+            {% else %}
+                <span class="font-semibold text-red-400">Permanente / Indefinida</span>
+            {% endif %}
+          </p>
+        </div>
+
+        {% if suspension.admin_comment %}
+        <div class="p-4 bg-gray-900/50 rounded-lg border-l-4 border-alt-500">
+            <h3 class="text-xs font-medium text-gray-500 uppercase">Comentario adicional del equipo</h3>
+            <p class="mt-1 text-sm text-gray-300 italic">
+                "{{ suspension.admin_comment }}"
+            </p>
+        </div>
+        {% endif %}
+
+        <div class="pt-4 border-t border-gray-700">
+          <p class="text-sm text-gray-400">
+            Si crees que esto es un error, puedes consultar nuestras 
+            <a href="/legal/community-guidelines" class="font-medium text-alt-400 hover:text-alt-300 transition-colors underline decoration-alt-400/30 underline-offset-4">Normas de la Comunidad</a>.
+          </p>
+        </div>
+
+        <div class="mt-8 space-y-3">
+          <a href="/support/appeal" class="flex w-full justify-center rounded-lg bg-alt px-4 py-2.5 text-sm font-bold text-white shadow-lg shadow-alt/20 hover:bg-alt-400 transition-all">
+            Apelar esta decisión
+          </a>
+          <a href="/logout" class="flex w-full justify-center rounded-lg bg-gray-700 px-4 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-600 transition-all">
+            Cerrar sesión
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-8 text-center">
+        <a href="/" class="text-sm text-gray-500 hover:text-gray-300 transition-colors">
+            &larr; Volver a la página principal
+        </a>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,69 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = true %}
+{% set title = 'Tus juegos' %}
+{% set panel_title = 'Tus juegos | Orion Dev Panel' %}
+{% set new_url = '/dev/panel/games/new' %}
+{% set new_label = 'Nuevo juego' %}
+
+{% block table %}
+  {{ ui.table_header(['Título', 'Precio base', 'Descuento', '¿Como editora?', 'Desarrolladora', 'Género', 'Tienda', 'Comunidad', 'Acciones']) }}
+  <tbody>
+    {% for game in games %}
+      <tr class="border-t border-gray-700 transition hover:bg-[#1f2937]">
+        <td class="flex items-center gap-2 px-4 py-3">
+          <img
+            src="{{ cdn_url('game/icon', game.id) }}"
+            alt="{{ game.title }}"
+            class="h-5 w-5 rounded"
+          />
+          {{ game.title }}
+        </td>
+        <td class="px-4 py-3">
+          {{ game.base_price == 0 ? 'Gratis' : game.base_price ~ ' €' }}
+        </td>
+        <td class="px-4 py-3">
+          {{ game.discount == 0 ? 'No' : (game.discount * 100) ~ ' %' }}
+        </td>
+        <td class="px-4 py-3">{{ game.as_editor ? 'Si' : 'No' }}</td>
+        <td class="px-4 py-3">
+          {{ game.as_editor ? game.developer_name : game.getDeveloper().name }}
+        </td>
+        <td class="px-4 py-3">
+          {{ game.getGenre() ? game.getGenre().name : 'N/A' }}
+        </td>
+        <td class="px-4 py-3">
+          {% if game.is_public %}
+            <a class="text-alt hover:opacity-80" href="/store/{{ game.id }}">Ir a la tienda</a>
+          {% else %}
+            No está disponible
+          {% endif %}
+        </td>
+        <td class="px-4 py-3">
+          {% if game.is_public %}
+            <a class="text-alt hover:opacity-80" href="/communities/{{ game.id }}">Ir a la comunidad</a>
+          {% else %}
+            No está disponible
+          {% endif %}
+        </td>
+        <td class="px-4 py-3 text-right">
+          <a
+            href="/dev/panel/games/{{ game.id }}/store/"
+            class="mx-1 text-alt hover:opacity-80 tooltip-btn"
+            data-tooltip="Tienda"
+          >
+            <i class="bi bi-bag-fill"></i>
+          </a>
+          <a
+            href="/dev/panel/games/{{ game.id }}/community/"
+            class="mx-1 text-alt hover:opacity-80 tooltip-btn"
+            data-tooltip="Comunidad"
+          >
+            <i class="bi bi-people-fill"></i>
+          </a>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+{% endblock %}
