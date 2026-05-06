@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Orion Test Runner</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 0; background: #101724; color: #f5f7fa; }
+    header { padding: 20px 24px; background: #152033; border-bottom: 1px solid #24314c; }
+    main { padding: 24px; display: grid; gap: 20px; grid-template-columns: 1.2fr 1fr; }
+    section { background: #152033; border: 1px solid #24314c; border-radius: 12px; padding: 20px; }
+    h1, h2 { margin-top: 0; }
+    button { background: #deab18; color: white; border: 0; border-radius: 8px; padding: 10px 14px; cursor: pointer; font-weight: 700; }
+    button.secondary { background: #263552; }
+    button.danger { background: #a93131; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .namespace-list { display: grid; gap: 10px; margin-top: 16px; }
+    .namespace-card { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-radius: 10px; background: #101724; border: 1px solid #24314c; }
+    .muted { color: #b6c0d4; font-size: 14px; }
+    .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #263552; font-size: 12px; }
+    .history-item { padding: 10px 0; border-bottom: 1px solid #24314c; }
+    .checkboxes { display: flex; gap: 16px; margin-top: 12px; }
+    pre { white-space: pre-wrap; background: #0b111c; border-radius: 10px; padding: 14px; min-height: 220px; max-height: 480px; overflow: auto; }
+    a { color: #ffd66b; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Orion Test Runner</h1>
+    <p class="muted">Servicio web aislado para ejecutar suites Playwright por namespace, reiniciar la base de pruebas y gestionar el bucket R2 del entorno de testing.</p>
+  </header>
+  <main>
+    <section>
+      <h2>Ejecución</h2>
+      <div class="row">
+        <button id="run-all">Run all</button>
+        <a href="/playwright-report/index.html" target="_blank">Abrir último reporte HTML</a>
+      </div>
+      <div class="checkboxes">
+        <label><input type="checkbox" id="reset-db" checked> Reset DB antes de correr</label>
+        <label><input type="checkbox" id="recreate-r2" checked> Recrear R2 antes de correr</label>
+      </div>
+      <div id="current-status" class="muted" style="margin-top: 12px;">Sin ejecución activa.</div>
+      <div id="namespaces" class="namespace-list"></div>
+    </section>
+
+    <section>
+      <h2>Entorno</h2>
+      <div class="row">
+        <button class="secondary" id="reset-db-only">Reset DB</button>
+        <button class="secondary" id="r2-status">R2 status</button>
+        <button class="secondary" id="r2-create">Crear R2</button>
+        <button class="secondary" id="r2-empty">Vaciar R2</button>
+        <button class="danger" id="r2-delete">Borrar R2</button>
+        <button class="secondary" id="r2-recreate">Recrear R2</button>
+      </div>
+      <pre id="env-output"></pre>
+    </section>
+
+    <section>
+      <h2>Logs actuales</h2>
+      <pre id="logs"></pre>
+    </section>
+
+    <section>
+      <h2>Historial</h2>
+      <div id="history"></div>
+    </section>
+  </main>
+
+  <script>
+    const $ = (selector) => document.querySelector(selector);
+    const namespacesEl = $('#namespaces');
+    const logsEl = $('#logs');
+    const historyEl = $('#history');
+    const statusEl = $('#current-status');
+    const envOutputEl = $('#env-output');
+
+    async function api(path, options = {}) {
+      const response = await fetch(path, {
+        headers: { 'Content-Type': 'application/json' },
+        ...options,
+      });
+
+      const payload = await response.json();
+      if (!response.ok) {
+        throw new Error(payload.message || 'Request failed');
+      }
+
+      return payload;
+    }
+
+    async function loadNamespaces() {
+      const { namespaces } = await api('/api/namespaces');
+      namespacesEl.innerHTML = '';
+      namespaces.forEach((namespace) => {
+        const card = document.createElement('div');
+        card.className = 'namespace-card';
+        card.innerHTML = `
+          <div>
+            <strong>${namespace}</strong>
+            <div class="muted">Namespace por carpeta</div>
+          </div>
+          <button data-namespace="${namespace}">Run namespace</button>
+        `;
+        card.querySelector('button').addEventListener('click', () => runNamespace(namespace));
+        namespacesEl.appendChild(card);
+      });
+    }
+
+    async function loadCurrentJob() {
+      const payload = await api('/api/jobs/current');
+      if (!payload.currentJob) {
+        statusEl.textContent = 'Sin ejecución activa.';
+        logsEl.textContent = '';
+        return;
+      }
+
+      statusEl.innerHTML = `
+        <span class="pill">${payload.currentJob.status}</span>
+        ${payload.currentJob.namespace ? `Namespace: ${payload.currentJob.namespace}` : 'Suite completa'}
+        · inicio ${payload.currentJob.startedAt}
+      `;
+      logsEl.textContent = payload.log || '';
+    }
+
+    async function loadHistory() {
+      const { history } = await api('/api/jobs/history');
+      historyEl.innerHTML = '';
+      history.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'history-item';
+        row.innerHTML = `
+          <div><strong>${item.namespace || 'all'}</strong> · ${item.status} · exit ${item.exitCode ?? '-'}</div>
+          <div class="muted">${item.startedAt} · ${item.durationMs ?? '-'} ms</div>
+          <div class="muted"><a href="${item.logUrl}" target="_blank">Ver log</a>${item.reportUrl ? ` · <a href="${item.reportUrl}" target="_blank">Ver reporte</a>` : ''}</div>
+        `;
+        historyEl.appendChild(row);
+      });
+    }
+
+    async function runNamespace(namespace) {
+      await api('/api/run', {
+        method: 'POST',
+        body: JSON.stringify({
+          namespace,
+          resetDb: $('#reset-db').checked,
+          recreateR2: $('#recreate-r2').checked,
+        }),
+      });
+      await refresh();
+    }
+
+    async function runAll() {
+      await api('/api/run', {
+        method: 'POST',
+        body: JSON.stringify({
+          resetDb: $('#reset-db').checked,
+          recreateR2: $('#recreate-r2').checked,
+        }),
+      });
+      await refresh();
+    }
+
+    async function invokeAction(path, method = 'POST') {
+      try {
+        const payload = await api(path, { method });
+        envOutputEl.textContent = JSON.stringify(payload, null, 2);
+      } catch (error) {
+        envOutputEl.textContent = error.message;
+      }
+    }
+
+    async function refresh() {
+      await Promise.all([loadNamespaces(), loadCurrentJob(), loadHistory()]);
+    }
+
+    $('#run-all').addEventListener('click', runAll);
+    $('#reset-db-only').addEventListener('click', () => invokeAction('/api/db/reset'));
+    $('#r2-status').addEventListener('click', () => invokeAction('/api/r2/status', 'GET'));
+    $('#r2-create').addEventListener('click', () => invokeAction('/api/r2/create'));
+    $('#r2-empty').addEventListener('click', () => invokeAction('/api/r2/empty'));
+    $('#r2-delete').addEventListener('click', () => invokeAction('/api/r2/delete'));
+    $('#r2-recreate').addEventListener('click', () => invokeAction('/api/r2/recreate'));
+
+    refresh();
+    setInterval(refresh, 3000);
+  </script>
+</body>
+</html>
