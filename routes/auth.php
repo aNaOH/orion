@@ -8,6 +8,7 @@ $router->get("/logout", 'UserController::logout');
 $router->get("/profile", 'UserController::showProfile');
 
 $router->get("/profile/friends", 'UserController::showFriendsList');
+$router->get("/suspended", 'UserController::showSuspended');
 
 $router->get("/library", 'UserController::showLibrary');
 

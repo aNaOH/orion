@@ -18,6 +18,14 @@ $router->mount("/admin", function () use ($router) {
         $router->get("/{id}", 'AdminSupportController::view');
         $router->post("/api/update", 'AdminSupportController::apiUpdateStatus');
     });
+
+    $router->mount("/users", function () use ($router) {
+        require_once "controllers/AdminSupportController.php";
+        $router->get("/", 'AdminSupportController::usersIndex');
+        $router->get("/{id}/suspend", 'AdminSupportController::showSuspendUser');
+        $router->post("/api/suspend", 'AdminSupportController::apiSuspendUser');
+        $router->post("/api/unsuspend", 'AdminSupportController::apiUnsuspendUser');
+    });
 });
 
 $router->set404("/admin(/.*)?", 'AdminController::handle404');

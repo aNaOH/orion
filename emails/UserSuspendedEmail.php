@@ -25,6 +25,12 @@ class UserSuspendedEmail extends Email
     {
         return "emails/user_suspended.twig";
     }
+    
+    protected function getPreheader(): string
+    {
+        $type = $this->suspension->isIndefinite() ? "permanentemente" : "temporalmente";
+        return "Hola " . $this->user->username . ", lamentamos informarte que tu cuenta ha sido suspendida " . $type . ".";
+    }
 
     protected function getVariables(): array
     {
@@ -35,6 +41,7 @@ class UserSuspendedEmail extends Email
             "starts_at" => $this->suspension->starts_at,
             "ends_at" => $this->suspension->ends_at,
             "is_indefinite" => $this->suspension->isIndefinite(),
+            "server_timezone" => date('T'),
             "guidelines_url" => $this->emailUrl("/legal/community-guidelines"),
         ];
     }

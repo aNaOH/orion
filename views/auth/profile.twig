@@ -64,6 +64,12 @@
                     <button onclick="friendAction('block', {{ target_user.id }})" class="ml-1 py-1 px-2 text-gray-600 hover:text-red-500 transition text-xs flex items-center">
                       <i class="bi bi-slash-circle mr-1"></i> Bloquear
                     </button>
+
+                    {% if is_admin %}
+                    <a href="/admin/users/{{ target_user.id }}/suspend" class="ml-1 py-1 px-2 text-red-500/50 hover:text-red-500 transition text-xs flex items-center border-l border-white/5 pl-2">
+                      <i class="bi bi-shield-lock-fill mr-1"></i> Suspender
+                    </a>
+                    {% endif %}
                 </div>
             {% endif %}
           </div>

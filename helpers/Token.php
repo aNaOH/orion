@@ -27,7 +27,7 @@ class Token
     private static function validationRules($tokenParts)
     {
         return $tokenParts[0] == self::$magicWord &&
-            $tokenParts[1] == getDate();
+            $tokenParts[1] == self::getDate();
     }
 }
 

@@ -426,3 +426,19 @@ CREATE TABLE IF NOT EXISTS `user_suspensions` (
     FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`)
     ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB;
+
+CREATE TABLE IF NOT EXISTS `ticket_appeals` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `ticket_id` INT NOT NULL,
+  `suspension_id` INT NOT NULL,
+  `message` TEXT NOT NULL,
+  PRIMARY KEY (`id`),
+  KEY `fk_appeal_ticket_id` (`ticket_id`),
+  KEY `fk_appeal_suspension_id` (`suspension_id`),
+  CONSTRAINT `fk_appeal_ticket_id`
+    FOREIGN KEY (`ticket_id`) REFERENCES `tickets` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_appeal_suspension_id`
+    FOREIGN KEY (`suspension_id`) REFERENCES `user_suspensions` (`id`)
+    ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB;

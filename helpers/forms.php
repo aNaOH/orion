@@ -75,7 +75,12 @@ class FormHelper {
 
     public static function ValidateDateTimeField($field, $fieldId, ?string $message = null): DateTime
     {
-        $value = DateTime::createFromFormat('Y-m-d\TH:i', $field);
+        // Try both formats (with and without seconds) as browsers can send either
+        $value = DateTime::createFromFormat('Y-m-d\TH:i:s', $field);
+        if (!$value) {
+            $value = DateTime::createFromFormat('Y-m-d\TH:i', $field);
+        }
+
         $errors = DateTime::getLastErrors();
 
         if (

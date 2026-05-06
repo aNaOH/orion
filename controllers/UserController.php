@@ -39,7 +39,7 @@ class UserController
             exit();
         }
 
-        header("location: /legal/community-guidelines?suspended=1");
+        header("location: /suspended");
         exit();
     }
 
@@ -73,6 +73,26 @@ class UserController
             exit();
         }
         ViewController::renderFromController('auth/login', ['title' => 'Entrar a Orion']);
+    }
+
+    public static function showSuspended()
+    {
+        $user = self::getLoggedUser();
+        if (!$user) {
+            header("location: /login");
+            exit();
+        }
+
+        $suspension = $user->getActiveSuspension();
+        if (!$suspension) {
+            header("location: /");
+            exit();
+        }
+
+        ViewController::renderFromController('auth/suspended', [
+            'title' => 'Cuenta Suspendida',
+            'suspension' => $suspension
+        ]);
     }
 
     public static function logout()
@@ -246,6 +266,8 @@ class UserController
             exit();
         }
 
+        $_SESSION["user"] = $user->toSessionArray();
+
         $activeSuspension = $user->getActiveSuspension();
         if ($activeSuspension) {
             header("HTTP/1.1 403 Forbidden");
@@ -259,7 +281,6 @@ class UserController
             exit();
         }
 
-        $_SESSION["user"] = $user->toSessionArray();
         echo json_encode(["status" => 200, "message" => "Login successful"]);
         exit();
     }

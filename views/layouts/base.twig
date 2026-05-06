@@ -43,6 +43,24 @@
   <script>AOS.init();</script>
 
   <script src="{{ asset('vendor/moment/moment.min.js') }}"></script>
+  <script>
+    $(document).ready(function() {
+      if (typeof moment !== 'undefined') {
+        $('.local-date').each(function() {
+          const timestamp = $(this).attr('data-timestamp');
+          if (timestamp) {
+            const m = moment(timestamp);
+            if (m.isValid()) {
+              const localDate = m.local().format('DD/MM/YYYY HH:mm');
+              $(this).text(localDate);
+            } else {
+              console.warn('Invalid timestamp for .local-date:', timestamp);
+            }
+          }
+        });
+      }
+    });
+  </script>
 
   {% block scripts %}{% endblock %}
 </body>

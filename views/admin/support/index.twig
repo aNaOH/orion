@@ -22,7 +22,11 @@
         {% for ticket in tickets %}
             <tr class="hover:bg-white/5 transition group">
                 <td class="px-6 py-4 text-gray-300 font-mono text-sm">#{{ ticket.id }}</td>
-                <td class="px-6 py-4 text-gray-400 text-sm">{{ ticket.created_at|date("d/m/Y H:i") }}</td>
+                <td class="px-6 py-4 text-gray-400 text-sm">
+                    <span class="local-date" data-timestamp="{{ ticket.created_at|date('c') }}">
+                        {{ ticket.created_at|date("d/m/Y H:i") }} ({{ server_timezone }})
+                    </span>
+                </td>
                 <td class="px-6 py-4">
                     <span class="px-2 py-1 bg-blue-500/10 text-blue-400 text-xs font-bold rounded uppercase">
                         {{ ticket.type }}

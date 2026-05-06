@@ -1,0 +1,82 @@
+{% extends 'layouts/base_nomain.twig' %}
+
+{% block title %}Apelar Suspensión - Orion{% endblock %}
+
+{% block content %}
+<section id="appeal-suspension" class="py-20">
+    <div class="container mx-auto max-w-2xl bg-branddark shadow-2xl rounded-xl p-8 border border-white/5 backdrop-blur-md">
+        <h1 class="text-3xl font-bold text-gray-100 mb-2">Apelar Suspensión</h1>
+        <p class="text-gray-400 mb-8 text-lg">Si crees que tu suspensión ha sido un error, por favor proporciona una explicación detallada.</p>
+
+        <div class="mb-8 p-4 bg-red-500/10 border border-red-500/20 rounded-lg">
+            <h3 class="text-xs font-bold text-red-400 uppercase tracking-widest mb-1">Tu suspensión actual</h3>
+            <p class="text-gray-200 font-semibold">{{ suspension.reason }}</p>
+            <p class="text-xs text-gray-500 mt-1">Iniciada el <span class="local-date" data-timestamp="{{ suspension.starts_at|date('c') }}">{{ suspension.starts_at|date('d/m/Y H:i') }} ({{ server_timezone }})</span></p>
+        </div>
+
+        <form id="appeal-form" class="space-y-6">
+            {{ token_input('USERACTION') | raw }}
+
+            <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Tu mensaje de apelación</label>
+                <textarea 
+                    name="message" 
+                    id="message" 
+                    rows="8" 
+                    class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-alt-500 transition shadow-inner placeholder-gray-600" 
+                    placeholder="Explica por qué deberíamos revisar tu caso..."
+                    required
+                ></textarea>
+                <p class="mt-2 text-xs text-gray-500">Mínimo 20 caracteres. Sé lo más claro y respetuoso posible.</p>
+            </div>
+
+            <div class="bg-alt-900/10 border border-alt-500/20 rounded-lg p-4 flex items-start space-x-3">
+                <i class="bi bi-info-circle-fill text-alt-500 mt-1"></i>
+                <p class="text-sm text-gray-400 leading-relaxed">
+                    Las apelaciones son revisadas manualmente por el equipo de moderación. El envío de apelaciones falsas o abusivas puede resultar en una extensión de la sanción.
+                </p>
+            </div>
+
+            <div class="pt-4 flex items-center justify-between">
+                <a href="/suspended" class="text-gray-500 hover:text-white transition text-sm font-medium">Volver atrás</a>
+                <button type="submit" id="submit-btn" class="px-8 py-3 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg shadow-lg shadow-alt/20 transition transform hover:-translate-y-0.5 active:translate-y-0 flex items-center">
+                    Enviar Apelación
+                </button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    $('#appeal-form').on('submit', function(e) {
+        e.preventDefault();
+        
+        const btn = $('#submit-btn');
+        const message = $('#message').val();
+        
+        if (message.trim().length < 20) {
+            alert('Por favor, escribe una apelación más detallada (mín. 20 caracteres).');
+            return;
+        }
+
+        btn.prop('disabled', true).html('<i class="bi bi-hourglass-split animate-spin mr-2"></i> Enviando...');
+
+        $.ajax({
+            url: '/support/appeal/api/create',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                alert('Tu apelación ha sido enviada correctamente. El equipo la revisará lo antes posible.');
+                window.location.href = '/suspended';
+            },
+            error: function(xhr) {
+                const response = xhr.responseJSON;
+                alert('Error: ' + (response ? response.message : 'No se pudo enviar la apelación.'));
+                btn.prop('disabled', false).text('Enviar Apelación');
+            }
+        });
+    });
+</script>
+{% endblock %}

@@ -13,6 +13,16 @@
             <input type="hidden" name="reported_id" value="{{ target_user.id }}">
 
             <div>
+                <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">ID del usuario reportado</label>
+                <div class="flex items-center space-x-2">
+                    <div class="bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white font-mono flex-1">
+                        #{{ target_user.id }}
+                    </div>
+                </div>
+                <p class="mt-2 text-xs text-gray-500">Este ID se obtiene en el perfil del usuario, es el número que se encuentra al lado del símbolo <strong>#</strong> en su nombre.</p>
+            </div>
+
+            <div>
                 <label class="block text-sm font-semibold text-gray-300 mb-2 uppercase tracking-wider">Motivo del reporte</label>
                 <select name="reason" id="reason" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-alt-500 transition shadow-inner">
                     <option value="" disabled {{ selected_reason == "" ? 'selected' : '' }}>Selecciona un motivo...</option>

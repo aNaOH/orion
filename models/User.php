@@ -49,6 +49,28 @@ class User
     }
 
     // Get by ID
+    public static function getAll(): array
+    {
+        $users = Connection::doSelect(ORION_DB, self::$table);
+        $result = [];
+        foreach ($users as $user) {
+            $result[] = new User(
+                $user["email"],
+                $user["username"],
+                $user["password"],
+                $user["birthdate"],
+                $user["role"],
+                $user["profile_pic"],
+                $user["motd"],
+                $user["badge_id"],
+                $user["id"],
+                $user["created_at"],
+                (bool) $user["is_archived"],
+            );
+        }
+        return $result;
+    }
+
     public static function getById(int $id): ?User
     {
         $user = Connection::doSelect(ORION_DB, self::$table, ["id" => $id]);

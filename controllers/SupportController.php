@@ -3,6 +3,7 @@
 require_once "./models/User.php";
 require_once "./models/Ticket.php";
 require_once "./models/TicketReportUser.php";
+require_once "./models/TicketAppeal.php";
 require_once "./helpers/s3.php";
 require_once "./emails/TicketCreatedEmail.php";
 require_once "./emails/TicketAdminNotificationEmail.php";
@@ -40,6 +41,11 @@ class SupportController
         $targetUser = User::getById($reportedUserId);
         if (!$targetUser) {
             ViewController::render('errors/404');
+            exit();
+        }
+
+        if ($user->id == $targetUser->id) {
+            header("location: /support");
             exit();
         }
 
@@ -124,6 +130,72 @@ class SupportController
         }
 
         echo json_encode(["status" => 200, "message" => "Reporte enviado correctamente", "ticket_id" => $ticket->id]);
+        exit();
+    }
+
+    public static function showAppeal()
+    {
+        $user = self::getLoggedUser();
+        if (!$user) {
+            header("location: /login?to=" . urlencode($_SERVER['REQUEST_URI']));
+            exit();
+        }
+
+        $suspension = $user->getActiveSuspension();
+        if (!$suspension) {
+            header("location: /");
+            exit();
+        }
+
+        ViewController::render('support/appeal', [
+            'suspension' => $suspension
+        ]);
+    }
+
+    public static function apiCreateAppeal()
+    {
+        $user = self::getLoggedUserOrExit();
+        FormHelper::ValidateToken($_POST["tript_token"] ?? "", "tript_token", ETOKEN_TYPE::USERACTION);
+
+        $message = $_POST["message"] ?? null;
+        FormHelper::ValidateRequiredField($message, "message");
+        FormHelper::ValidateMinChars(trim($message), 20, "message");
+        FormHelper::ValidateMaxChars(trim($message), 3000, "message");
+
+        $suspension = $user->getActiveSuspension();
+        if (!$suspension) {
+            header("HTTP/1.1 400 Bad Request");
+            echo json_encode(["status" => 400, "message" => "No tienes una suspensión activa que apelar."]);
+            exit();
+        }
+
+        // Check if there's already a pending appeal
+        $sql = "SELECT id FROM tickets WHERE user_id = :user_id AND type = 'appeal' AND status = 0";
+        $row = Connection::customQuery(ORION_DB, $sql, ["user_id" => $user->id])->fetch(PDO::FETCH_ASSOC);
+        if ($row) {
+            header("HTTP/1.1 409 Conflict");
+            echo json_encode(["status" => 409, "message" => "Ya tienes una apelación pendiente."]);
+            exit();
+        }
+
+        $ticket = new Ticket($user->id, "appeal");
+        $ticket->save();
+
+        $appeal = new TicketAppeal($ticket->id, $suspension->id, trim($message));
+        $appeal->save();
+
+        // Notify admins
+        $admins = User::all();
+        foreach ($admins as $admin) {
+            if ($admin->role === EUSER_TYPE::ADMIN) {
+                try {
+                    $adminEmail = new TicketAdminNotificationEmail($admin->email, $ticket, $user);
+                    $adminEmail->send();
+                } catch (Exception $e) {}
+            }
+        }
+
+        echo json_encode(["status" => 200, "message" => "Tu apelación ha sido enviada correctamente."]);
         exit();
     }
 }

@@ -70,7 +70,9 @@
                                 <p class="font-semibold">Este usuario ya tiene una suspensión activa.</p>
                                 <p class="mt-1">
                                     {% if active_suspension.ends_at %}
-                                        Vigente hasta el {{ active_suspension.ends_at|date("d/m/Y H:i") }}.
+                                        Vigente hasta el <span class="local-date" data-timestamp="{{ active_suspension.ends_at|date('c') }}">
+                                            {{ active_suspension.ends_at|date("d/m/Y H:i") }} ({{ server_timezone }})
+                                        </span>.
                                     {% else %}
                                         La suspensión es indefinida.
                                     {% endif %}
@@ -119,6 +121,43 @@
                             <i class="bi bi-info-circle mr-1"></i> Estos datos quedaron congelados al momento de crear el reporte.
                         </p>
                     </div>
+                {% elseif ticket.type == "appeal" %}
+                    <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                        <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                            <i class="bi bi-chat-left-dots-fill mr-2 text-alt"></i> Mensaje de Apelación
+                        </h2>
+                        <div class="bg-brand-900 p-6 rounded-lg border border-white/5 shadow-inner">
+                            <p class="text-gray-200 whitespace-pre-wrap leading-relaxed">{{ appeal.message }}</p>
+                        </div>
+                    </div>
+
+                    {% if original_suspension %}
+                        <div class="bg-branddark rounded-xl p-6 border border-white/5">
+                            <h2 class="text-lg font-bold text-gray-200 mb-4 flex items-center">
+                                <i class="bi bi-exclamation-octagon-fill mr-2 text-red-500"></i> Suspensión Apelada
+                            </h2>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase">Motivo Público</label>
+                                        <p class="text-gray-200 font-semibold">{{ original_suspension.reason }}</p>
+                                    </div>
+                                    <div>
+                                        <label class="block text-xs font-bold text-gray-500 uppercase">Estado Actual</label>
+                                        {% if original_suspension.is_active %}
+                                            <span class="text-green-500 font-bold text-sm">ACTIVA</span>
+                                        {% else %}
+                                            <span class="text-gray-500 font-bold text-sm italic">REVOCADA / EXPIRADA</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 uppercase">Comentario del Moderador</label>
+                                    <p class="text-gray-400 italic mt-1 bg-brand-900/50 p-3 rounded border border-white/5">"{{ original_suspension.admin_comment }}"</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
                 {% endif %}
             </div>
 
@@ -135,61 +174,92 @@
                             <input type="hidden" name="id" value="{{ ticket.id }}">
                             
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Acción</label>
-                                <div class="grid grid-cols-2 gap-2">
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Acción de Resolución</label>
+                                <div class="grid grid-cols-2 gap-3">
                                     <label class="cursor-pointer">
                                         <input type="radio" name="status" value="1" class="hidden peer" checked>
-                                        <div class="text-center p-3 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-green-600/20 peer-checked:border-green-600 peer-checked:text-green-500 transition">
-                                            Aceptar
+                                        <div class="text-center p-4 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-green-600/20 peer-checked:border-green-600 peer-checked:text-green-500 transition shadow-sm hover:border-white/20">
+                                            <i class="bi bi-check-circle block text-xl mb-1"></i>
+                                            {{ ticket.type == 'appeal' ? 'Aceptar Apelación' : 'Aceptar' }}
                                         </div>
                                     </label>
                                     <label class="cursor-pointer">
                                         <input type="radio" name="status" value="2" class="hidden peer">
-                                        <div class="text-center p-3 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-red-600/20 peer-checked:border-red-600 peer-checked:text-red-500 transition">
+                                        <div class="text-center p-4 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-red-600/20 peer-checked:border-red-600 peer-checked:text-red-500 transition shadow-sm hover:border-white/20">
+                                            <i class="bi bi-x-circle block text-xl mb-1"></i>
                                             Rechazar
                                         </div>
                                     </label>
                                 </div>
+                                {% if ticket.type == 'appeal' %}
+                                    <p class="mt-3 text-[10px] text-gray-500 italic flex items-center">
+                                        <i class="bi bi-info-circle mr-2 text-alt"></i> Aceptar la apelación revocará automáticamente la suspensión.
+                                    </p>
+                                {% endif %}
                             </div>
 
-                            <div id="moderation-wrapper">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Medida adicional</label>
-                                <select name="moderation_action" id="moderation_action" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner">
-                                    <option value="none">Aceptar sin suspensión</option>
-                                    <option value="suspend_temp">Suspensión temporal</option>
-                                    <option value="suspend_indef">Suspensión indefinida</option>
-                                </select>
-                            </div>
+                            {% if ticket.type == 'report_user' %}
+                                <div id="moderation-wrapper">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-3 tracking-wider">Medida disciplinaria</label>
+                                    <div class="grid grid-cols-1 gap-2">
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="moderation_action" value="none" class="hidden peer" checked>
+                                            <div class="flex items-center px-4 py-3 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-brand-700 peer-checked:border-white/30 peer-checked:text-white transition">
+                                                <i class="bi bi-slash-circle mr-3"></i>
+                                                <span class="text-sm">Ninguna / Solo advertencia</span>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="moderation_action" value="suspend_temp" class="hidden peer">
+                                            <div class="flex items-center px-4 py-3 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-yellow-600/20 peer-checked:border-yellow-600 peer-checked:text-yellow-500 transition">
+                                                <i class="bi bi-clock-history mr-3"></i>
+                                                <span class="text-sm">Suspensión Temporal</span>
+                                            </div>
+                                        </label>
+                                        <label class="cursor-pointer">
+                                            <input type="radio" name="moderation_action" value="suspend_indef" class="hidden peer">
+                                            <div class="flex items-center px-4 py-3 rounded-lg border border-white/10 bg-brand-900 text-gray-400 peer-checked:bg-red-600/20 peer-checked:border-red-600 peer-checked:text-red-500 transition">
+                                                <i class="bi bi-infinity mr-3"></i>
+                                                <span class="text-sm">Suspensión Indefinida</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
 
-                            <div id="suspension-reason-wrapper" class="hidden">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Motivo visible de la suspensión</label>
-                                <input
-                                    type="text"
-                                    name="suspension_reason"
-                                    id="suspension_reason"
-                                    value="{{ report.getReasonLabel() }}"
-                                    class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
-                                    placeholder="Ej. Suplantación de identidad"
-                                >
-                            </div>
+                                <div id="suspension-reason-wrapper" class="hidden">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Motivo público</label>
+                                    <input
+                                        type="text"
+                                        name="suspension_reason"
+                                        id="suspension_reason"
+                                        value="{{ report.getReasonLabel() }}"
+                                        class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
+                                        placeholder="Ej. Comportamiento inadecuado"
+                                    >
+                                </div>
 
-                            <div id="suspension-until-wrapper" class="hidden">
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Fin de la suspensión temporal</label>
-                                <input
-                                    type="datetime-local"
-                                    name="suspension_until"
-                                    id="suspension_until"
-                                    class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
-                                >
-                            </div>
+                                <div id="suspension-until-wrapper" class="hidden">
+                                    <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Fin de la suspensión (Hora del Servidor / UTC)</label>
+                                    <input
+                                        type="datetime-local"
+                                        name="suspension_until"
+                                        id="suspension_until"
+                                        class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner"
+                                    >
+                                    <p id="server-time-preview" class="mt-2 text-[10px] text-alt-400 italic hidden">
+                                        <i class="bi bi-clock mr-1"></i> 
+                                        En tu horario local será: <span id="server-time-value"></span>
+                                    </p>
+                                </div>
+                            {% endif %}
 
                             <div>
-                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Comentario para el usuario reportante</label>
-                                <textarea name="admin_comment" rows="4" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner" placeholder="Explica el motivo de la resolución o la medida aplicada..."></textarea>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-2">Comentario de Resolución</label>
+                                <textarea name="admin_comment" rows="4" class="w-full bg-brand-900 border border-white/10 rounded-lg px-4 py-3 text-white text-sm focus:outline-none focus:border-alt-500 transition shadow-inner" placeholder="Explica el motivo de esta resolución..."></textarea>
                             </div>
 
-                            <button type="submit" id="submit-btn" class="w-full py-3 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg transition shadow-lg shadow-alt/20">
-                                Resolver Ticket
+                            <button type="submit" id="submit-btn" class="w-full py-4 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg transition shadow-xl shadow-alt/20 transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center">
+                                <i class="bi bi-check-all text-xl mr-2"></i> Procesar Resolución
                             </button>
                         </form>
                     {% else %}
@@ -199,7 +269,9 @@
                                 <p class="text-gray-300 mt-1 italic">"{{ ticket.admin_comment ?: "Sin comentarios adicionales." }}"</p>
                             </div>
                             <div class="pt-4 text-xs text-gray-500">
-                                Resuelto el {{ ticket.updated_at|date("d/m/Y H:i") }}
+                                Resuelto el <span class="local-date" data-timestamp="{{ ticket.updated_at|date('c') }}">
+                                    {{ ticket.updated_at|date("d/m/Y H:i") }}
+                                </span>
                             </div>
                         </div>
                     {% endif %}
@@ -214,19 +286,59 @@
 <script>
     function toggleSuspensionFields() {
         const status = $('input[name="status"]:checked').val();
-        const moderationAction = $('#moderation_action').val();
-        const allowSuspension = status == '1';
-        const suspensionFieldsVisible = allowSuspension && moderationAction !== 'none';
-        const temporaryVisible = allowSuspension && moderationAction === 'suspend_temp';
+        const moderationAction = $('input[name="moderation_action"]:checked').val();
+        
+        const isAccepted = status === '1';
+        
+        if (isAccepted) {
+            $('#moderation-wrapper').slideDown(200);
+        } else {
+            $('#moderation-wrapper').slideUp(200);
+        }
 
-        $('#moderation-wrapper').toggleClass('hidden', !allowSuspension);
-        $('#suspension-reason-wrapper').toggleClass('hidden', !suspensionFieldsVisible);
-        $('#suspension-until-wrapper').toggleClass('hidden', !temporaryVisible);
+        const isSuspending = isAccepted && moderationAction !== 'none';
+        if (isSuspending) {
+            $('#suspension-reason-wrapper').slideDown(200);
+        } else {
+            $('#suspension-reason-wrapper').slideUp(200);
+        }
+
+        const isTemporary = isAccepted && moderationAction === 'suspend_temp';
+        if (isTemporary) {
+            $('#suspension-until-wrapper').slideDown(200);
+        } else {
+            $('#suspension-until-wrapper').slideUp(200);
+        }
     }
 
-    $('#moderation_action').on('change', toggleSuspensionFields);
+    function updateServerTimePreview() {
+        const val = $('#suspension_until').val();
+        const preview = $('#server-time-preview');
+        const valueSpan = $('#server-time-value');
+
+        if (val) {
+            // We interpret the input value as UTC
+            const m = moment.utc(val);
+            if (m.isValid()) {
+                // We show the local conversion
+                valueSpan.text(m.local().format('DD/MM/YYYY HH:mm'));
+                preview.slideDown(200);
+                return;
+            }
+        }
+        preview.slideUp(200);
+    }
+
+    $('#suspension_until').on('input change', updateServerTimePreview);
+
+    $('input[name="moderation_action"]').on('change', function() {
+        toggleSuspensionFields();
+        updateServerTimePreview();
+    });
     $('input[name="status"]').on('change', toggleSuspensionFields);
-    toggleSuspensionFields();
+    $(document).ready(function() {
+        toggleSuspensionFields();
+    });
 
     $('#resolve-form').on('submit', function(e) {
         e.preventDefault();
@@ -234,33 +346,33 @@
         const btn = $('#submit-btn');
         const status = $('input[name="status"]:checked').val();
         const comment = $('textarea[name="admin_comment"]').val();
-        const moderationAction = $('#moderation_action').val();
+        const moderationAction = $('input[name="moderation_action"]:checked').val();
         const suspensionReason = $('#suspension_reason').val();
         const suspensionUntil = $('#suspension_until').val();
         
-        if (status == 2 && comment.length < 5) {
-            alert('Por favor, indica un motivo para el rechazo.');
+        if (status == 2 && comment.trim().length < 5) {
+            alert('Por favor, indica un motivo para el rechazo (mínimo 5 caracteres).');
             return;
         }
 
-        if (status == 1 && moderationAction !== 'none' && suspensionReason.trim().length < 3) {
-            alert('Indica un motivo visible para la suspensión.');
-            return;
+        if (status == 1 && moderationAction && moderationAction !== 'none') {
+            if (suspensionReason && suspensionReason.trim().length < 3) {
+                alert('Indica un motivo visible para la suspensión.');
+                return;
+            }
+            if (comment.trim().length < 5) {
+                alert('Explica el motivo de la medida aplicada al usuario.');
+                return;
+            }
+            if (moderationAction === 'suspend_temp' && !suspensionUntil) {
+                alert('Indica cuándo termina la suspensión temporal.');
+                return;
+            }
         }
 
-        if (status == 1 && moderationAction !== 'none' && comment.trim().length < 5) {
-            alert('Explica el motivo de la medida aplicada al usuario.');
-            return;
-        }
+        if (!confirm('¿Estás seguro de resolver este ticket?')) return;
 
-        if (status == 1 && moderationAction === 'suspend_temp' && !suspensionUntil) {
-            alert('Indica cuándo termina la suspensión temporal.');
-            return;
-        }
-
-        if (!confirm('¿Estás seguro de resolver este ticket con esta acción? Se enviará un correo al usuario.')) return;
-
-        btn.prop('disabled', true).text('Procesando...');
+        btn.prop('disabled', true).html('<i class="bi bi-hourglass-split animate-spin mr-2"></i> Procesando...');
 
         $.ajax({
             url: '/admin/tickets/api/update',
@@ -272,7 +384,7 @@
             error: function(xhr) {
                 const response = xhr.responseJSON;
                 alert(response && response.message ? response.message : 'Error al actualizar ticket');
-                btn.prop('disabled', false).text('Resolver Ticket');
+                btn.prop('disabled', false).html('<i class="bi bi-check-all text-xl mr-2"></i> Procesar Resolución');
             }
         });
     });

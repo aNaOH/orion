@@ -22,6 +22,11 @@ class RegisterEmail extends Email
         return "emails/register.twig";
     }
 
+    protected function getPreheader(): string
+    {
+        return "Gracias por unirte a Orion. Estamos encantados de tenerte con nosotros.";
+    }
+
     protected function getVariables(): array
     {
         return [

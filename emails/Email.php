@@ -26,6 +26,13 @@ abstract class Email
     abstract protected function getSubject(): string;
     abstract protected function getTemplatePath(): string;
 
+    /** Texto de previsualización (snippet) */
+    protected function getPreheader(): string
+    {
+        return "";
+    }
+
+
     protected function getVariables(): array
     {
         return [];
@@ -153,7 +160,10 @@ abstract class Email
         }
 
         try {
-            return $twig->render($template, $this->getVariables());
+            $variables = $this->getVariables();
+            $variables['preheader'] = $this->getPreheader();
+            return $twig->render($template, $variables);
+
         } catch (\Exception $e) {
             throw new RuntimeException("Error rendering email template [$template]: " . $e->getMessage() . " at " . $e->getFile() . ":" . $e->getLine());
         }
@@ -209,7 +219,9 @@ abstract class Email
             $mail->CharSet = 'UTF-8';
             $mail->Subject = $this->subject;
             $mail->Body = $this->body;
-            $mail->AltBody = strip_tags($this->body);
+            $cleanBody = preg_replace('/<(style|script)\b[^>]*>.*?<\/\1>/is', '', $this->body);
+            $mail->AltBody = trim(strip_tags($cleanBody));
+
 
             $mail->send();
             return true;
