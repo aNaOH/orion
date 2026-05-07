@@ -30,6 +30,7 @@ form.onsubmit = async (e) => {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
+        tript_token: fields["tript_token"]?.value || "",
         title: fields["title"].value,
         shortDescription: fields["shortDescription"].value,
         asEditor: asEditor.checked,

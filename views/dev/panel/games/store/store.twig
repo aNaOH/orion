@@ -1,4 +1,5 @@
 {% extends 'layouts/admin.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
 
 {% set is_dev_panel = true %}
 {% set title = 'Editar tienda para ' ~ game.title ~ ' | Orion Dev Panel' %}
@@ -7,275 +8,230 @@
 
 {% block styles %}
   <link rel="stylesheet" href="{{ asset('vendor/simplemde/simplemde.orion.css') }}">
+  <link rel="stylesheet" href="{{ asset('css/components/markdown-editor.css') }}">
 {% endblock %}
 
 {% block content %}
-  <div class="container mx-auto mt-6 max-w-full px-6">
-    <div class="flex items-center justify-between">
-      <h1 class="text-xl font-semibold text-alt">Editar tienda para {{ game.title }}</h1>
-      <a href="/dev/panel/games/" class="text-gray-400 transition hover:text-alt">Volver</a>
+<div class="max-w-6xl mx-auto animate__animated animate__fadeIn">
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-2xl font-bold text-alt">Editar Tienda: {{ game.title }}</h1>
+            <p class="text-gray-400 text-sm mt-1">Configura cómo se ve tu juego en la plataforma</p>
+        </div>
+        <a href="/dev/panel/games" class="text-gray-400 hover:text-alt transition flex items-center gap-2">
+            <i class="bi bi-arrow-left"></i> Volver al Listado
+        </a>
     </div>
 
-    <div class="border-b border-gray-700">
-      <nav class="flex space-x-6" id="tabButtons">
-        <button
-          data-tab="store"
-          class="tab-button border-b-2 border-alt py-2 font-medium text-alt transition"
-        >
-          Página de la tienda
+    <!-- TABS -->
+    <div class="flex gap-2 mb-8 bg-branddark-700/30 p-1 rounded-xl border border-branddark-500 w-fit">
+        <button data-tab="store" class="tab-button px-6 py-2.5 rounded-lg font-bold transition-all border-b-0 text-alt bg-branddark-600 shadow-lg">
+            <i class="bi bi-shop mr-2"></i> Página de Tienda
         </button>
-        <button
-          data-tab="builds"
-          class="tab-button border-b-2 border-transparent py-2 font-medium text-gray-400 transition hover:text-alt"
-        >
-          Compilaciones
+        <button data-tab="builds" class="tab-button px-6 py-2.5 rounded-lg font-bold transition-all border-b-0 text-gray-400 hover:text-white">
+            <i class="bi bi-cloud-upload mr-2"></i> Compilaciones (Builds)
         </button>
-      </nav>
     </div>
 
-    <div id="tabContent" class="mt-6">
-      <div id="store" class="tab-pane block">
-        <form id="editGameForm" class="space-y-6">
-          <div class="relative">
-            <input
-              type="text"
-              id="title"
-              name="title"
-              placeholder=" "
-              value="{{ game.title }}"
-              class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
-            />
-            <label
-              for="title"
-              class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
-            >
-              Título
-            </label>
-          </div>
+    <div id="tabContent">
+        <!-- PÁGINA DE TIENDA -->
+        <div id="store" class="tab-pane block space-y-8">
+            <form id="editGameForm" class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Info Card -->
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="bi bi-info-circle text-alt"></i> Información General
+                        </h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label for="title" class="block text-sm font-medium text-gray-300 mb-1">Título</label>
+                                <input type="text" id="title" name="title" value="{{ game.title }}" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" required>
+                            </div>
 
-          <div class="relative">
-            <input
-              type="text"
-              id="shortDescription"
-              name="shortDescription"
-              placeholder=" "
-              value="{{ game.short_description }}"
-              class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
-            />
-            <label
-              for="shortDescription"
-              class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
-            >
-              Descripción corta
-            </label>
-          </div>
+                            <div>
+                                <label for="shortDescription" class="block text-sm font-medium text-gray-300 mb-1">Descripción Corta</label>
+                                <textarea id="shortDescription" name="shortDescription" rows="2" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" required>{{ game.short_description }}</textarea>
+                            </div>
 
-          <div>
-            <label for="genre" class="mb-2 block font-medium text-gray-300">Género</label>
-            <select
-              id="genre"
-              name="genre"
-              class="w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 py-3 text-gray-200 outline-none focus:border-alt focus:ring-2 focus:ring-alt"
-            >
-              {% for genre in genres %}
-                <option value="{{ genre.id }}" {% if game.genre_id == genre.id %}selected{% endif %}>
-                  {{ genre.name }}
-                </option>
-              {% endfor %}
-            </select>
-          </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label for="genre" class="block text-sm font-medium text-gray-300 mb-1">Género Principal</label>
+                                    <select id="genre" name="genre" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors">
+                                        {% for genre in genres %}
+                                            <option value="{{ genre.id }}" {% if game.genre_id == genre.id %}selected{% endif %}>{{ genre.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-3">Publicación</label>
+                                    <div class="flex items-center gap-4">
+                                        <label class="flex items-center gap-2 cursor-pointer">
+                                            <input type="checkbox" id="asEditor" name="asEditor" {% if game.as_editor %}checked{% endif %} class="hidden peer">
+                                            <div class="w-5 h-5 rounded border-2 border-branddark-400 peer-checked:border-alt peer-checked:bg-alt transition-all flex items-center justify-center">
+                                                <i class="bi bi-check-lg text-branddark-900 text-xs"></i>
+                                            </div>
+                                            <span class="text-sm text-gray-300">Como Editora</span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
 
-          <div class="flex flex-col gap-2">
-            <p class="mb-2 block font-medium text-gray-300">Características</p>
+                            <div id="developerNameContainer" class="{% if not game.as_editor %}hidden{% endif %} animate__animated animate__fadeIn">
+                                <label for="developerName" class="block text-sm font-medium text-gray-300 mb-1">Nombre del Desarrollador Original</label>
+                                <input type="text" id="developerName" name="developerName" value="{{ game.developer_name }}" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors">
+                            </div>
+                        </div>
+                    </div>
 
-            <div class="flex flex-row gap-2">
-              <select
-                id="featureSelector"
-                class="w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 py-3 text-gray-200 outline-none focus:border-alt focus:ring-2 focus:ring-alt"
-              >
-                <option value="">Seleccionar característica</option>
-                {% for feature in features %}
-                  <option value="{{ feature.id }}">{{ feature.name }}</option>
-                {% endfor %}
-              </select>
-              <button type="button" id="addFeatureButton" class="flex w-[25%] items-center justify-center rounded-lg bg-alt px-6 py-3 font-medium text-[#1B2A49] transition hover:opacity-90">Agregar característica</button>
-            </div>
+                    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="bi bi-file-earmark-text text-alt"></i> Descripción Detallada
+                        </h3>
+                        <div class="editor-wrapper rounded-2xl overflow-hidden">
+                            <textarea id="description" name="description">{{ game.description }}</textarea>
+                        </div>
+                    </div>
 
-            <div id="featuresContainer" class="flex flex-col gap-2">
-              {% for gameFeature in game.getFeatures() %}
-                <div class="flex items-center gap-2" data-feature-id="{{ gameFeature.id }}">
-                  <gradient-chip
-                    base-color="{{ gameFeature.tint }}"
-                    size="24"
-                    icon-path="{{ cdn_url('game/feature', gameFeature.icon) }}"
-                    text="{{ gameFeature.name }}"
-                    border-radius="8"
-                    class="w-full"
-                  ></gradient-chip>
-                  <button type="button" class="rounded-full bg-red-500 px-2 py-1 text-white hover:bg-red-600" data-feature-id="{{ gameFeature.id }}" onclick="deleteFeature({{ gameFeature.id }})">Eliminar</button>
+                    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="bi bi-tags text-alt"></i> Características
+                        </h3>
+                        <div class="flex flex-col gap-4">
+                            <div class="flex gap-2">
+                                {% set game_feature_ids = [] %}
+                                {% for gf in game.getFeatures() %}
+                                    {% set game_feature_ids = game_feature_ids|merge([gf.id]) %}
+                                {% endfor %}
+                                <select id="featureSelector" class="flex-1 bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors">
+                                    <option value="">Seleccionar característica...</option>
+                                    {% for feature in features %}
+                                        {% if feature.id not in game_feature_ids %}
+                                            <option value="{{ feature.id }}">{{ feature.name }}</option>
+                                        {% endif %}
+                                    {% endfor %}
+                                </select>
+                                <button type="button" id="addFeatureButton" class="bg-alt text-branddark-900 font-bold px-6 rounded-lg hover:opacity-90 transition shadow-lg">
+                                    Agregar
+                                </button>
+                            </div>
+                            <div id="featuresContainer" class="flex flex-wrap gap-3">
+                                {% for gameFeature in game.getFeatures() %}
+                                    <div class="flex items-center gap-2 bg-branddark-600/50 p-2 rounded-xl border border-branddark-500" data-feature-id="{{ gameFeature.id }}">
+                                        {{ ui.gradient_chip(gameFeature.tint, gameFeature.name, 20) }}
+                                        <button type="button" class="text-red-400 hover:text-red-300 transition px-1" onclick="deleteFeature({{ gameFeature.id }})">
+                                            <i class="bi bi-x-circle-fill"></i>
+                                        </button>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              {% endfor %}
+
+                <!-- Sidebar Cards -->
+                <div class="space-y-8">
+                    <!-- Pricing Card -->
+                    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="bi bi-currency-euro text-alt"></i> Precio y Ofertas
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label for="price" class="block text-sm font-medium text-gray-300 mb-1">Precio Base</label>
+                                <select id="price" name="price" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors">
+                                    <option value="0" {% if game.base_price == 0 %}selected{% endif %}>Gratis</option>
+                                    {% for p in prices %}
+                                        <option value="{{ p }}" {% if game.base_price == p %}selected{% endif %}>{{ p }} €</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div>
+                                <label for="discount" class="block text-sm font-medium text-gray-300 mb-1">Descuento (%)</label>
+                                <input type="number" id="discount" name="discount" value="{{ game.discount * 100 }}" min="0" max="100" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Assets Card -->
+                    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+                        <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                            <i class="bi bi-image text-alt"></i> Multimedia
+                        </h3>
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Portada (600x900)</label>
+                                <file-upload id="coverFile" min-image-width="600" max-image-width="600" min-image-height="900" max-image-height="900"></file-upload>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Miniatura (920x430)</label>
+                                <file-upload id="thumbFile" min-image-width="920" max-image-width="920" min-image-height="430" max-image-height="430"></file-upload>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Icono (512x512)</label>
+                                <file-upload id="iconFile" min-image-width="32" max-image-width="512" min-image-height="32" max-image-height="512" image-aspect-ratio="1:1"></file-upload>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Actions Card -->
+                    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+                        <div class="space-y-3">
+                            <button id="submitButtonEdit" type="submit" class="w-full bg-alt text-branddark-900 font-bold px-8 py-3 rounded-lg hover:scale-[1.02] transition-transform shadow-lg flex items-center justify-center gap-2">
+                                <i class="bi bi-save-fill"></i> Guardar Cambios
+                            </button>
+                            <button id="changeVisibility" data-status="{{ game.is_public ? 'public' : 'hidden' }}" class="w-full {{ game.is_public ? 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/50' : 'bg-green-500/20 text-green-500 border border-green-500/50' }} font-bold px-8 py-3 rounded-lg hover:opacity-80 transition shadow-lg">
+                                {{ game.is_public ? 'Ocultar de la Tienda' : 'Publicar en la Tienda' }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- COMPILACIONES -->
+        <div id="builds" class="tab-pane hidden max-w-2xl mx-auto">
+            <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+                <h3 class="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                    <i class="bi bi-cloud-upload text-alt"></i> Subir Nueva Compilación
+                </h3>
+                <form id="buildForm" class="space-y-6">
+                    <div>
+                        <label for="version" class="block text-sm font-medium text-gray-300 mb-1">Versión (Ej: 1.0.4)</label>
+                        <input type="text" id="version" name="version" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" placeholder="v1.0.0" required>
+                    </div>
+
+                    <div>
+                        <label for="file" class="block text-sm font-medium text-gray-300 mb-1">Archivo del Juego (.zip)</label>
+                        <input id="file" name="file" type="file" accept="application/zip" class="w-full text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-branddark-600 file:text-alt hover:file:bg-branddark-500 cursor-pointer">
+                    </div>
+
+                    <div id="uploadProgressContainer" class="hidden space-y-2">
+                        <div class="flex justify-between text-xs text-gray-400">
+                            <span id="uploadProgressLabel">Subiendo...</span>
+                            <span id="uploadProgressPct">0%</span>
+                        </div>
+                        <div class="h-2 w-full bg-branddark-800 rounded-full overflow-hidden">
+                            <div id="uploadProgressBar" class="h-full bg-alt transition-all duration-300 w-0"></div>
+                        </div>
+                    </div>
+
+                    <button id="submitButtonBuild" type="submit" class="w-full bg-alt text-branddark-900 font-bold px-8 py-3 rounded-lg hover:scale-[1.02] transition-transform shadow-lg">
+                        Iniciar Subida
+                    </button>
+                </form>
             </div>
-          </div>
-
-          <div class="flex items-center gap-2">
-            <input
-              id="asEditor"
-              name="asEditor"
-              type="checkbox"
-              {% if game.as_editor %}checked{% endif %}
-              class="h-4 w-4 accent-alt focus:ring-alt"
-            />
-            <label for="asEditor" class="font-medium text-gray-300">¿Eres la editora?</label>
-          </div>
-
-          <div id="developerNameContainer" class="{% if not game.as_editor %}hidden {% endif %}relative">
-            <input
-              type="text"
-              id="developerName"
-              name="developerName"
-              placeholder=" "
-              value="{{ game.developer_name }}"
-              class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
-            />
-            <label
-              for="developerName"
-              class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
-            >
-              Desarrollador
-            </label>
-          </div>
-
-          <div>
-            <label for="price" class="mb-2 block font-medium text-gray-300">Precio</label>
-            <select
-              id="price"
-              name="price"
-              class="w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 py-3 text-gray-200 outline-none focus:border-alt focus:ring-2 focus:ring-alt"
-            >
-              <option value="0" {% if game.base_price is null or game.base_price == 0 %}selected{% endif %}>Gratis</option>
-              {% for price in prices %}
-                <option value="{{ price }}" {% if game.base_price == price %}selected{% endif %}>{{ price|number_format(2, ',', '.') }} €</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div>
-            <label for="discount" class="mb-2 block font-medium text-gray-300">Descuento</label>
-            <div class="flex items-center gap-2">
-              <input
-                id="discount"
-                name="discount"
-                type="number"
-                min="0"
-                max="100"
-                step="1"
-                value="{{ game.discount * 100 }}"
-                class="w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 py-3 text-gray-200 outline-none focus:border-alt focus:ring-2 focus:ring-alt"
-              />
-              <span class="font-medium text-gray-400">%</span>
-            </div>
-          </div>
-
-          <div>
-            <label for="description" class="mb-2 block font-medium text-gray-300">Descripción</label>
-            <textarea
-              id="description"
-              name="description"
-              rows="8"
-              class="w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 py-3 text-gray-200 outline-none focus:border-alt focus:ring-2 focus:ring-alt"
-            >{{ game.description }}</textarea>
-          </div>
-
-          <div class="space-y-6">
-            <div>
-              <label for="coverFile" class="mb-2 block font-medium text-gray-300">Portada (600x900)</label>
-              <file-upload id="coverFile" min-image-width="600" max-image-width="600" min-image-height="900" max-image-height="900"></file-upload>
-            </div>
-
-            <div>
-              <label for="thumbFile" class="mb-2 block font-medium text-gray-300">Miniatura (920x430)</label>
-              <file-upload id="thumbFile" min-image-width="920" max-image-width="920" min-image-height="430" max-image-height="430"></file-upload>
-            </div>
-
-            <div>
-              <label for="iconFile" class="mb-2 block font-medium text-gray-300">Icono (32x32–512x512, cuadrado)</label>
-              <file-upload id="iconFile" min-image-width="32" max-image-width="512" min-image-height="32" max-image-height="512" image-aspect-ratio="1:1"></file-upload>
-            </div>
-          </div>
-
-          <div class="mt-6 flex flex-col gap-3">
-            <button
-              id="submitButtonEdit"
-              type="submit"
-              class="flex w-full items-center justify-center gap-2 rounded-lg bg-alt px-6 py-3 font-medium text-[#1B2A49] transition hover:opacity-90"
-            >
-              <i class="bi bi-arrow-repeat hidden animate-spin" id="spinnerEdit"></i>
-              <span>Cambiar</span>
-            </button>
-            <button
-              id="changeVisibility"
-              data-status="{{ game.is_public ? 'public' : 'hidden' }}"
-              class="{{ game.is_public ? 'bg-yellow-500 hover:bg-yellow-400' : 'bg-green-500 hover:bg-green-400' }} w-full rounded-lg px-6 py-3 font-medium text-[#1B2A49] transition"
-            >
-              {{ game.is_public ? 'Ocultar' : 'Publicar' }}
-            </button>
-          </div>
-        </form>
-      </div>
-
-      <div id="builds" class="tab-pane hidden">
-        <form id="buildForm" class="space-y-6" enctype="multipart/form-data">
-          <div class="relative">
-            <input
-              type="text"
-              id="version"
-              name="version"
-              placeholder=" "
-              class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
-            />
-            <label
-              for="version"
-              class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
-            >
-              Versión
-            </label>
-          </div>
-
-          <div>
-            <label for="file" class="mb-2 block font-medium text-gray-300">Compilación</label>
-            <input
-              id="file"
-              name="file"
-              type="file"
-              accept="application/zip"
-              class="w-full text-gray-300 transition file:mr-4 file:rounded-md file:border-0 file:bg-alt file:px-4 file:py-2 file:text-[#1B2A49] hover:file:opacity-90"
-            />
-          </div>
-
-          <div class="hidden h-2.5 w-full overflow-hidden rounded-full bg-gray-800" id="uploadProgressContainer">
-            <div id="uploadProgress" class="h-2.5 w-0 bg-alt transition-all duration-300"></div>
-          </div>
-
-          <button
-            id="submitButtonBuild"
-            type="submit"
-            class="flex w-full items-center justify-center gap-2 rounded-lg bg-alt px-6 py-3 font-medium text-[#1B2A49] transition hover:opacity-90"
-          >
-            <i class="bi bi-arrow-repeat hidden animate-spin" id="spinnerBuild"></i>
-            <span>Subir</span>
-          </button>
-        </form>
-      </div>
+        </div>
     </div>
-  </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
+  <script src="{{ asset('js/forms/dev/getStoreID.js') }}"></script>
   <script src="{{ asset('vendor/simplemde/simplemde.min.js') }}"></script>
   <script src="{{ asset('js/components/gradientChip.js') }}"></script>
   <script src="{{ asset('js/components/fileUpload.js') }}"></script>
-  <script src="{{ asset('js/forms/dev/getStoreID.js') }}"></script>
+  <script src="{{ asset('js/orion-panel/markdown-editor.js') }}"></script>
   <script src="{{ asset('js/forms/validator.js') }}"></script>
   <script src="{{ asset('js/orion-panel/dev/store.js') }}"></script>
 {% endblock %}

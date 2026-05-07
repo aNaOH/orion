@@ -1,88 +1,9 @@
 /* ---------------------------------------------------------
    CONFIGURACIÓN DE SIMPLEMDE
 --------------------------------------------------------- */
-const simplemde = new SimpleMDE({
-  element: document.getElementById("description"),
-  autosave: {
-    enabled: true,
-    uniqueId: "Orion_StoreGame_" + gameID.toString() + "_Description",
-    delay: 1000,
-  },
-  insertTexts: {
-    horizontalRule: ["", "\n\n-----\n\n"],
-    link: ["[", "](http://)"],
-    table: [
-      "",
-      "\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text      | Text     |\n\n",
-    ],
-  },
-  placeholder: "Type here...",
-  toolbar: [
-    {
-      name: "bold",
-      action: SimpleMDE.toggleBold,
-      className: "fa fa-bold !text-alt",
-      title: "Bold",
-    },
-    {
-      name: "italic",
-      action: SimpleMDE.toggleItalic,
-      className: "fa fa-italic !text-alt",
-      title: "Italic",
-    },
-    {
-      name: "underline",
-      action: SimpleMDE.toggleUnderline,
-      className: "fa fa-underline !text-alt",
-      title: "Underline",
-    },
-    {
-      name: "heading",
-      action: SimpleMDE.toggleHeadingSmaller,
-      className: "fa fa-header !text-alt",
-      title: "Heading",
-    },
-    "|",
-    {
-      name: "link",
-      action: SimpleMDE.toggleLink,
-      className: "fa fa-link !text-alt",
-      title: "Link",
-    },
-    {
-      name: "table",
-      action: SimpleMDE.toggleTable,
-      className: "fa fa-table !text-alt",
-      title: "Table",
-    },
-    "|",
-    {
-      name: "preview",
-      action: SimpleMDE.togglePreview,
-      className: "fa fa-eye !text-alt no-disable",
-      title: "Preview",
-    },
-  ],
-  previewRender: function (plainText) {
-    const html = SimpleMDE.prototype.markdown(plainText);
-    const temp = document.createElement("div");
-    temp.innerHTML = html;
-
-    const applyClass = (sel, cls) =>
-      temp.querySelectorAll(sel).forEach((el) => (el.className = cls));
-
-    applyClass("h1", "text-4xl font-bold my-4");
-    applyClass("h2", "text-2xl font-bold my-4");
-    applyClass("h3", "text-xl font-bold my-4");
-    applyClass("h4", "text-lg font-bold my-4");
-    applyClass("p", "text-base leading-relaxed my-2");
-    applyClass("ul", "list-disc pl-5 my-2");
-    applyClass("ol", "list-decimal pl-5 my-2");
-    applyClass("a", "text-blue-500 hover:underline");
-    applyClass("img", "max-w-full h-auto rounded");
-
-    return temp.innerHTML;
-  },
+const simplemde = setupMarkdownEditor({
+  selector: "#description",
+  uniqueId: "Orion_StoreGame_" + gameID.toString() + "_Description"
 });
 
 const features = [];
@@ -173,16 +94,34 @@ async function addFeature(featureId) {
 
   featuresContainer.appendChild(featureElement);
   reorderFeatures();
+
+  // Eliminar la opción del selector
+  const optionToRemove = featureSelector.querySelector(`option[value="${featureId}"]`);
+  if (optionToRemove) {
+    optionToRemove.remove();
+  }
 }
 
-// --- Eliminar una feature del contenedor ---
-function deleteFeature(featureId) {
+async function deleteFeature(featureId) {
   const featureElement = document.querySelector(
     `[data-feature-id="${featureId}"]`,
   );
   if (featureElement) {
     featureElement.remove();
     reorderFeatures();
+
+    if (features.length === 0) {
+      await fetchFeatures();
+    }
+
+    // Devolver la opción al selector
+    const feature = features.find((f) => f.id.toString() === featureId.toString());
+    if (feature) {
+      const option = document.createElement("option");
+      option.value = feature.id;
+      option.textContent = feature.name;
+      featureSelector.appendChild(option);
+    }
   }
 }
 
@@ -277,6 +216,7 @@ if (formEdit) {
     };
 
     const formData = new FormData();
+    formData.append("tript_token", document.getElementById("tript_token").value);
     formData.append("data", JSON.stringify(data));
 
     // Adjuntar archivos (si existen)
@@ -294,12 +234,48 @@ if (formEdit) {
       data: formData,
       processData: false,
       contentType: false,
-      success: () => (location.href = `/dev/panel/games/${gameID}/store`),
+      success: () => {
+        Orion.showToast('success', 'Cambios guardados correctamente');
+        setTimeout(() => location.reload(), 1500);
+      },
       error: (xhr) => {
-        //showError(xhr.responseJSON);
+        Orion.showToast('error', xhr.responseJSON?.message || 'Error al guardar cambios');
         toggleSpinner(submitEdit, false);
       },
     });
+  };
+}
+
+/* ---------------------------------------------------------
+   BOTÓN: CAMBIAR VISIBILIDAD
+--------------------------------------------------------- */
+if (visibilityButton) {
+  visibilityButton.onclick = async (e) => {
+    e.preventDefault();
+    const currentStatus = visibilityButton.dataset.status;
+    const isPublic = currentStatus === "public";
+
+    try {
+      const formData = new FormData();
+      formData.append("tript_token", document.getElementById("tript_token").value);
+      formData.append("game", gameID);
+      formData.append("isPublic", !isPublic);
+
+      const response = await fetch("/api/dev/game/public", {
+        method: "POST",
+        body: formData,
+      });
+      const result = await response.json();
+
+      if (result.status === 200) {
+        Orion.showToast('success', result.message);
+        setTimeout(() => location.reload(), 1500);
+      } else {
+        Orion.showToast('error', result.message || "Error al cambiar visibilidad");
+      }
+    } catch (error) {
+      Orion.showToast('error', "Error de red");
+    }
   };
 }
 
@@ -368,6 +344,7 @@ if (formBuild) {
         const isLast = index === totalChunks - 1;
 
         const formData = new FormData();
+        formData.append("tript_token", document.getElementById("tript_token").value);
         formData.append("game", gameID);
         formData.append("version", version);
         formData.append("upload_id", uploadId);
@@ -399,12 +376,14 @@ if (formBuild) {
       }
 
       // Éxito
+      Orion.showToast('success', 'Build subida correctamente');
       toggleSpinner(submitBuild, false);
       setTimeout(() => {
         progressContainer.remove();
         location.reload();
       }, 1500);
     } catch (err) {
+      Orion.showToast('error', err.message || "Error al subir el archivo");
       showError({
         field: "file",
         message: err.message || "Error al subir el archivo",

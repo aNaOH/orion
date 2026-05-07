@@ -70,12 +70,13 @@ class GradientChipElement extends HTMLElement {
         display: block;
       }
       .text-container {
-        font-size: 11px;
-        font-weight: 800;
-        line-height: 1.25;
+        font-family: 'Lexend', sans-serif;
+        font-size: 10px;
+        font-weight: 700;
+        line-height: 1;
         white-space: nowrap;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        letter-spacing: 0.1em;
         flex-grow: 1;
         min-width: 0;
       }
@@ -91,46 +92,61 @@ class GradientChipElement extends HTMLElement {
   }
 
   generateTonalGradient(color) {
-    const [r, g, b] = color.match(/\w\w/g).map((hex) => parseInt(hex, 16));
-    const lighterColor = `rgb(${Math.min(r + 40, 255)}, ${Math.min(g + 40, 255)}, ${Math.min(b + 40, 255)})`;
-    return `linear-gradient(135deg, ${color} 0%, ${lighterColor} 100%)`;
+    let r, g, b;
+    if (color.startsWith("#")) {
+      if (color.length === 4) {
+        r = parseInt(color[1] + color[1], 16);
+        g = parseInt(color[2] + color[2], 16);
+        b = parseInt(color[3] + color[3], 16);
+      } else {
+        r = parseInt(color.substring(1, 3), 16);
+        g = parseInt(color.substring(3, 5), 16);
+        b = parseInt(color.substring(5, 7), 16);
+      }
+    } else {
+      // Default to black if invalid
+      r = g = b = 0;
+    }
+
+    const lighterColor = `rgb(${Math.min(r + 60, 255)}, ${Math.min(g + 60, 255)}, ${Math.min(b + 60, 255)})`;
+    const darkerColor = `rgb(${Math.max(r - 20, 0)}, ${Math.max(g - 20, 0)}, ${Math.max(b - 20, 0)})`;
+    return `linear-gradient(135deg, ${darkerColor} 0%, ${lighterColor} 100%)`;
   }
 
   calculateIconColor(baseColor) {
-    const [r, g, b] = baseColor
-      .match(/\w\w/g)
-      .map((hex) => parseInt(hex, 16) / 255);
-    const luminance = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    return luminance > 0.5 ? "#000000" : "#ffffff";
+    let r, g, b;
+    if (baseColor.startsWith("#")) {
+      if (baseColor.length === 4) {
+        r = parseInt(baseColor[1] + baseColor[1], 16);
+        g = parseInt(baseColor[2] + baseColor[2], 16);
+        b = parseInt(baseColor[3] + baseColor[3], 16);
+      } else {
+        r = parseInt(baseColor.substring(1, 3), 16);
+        g = parseInt(baseColor.substring(3, 5), 16);
+        b = parseInt(baseColor.substring(5, 7), 16);
+      }
+    } else {
+      r = g = b = 0;
+    }
+    const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    return luminance > 0.6 ? "#111827" : "#ffffff";
   }
 
   updateStyles() {
-    const baseColor = this.getAttribute("base-color") || "#000000";
+    const baseColor = this.getAttribute("base-color") || "#7c3aed";
     const size = Math.max(10, parseInt(this.getAttribute("size") || "16", 10));
     const borderRadius = Math.max(
       0,
       parseInt(this.getAttribute("border-radius") || "8", 10),
     );
-    const useTailwind = this.getAttribute("use-tailwind") !== "false";
 
     const iconColor = this.calculateIconColor(baseColor);
-
-    if (useTailwind) {
-      this.wrapper.className =
-        "wrapper flex items-center cursor-pointer";
-      this.iconContainer.className =
-        "icon-container flex items-center justify-center";
-      this.textContainer.className = "text-container text-[10px] font-black uppercase tracking-widest";
-    } else {
-      this.wrapper.className = "wrapper";
-      this.iconContainer.className = "icon-container";
-      this.textContainer.className = "text-container";
-    }
 
     Object.assign(this.wrapper.style, {
       background: this.generateTonalGradient(baseColor),
       borderRadius: `${borderRadius}px`,
       color: iconColor,
+      border: `1px solid ${baseColor}88`
     });
 
     Object.assign(this.iconContainer.style, {
@@ -142,9 +158,11 @@ class GradientChipElement extends HTMLElement {
     if (!this.iconContainer.innerHTML.trim()) {
       this.iconContainer.style.display = "none";
       this.wrapper.style.gap = "0px";
+      this.wrapper.style.padding = "4px 10px";
     } else {
       this.iconContainer.style.display = "flex";
       this.wrapper.style.gap = "8px";
+      this.wrapper.style.padding = "4px 12px";
     }
   }
 

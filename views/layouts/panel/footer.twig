@@ -42,6 +42,39 @@
             tooltip.css("opacity", 0);
         });
 
+        // Orion Global Helper
+        window.Orion = {
+            showToast: function(type, message) {
+                const toastContainer = document.getElementById('toast-container') || this.createToastContainer();
+                const toast = document.createElement('div');
+                
+                const bgColor = type === 'success' ? 'bg-green-500/20' : 'bg-red-500/20';
+                const borderColor = type === 'success' ? 'border-green-500/50' : 'border-red-500/50';
+                const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+                const iconColor = type === 'success' ? 'text-green-400' : 'text-red-400';
+
+                toast.className = `flex items-center gap-3 px-6 py-4 rounded-xl border ${bgColor} ${borderColor} backdrop-blur-md shadow-2xl animate__animated animate__fadeInRight mb-3 min-w-[300px]`;
+                toast.innerHTML = `
+                    <i class="bi ${icon} ${iconColor} text-xl"></i>
+                    <p class="text-white font-medium">${message}</p>
+                `;
+
+                toastContainer.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.replace('animate__fadeInRight', 'animate__fadeOutRight');
+                    setTimeout(() => toast.remove(), 500);
+                }, 4000);
+            },
+            createToastContainer: function() {
+                const container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed bottom-8 right-8 z-[9999] flex flex-col items-end';
+                document.body.appendChild(container);
+                return container;
+            }
+        };
+
         // Timezone conversion
         $(document).ready(function() {
           if (typeof moment !== 'undefined') {

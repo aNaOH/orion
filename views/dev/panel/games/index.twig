@@ -62,8 +62,22 @@
           >
             <i class="bi bi-people-fill"></i>
           </a>
+          <button
+            type="button"
+            class="text-red-500 hover:opacity-80 mx-1 tooltip-btn bg-transparent border-none delete-btn"
+            data-tooltip="Eliminar"
+            data-id="{{ game.id }}"
+            data-name="{{ game.title }}"
+          >
+            <i class="bi bi-trash-fill"></i>
+          </button>
         </td>
       </tr>
     {% endfor %}
   </tbody>
+{% endblock %}
+
+{% block scripts %}
+    {{ csrf_token('DEVACTION', { userID: user.id }) }}
+    {{ admin_delete_setup('/api/dev/game/{id}/delete/', '/dev/panel/games/', '¿Eliminar juego?') }}
 {% endblock %}

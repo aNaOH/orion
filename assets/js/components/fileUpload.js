@@ -61,38 +61,70 @@ class FileUpload extends HTMLElement {
     render() {
       this.shadowRoot.innerHTML = `
         <style>
+          :host {
+            display: block;
+          }
           .drop-area {
             width: 100%;
-            height: 200px;
-            border: 2px dashed #ccc;
-            border-radius: 8px;
+            min-height: 120px;
+            border: 2px dashed #334155;
+            border-radius: 12px;
+            background: #1e293b50;
             display: flex;
+            flex-direction: column;
             justify-content: center;
             align-items: center;
             text-align: center;
             cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 20px;
+            box-sizing: border-box;
+            color: #94a3b8;
           }
-          .drop-area.drag-over {
-            background-color: rgba(0, 0, 0, 0.1);
+          .drop-area:hover, .drop-area.drag-over {
+            border-color: #00d2ff;
+            background: #00d2ff10;
+            color: #f8fafc;
+          }
+          .drop-area i {
+            font-size: 24px;
+            margin-bottom: 8px;
+          }
+          .drop-area p {
+            margin: 0;
+            font-size: 13px;
+            font-weight: 500;
           }
           .file-info {
-            margin-top: 10px;
+            margin-top: 12px;
+            font-size: 12px;
           }
+          .text-red-500 { color: #ef4444; }
+          .text-green-500 { color: #10b981; }
           input[type="file"] {
             display: none;
           }
+          .preview-container {
+            margin-top: 12px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 8px;
+          }
           .preview {
-            margin-top: 10px;
-            max-width: 100%;
-            max-height: 200px;
+            width: 100%;
+            aspect-ratio: 16/9;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #334155;
           }
         </style>
         <div class="drop-area" id="drop-area">
-          <p>Arrastra o haz clic para seleccionar un archivo</p>
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <p>Click o arrastra para subir</p>
           <input type="file" id="file-input" accept="${this.getAcceptedTypes()}">
         </div>
         <div class="file-info" id="file-info"></div>
-        <div id="preview-container"></div>
+        <div class="preview-container" id="preview-container"></div>
       `;
     }
   

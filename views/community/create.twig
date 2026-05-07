@@ -198,16 +198,11 @@
     {% else %}
         <script src="{{ asset('js/forms/community-create.js') }}"></script>
         <script src="{{ asset('vendor/simplemde/simplemde.min.js') }}"></script>
+        <script src="{{ asset('js/orion-panel/markdown-editor.js') }}"></script>
         <script>
-            var simplemde = new SimpleMDE({
-                element: document.getElementById("body"),
-                autosave: {
-                    enabled: true,
-                    uniqueId: "Orion_New{{ post_type|capitalize }}_Body",
-                    delay: 1000,
-                },
-                placeholder: "Escribe aquí el contenido...",
-                hideIcons: ["side-by-side", "fullscreen"],
+            var simplemde = setupMarkdownEditor({
+                selector: "#body",
+                uniqueId: "Orion_New{{ post_type|capitalize }}_Body"
             });
         </script>
         {% if post_type == 'guides' %}

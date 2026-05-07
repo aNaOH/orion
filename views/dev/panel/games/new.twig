@@ -1,86 +1,123 @@
 {% extends 'layouts/admin.twig' %}
 
 {% set is_dev_panel = true %}
-{% set title = 'Nuevo juego | Orion Dev Panel' %}
+{% set title = 'Nuevo Juego | Orion Dev Panel' %}
 {% set panel_title = title %}
 
 {% block content %}
-  <div class="container mx-auto px-4">
-    <form id="newGameForm" class="mx-auto max-w-lg space-y-6">
-      <div class="relative">
-        <input
-          type="text"
-          id="title"
-          name="title"
-          placeholder=" "
-          class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
-        />
-        <label
-          for="title"
-          class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
-        >
-          Título
-        </label>
-        <div id="titleError" class="hidden mt-1 text-sm text-red-500"></div>
-      </div>
+<div class="max-w-4xl mx-auto animate__animated animate__fadeIn">
+    <div class="mb-8 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-alt">Registrar Nuevo Juego</h1>
+        <a href="/dev/panel/games" class="text-gray-400 hover:text-alt transition">Volver al Listado</a>
+    </div>
 
-      <div class="relative">
-        <input
-          type="text"
-          id="shortDescription"
-          name="shortDescription"
-          placeholder=" "
-          class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
-        />
-        <label
-          for="shortDescription"
-          class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
-        >
-          Descripción corta
-        </label>
-        <div id="shortDescriptionError" class="hidden mt-1 text-sm text-red-500"></div>
-      </div>
+    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+        <form id="new-game-form" class="space-y-6">
+            {{ csrf_token('COMMON') }}
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="md:col-span-2">
+                    <label for="title" class="block text-sm font-medium text-gray-300 mb-1">Título del Juego</label>
+                    <input type="text" id="title" name="title" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" placeholder="Ej: CyberOrion 2077" required>
+                </div>
 
-      <div class="flex items-center gap-2">
-        <input
-          id="asEditor"
-          name="asEditor"
-          type="checkbox"
-          class="h-4 w-4 accent-alt focus:ring-alt"
-        />
-        <label for="asEditor" class="font-medium text-gray-300">¿Eres la editora?</label>
-      </div>
+                <div class="md:col-span-2">
+                    <label for="shortDescription" class="block text-sm font-medium text-gray-300 mb-1">Descripción Corta</label>
+                    <textarea id="shortDescription" name="shortDescription" rows="2" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" placeholder="Un breve resumen que aparecerá en los listados..." required></textarea>
+                </div>
 
-      <div id="developerNameContainer" class="relative hidden">
-        <input
-          type="text"
-          id="developerName"
-          name="developerName"
-          placeholder=" "
-          class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
-        />
-        <label
-          for="developerName"
-          class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
-        >
-          Desarrollador
-        </label>
-        <div id="developerNameError" class="hidden mt-1 text-sm text-red-500"></div>
-      </div>
+                <div>
+                    <label for="genre" class="block text-sm font-medium text-gray-300 mb-1">Género Principal</label>
+                    <select id="genre" name="genre" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" required>
+                        {% for genre in genres %}
+                            <option value="{{ genre.id }}">{{ genre.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
 
-      <button
-        id="submitButton"
-        type="submit"
-        class="flex w-full items-center justify-center gap-2 rounded-lg bg-alt px-6 py-3 font-medium text-[#1B2A49] transition disabled:cursor-not-allowed disabled:opacity-50 hover:opacity-90"
-      >
-        <span>Crear</span>
-        <i id="spinner" class="bi bi-arrow-repeat hidden animate-spin"></i>
-      </button>
-    </form>
-  </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-3">Tipo de Publicación</label>
+                    <div class="flex items-center gap-6">
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="asEditor" value="false" checked class="hidden peer">
+                            <div class="w-5 h-5 rounded-full border-2 border-branddark-400 peer-checked:border-alt peer-checked:bg-alt transition-all"></div>
+                            <span class="text-sm text-gray-300 group-hover:text-white transition">Propia</span>
+                        </label>
+                        <label class="flex items-center gap-2 cursor-pointer group">
+                            <input type="radio" name="asEditor" value="true" class="hidden peer">
+                            <div class="w-5 h-5 rounded-full border-2 border-branddark-400 peer-checked:border-alt peer-checked:bg-alt transition-all"></div>
+                            <span class="text-sm text-gray-300 group-hover:text-white transition">Como Editora</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div id="developer-name-container" class="md:col-span-2 hidden animate__animated animate__fadeIn">
+                    <label for="developerName" class="block text-sm font-medium text-gray-300 mb-1">Nombre del Desarrollador Externo</label>
+                    <input type="text" id="developerName" name="developerName" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" placeholder="Nombre del estudio original">
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-branddark-500 flex justify-end">
+                <button type="submit" class="bg-alt text-branddark-900 font-bold px-8 py-3 rounded-lg hover:scale-105 transition-transform shadow-lg">
+                    Crear Juego
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
-  <script src="{{ asset('js/forms/validator.js') }}"></script>
-  <script src="{{ asset('js/forms/dev/game.js') }}"></script>
+<script>
+// Toggle developer name field
+document.querySelectorAll('input[name="asEditor"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        const container = document.getElementById('developer-name-container');
+        if (this.value === 'true') {
+            container.classList.remove('hidden');
+            document.getElementById('developerName').required = true;
+        } else {
+            container.classList.add('hidden');
+            document.getElementById('developerName').required = false;
+        }
+    });
+});
+
+document.getElementById('new-game-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    // Convert form to JSON because apiCreateGame uses json_decode
+    const formData = new FormData(this);
+    const data = {};
+    formData.forEach((value, key) => {
+        if (key === 'asEditor') {
+            data[key] = value === 'true';
+        } else if (key === 'genre') {
+            data[key] = parseInt(value);
+        } else {
+            data[key] = value;
+        }
+    });
+
+    try {
+        const response = await fetch('/api/dev/game', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        });
+        const result = await response.json();
+        
+        if (result.status === 200) {
+            Orion.showToast('success', 'Juego registrado correctamente');
+            setTimeout(() => window.location.href = '/dev/panel/games', 1500);
+        } else {
+            Orion.showToast('error', result.message || 'Error al registrar juego');
+        }
+    } catch (error) {
+        Orion.showToast('error', 'Error de red');
+    }
+});
+</script>
 {% endblock %}

@@ -71,6 +71,24 @@
           {% endfor %}
         </select>
         <div class="invalid-feedback mt-1 text-sm text-red-400" id="statError"></div>
+        <div class="mt-4 relative">
+          <input
+            type="number"
+            id="stat_value"
+            name="stat_value"
+            value="{{ achievement.stat_value }}"
+            placeholder=" "
+            min="1"
+            class="peer w-full rounded-lg border border-gray-600 bg-[#0f172a] px-4 pb-2 pt-6 text-gray-200 outline-none placeholder-transparent focus:border-alt focus:ring-2 focus:ring-alt"
+          />
+          <label
+            for="stat_value"
+            class="absolute left-4 top-3 text-sm text-gray-400 transition-all peer-placeholder-shown:top-4 peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-500 peer-focus:top-2.5 peer-focus:text-sm peer-focus:text-alt"
+          >
+            Valor a alcanzar
+          </label>
+          <div class="invalid-feedback mt-1 text-sm text-red-400" id="stat_valueError"></div>
+        </div>
       </div>
 
       <div>

@@ -1,0 +1,35 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = true %}
+{% set panel_title = 'Estadísticas para ' ~ game.title ~ ' | Orion Dev Panel' %}
+{% set title = 'Estadísticas para ' ~ game.title %}
+{% set back_url = '/dev/panel/games/' ~ game.id ~ '/community/' %}
+{% set new_url = '/dev/panel/games/' ~ game.id ~ '/community/stats/new' %}
+{% set new_label = 'Nueva estadística' %}
+{% set api_delete_url = '/api/dev/stat/' ~ game.id ~ '/{id}/delete/' %}
+{% set redirect_after_delete = '/dev/panel/games/' ~ game.id ~ '/community/stats/' %}
+{% set delete_title = '¿Eliminar estadística?' %}
+
+{% block table %}
+    {{ csrf_token('DEVACTION', { userID: user.id, gameID: game.id }) }}
+    {{ ui.table_header(['ID', 'Nombre', 'Tipo', 'Acciones']) }}
+    <tbody>
+      {% for stat in stats %}
+      <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+        <td class="px-4 py-3 text-gray-400">#{{ stat.id }}</td>
+        <td class="px-4 py-3 font-medium">{{ stat.name }}</td>
+        <td class="px-4 py-3">
+            {% if stat.type.value == 0 %}
+                Incremental (Suma)
+            {% elseif stat.type.value == 1 %}
+                Mejor valor (Máximo)
+            {% else %}
+                Desconocido
+            {% endif %}
+        </td>
+        {{ ui.action_buttons('/dev/panel/games/' ~ game.id ~ '/community/stats/' ~ stat.id ~ '/edit/', stat.id, stat.name) }}
+      </tr>
+      {% endfor %}
+    </tbody>
+{% endblock %}

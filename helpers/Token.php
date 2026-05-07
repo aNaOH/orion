@@ -173,10 +173,10 @@ class DevActionToken
 {
     private static $magicWord = "oriondevaction";
 
-    public static function createToken(int $userId, int $gameId): string
+    public static function createToken(int $userId, ?int $gameId = null): string
     {
         return Tript::encryptString(
-            self::$magicWord . "_" . $userId . "_" . $gameId,
+            self::$magicWord . "_" . $userId . "_" . ($gameId ?? 0),
         );
     }
 
@@ -196,6 +196,12 @@ class DevActionToken
 
         $userId = intval($tokenParts[1]);
         $gameId = intval($tokenParts[2]);
+
+        // If gameId is 0, we only validate the user is a developer
+        if ($gameId === 0) {
+            $user = User::getById($userId);
+            return $user && !is_null($user->getDeveloperInfo());
+        }
 
         $game = Game::getById($gameId);
         if (!$game || $game->getDeveloper()->getOwner()->id !== $userId) {

@@ -8,6 +8,8 @@ require_once "models/GameGenre.php";
 require_once "models/Achievement.php";
 require_once "models/Post.php";
 require_once "models/GameNewsCategory.php";
+require_once "models/Stat.php";
+require_once "models/Leaderboard.php";
 
 class DevController
 {
@@ -44,7 +46,9 @@ class DevController
 
     public static function showPanelNewGame()
     {
-        ViewController::render('dev/panel/games/new');
+        ViewController::render('dev/panel/games/new', [
+            'genres' => GameGenre::getAll()
+        ]);
     }
 
     public static function showPanelGameStore($gameId)
@@ -204,6 +208,125 @@ class DevController
             'new' => $new,
             'newscategories' => GameNewsCategory::getAll()
         ]);
+    }
+    
+    public static function showPanelGameLeaderboards($gameId)
+    {
+        global $router;
+        $user = User::getById($_SESSION["user"]["id"]);
+        $game = Game::getById($gameId);
+        if (is_null($game) || $game->getDeveloper()->getOwner()->id != $user->id) {
+            $router->trigger404();
+            exit();
+        }
+        
+        ViewController::render('dev/panel/games/community/leaderboards/index', [
+            'game' => $game,
+            'leaderboards' => $game->getLeaderboards()
+        ]);
+    }
+
+    public static function showPanelGameNewLeaderboard($gameId)
+    {
+        global $router;
+        $user = User::getById($_SESSION["user"]["id"]);
+        $game = Game::getById($gameId);
+        if (is_null($game) || $game->getDeveloper()->getOwner()->id != $user->id) {
+            $router->trigger404();
+            exit();
+        }
+        
+        ViewController::render('dev/panel/games/community/leaderboards/create', [
+            'game' => $game,
+            'stats' => $game->getStats()
+        ]);
+    }
+
+    public static function showPanelGameEditLeaderboard($gameId, $leaderboardId)
+    {
+        global $router;
+        $user = User::getById($_SESSION["user"]["id"]);
+        $game = Game::getById($gameId);
+        if (is_null($game) || $game->getDeveloper()->getOwner()->id != $user->id) {
+            $router->trigger404();
+            exit();
+        }
+        
+        $leaderboard = Leaderboard::getById($leaderboardId);
+        if (is_null($leaderboard) || $leaderboard->game_id != $gameId) {
+            $router->trigger404();
+            exit();
+        }
+
+        ViewController::render('dev/panel/games/community/leaderboards/edit', [
+            'game' => $game,
+            'leaderboard' => $leaderboard,
+            'stats' => $game->getStats()
+        ]);
+    }
+
+    public static function showPanelGameStats($gameId)
+    {
+        global $router;
+        $user = User::getById($_SESSION["user"]["id"]);
+        $game = Game::getById($gameId);
+        if (is_null($game) || $game->getDeveloper()->getOwner()->id != $user->id) {
+            $router->trigger404();
+            exit();
+        }
+        
+        ViewController::render('dev/panel/games/community/stats/index', [
+            'game' => $game,
+            'stats' => $game->getStats()
+        ]);
+    }
+
+    public static function showPanelGameNewStat($gameId)
+    {
+        global $router;
+        $user = User::getById($_SESSION["user"]["id"]);
+        $game = Game::getById($gameId);
+        if (is_null($game) || $game->getDeveloper()->getOwner()->id != $user->id) {
+            $router->trigger404();
+            exit();
+        }
+        
+        ViewController::render('dev/panel/games/community/stats/create', [
+            'game' => $game
+        ]);
+    }
+
+    public static function showPanelGameEditStat($gameId, $statId)
+    {
+        global $router;
+        $user = User::getById($_SESSION["user"]["id"]);
+        $game = Game::getById($gameId);
+        if (is_null($game) || $game->getDeveloper()->getOwner()->id != $user->id) {
+            $router->trigger404();
+            exit();
+        }
+        
+        $stat = Stat::getById($statId);
+        if (is_null($stat) || $stat->game_id != $gameId) {
+            $router->trigger404();
+            exit();
+        }
+
+        ViewController::render('dev/panel/games/community/stats/edit', [
+            'game' => $game,
+            'stat' => $stat
+        ]);
+    }
+
+    public static function showPanelSettings()
+    {
+        $user = User::getById($_SESSION["user"]["id"]);
+        ViewController::render('dev/panel/settings', ['developer' => $user->getDeveloperInfo()]);
+    }
+
+    public static function showPanelPayment()
+    {
+        ViewController::render('dev/panel/payment');
     }
 
     public static function handlePanel404()
@@ -414,6 +537,7 @@ class DevController
         $desc = $_POST["description"];
         $type = EACHIEVEMENT_TYPE::tryFrom($_POST["type"]);
         $stat = $_POST["stat"] ?? null;
+        $stat_value = isset($_POST["stat_value"]) && is_numeric($_POST["stat_value"]) ? intval($_POST["stat_value"]) : null;
         $icon = $_FILES["icon"];
 
         $iconPath = Tript::encryptString("orionach_" . count($game->getAchievements()));
@@ -425,7 +549,7 @@ class DevController
             S3Helper::upload(EBUCKET_LOCATION::GAME_ACHIEVEMENT, $lockedIconPath, null, $_FILES["lockedIcon"]["type"], $_FILES["lockedIcon"]["tmp_name"]);
         }
 
-        $game->addAchievement($name, $desc, $iconPath, $lockedIconPath, false, $type, $stat, 0);
+        $game->addAchievement($name, $desc, $iconPath, $lockedIconPath, false, $type, $stat, $stat_value);
         echo json_encode(["status" => 201, "message" => "Logro creado"]);
         exit();
     }
@@ -438,6 +562,7 @@ class DevController
         $achievement->description = $_POST["description"];
         $achievement->type = EACHIEVEMENT_TYPE::tryFrom($_POST["type"]);
         $achievement->stat_id = $_POST["stat"] ?? null;
+        $achievement->stat_value = isset($_POST["stat_value"]) && is_numeric($_POST["stat_value"]) ? intval($_POST["stat_value"]) : null;
 
         if (isset($_FILES["icon"])) S3Helper::upload(EBUCKET_LOCATION::GAME_ACHIEVEMENT, $achievement->icon, null, $_FILES["icon"]["type"], $_FILES["icon"]["tmp_name"]);
         if (isset($_FILES["lockedIcon"])) {
@@ -490,6 +615,121 @@ class DevController
         $news = Post::getById($id);
         if ($news && $news->game_id == $gameId) $news->delete();
         echo json_encode(["status" => 200, "message" => "Noticia eliminada"]);
+        exit();
+    }
+
+    public static function apiDeleteGame($id)
+    {
+        FormHelper::ValidateToken($_GET["tript_token"] ?? "", "tript_token", ETOKEN_TYPE::DEVACTION);
+        $game = Game::getById($id);
+        $user = User::getById($_SESSION["user"]["id"]);
+        if ($game && $game->getDeveloper()->getOwner()->id == $user->id) {
+            $game->delete();
+        }
+        echo json_encode(["status" => 200, "message" => "Juego eliminado"]);
+        exit();
+    }
+
+    public static function apiUpdateSettings()
+    {
+        FormHelper::ValidateToken($_POST["tript_token"], "tript_token", ETOKEN_TYPE::DEVACTION);
+        $user = User::getById($_SESSION["user"]["id"]);
+        $developer = $user->getDeveloperInfo();
+
+        if (isset($_FILES["profile_pic"])) {
+            $pic = $_FILES["profile_pic"];
+            $path = Tript::encryptString("devprof_" . $developer->id);
+            S3Helper::upload(EBUCKET_LOCATION::PROFILE_PIC, $path, null, $pic["type"], $pic["tmp_name"]);
+            $developer->profile_pic = $path;
+        }
+
+        $developer->name = $_POST["name"];
+        $developer->motd = $_POST["motd"];
+        $developer->save();
+
+        echo json_encode(["status" => 200, "message" => "Perfil actualizado"]);
+        exit();
+    }
+
+    public static function apiCreateLeaderboard()
+    {
+        FormHelper::ValidateToken($_POST["tript_token"], "tript_token", ETOKEN_TYPE::DEVACTION);
+        $gameId = $_POST["game"];
+        $concept = intval($_POST["concept"]);
+        $statId = $_POST["stat"] != "" ? intval($_POST["stat"]) : null;
+
+        $leaderboard = new Leaderboard(0, $concept, $gameId, $statId);
+        $leaderboard->save();
+
+        echo json_encode(["status" => 201, "message" => "Tabla de clasificación creada"]);
+        exit();
+    }
+
+    public static function apiEditLeaderboard()
+    {
+        FormHelper::ValidateToken($_POST["tript_token"], "tript_token", ETOKEN_TYPE::DEVACTION);
+        $leaderboardId = $_POST["leaderboard"];
+        $concept = intval($_POST["concept"]);
+        $statId = $_POST["stat"] != "" ? intval($_POST["stat"]) : null;
+
+        $leaderboard = Leaderboard::getById($leaderboardId);
+        $leaderboard->concept = $concept;
+        $leaderboard->stat_id = $statId;
+        $leaderboard->save();
+
+        echo json_encode(["status" => 200, "message" => "Tabla de clasificación editada"]);
+        exit();
+    }
+
+    public static function apiDeleteLeaderboard($gameId, $id)
+    {
+        FormHelper::ValidateToken($_GET["tript_token"] ?? "", "tript_token", ETOKEN_TYPE::DEVACTION);
+        $leaderboard = Leaderboard::getById($id);
+        if ($leaderboard && $leaderboard->game_id == $gameId) {
+            $leaderboard->delete();
+        }
+        echo json_encode(["status" => 200, "message" => "Tabla de clasificación eliminada"]);
+        exit();
+    }
+
+    public static function apiCreateStat()
+    {
+        FormHelper::ValidateToken($_POST["tript_token"], "tript_token", ETOKEN_TYPE::DEVACTION);
+        $gameId = $_POST["game"];
+        $name = $_POST["name"];
+        $type = intval($_POST["type"]);
+
+        $stat = new Stat(0, $gameId, $name, 0, $type);
+        $stat->save();
+
+        echo json_encode(["status" => 201, "message" => "Estadística creada"]);
+        exit();
+    }
+
+    public static function apiEditStat()
+    {
+        FormHelper::ValidateToken($_POST["tript_token"], "tript_token", ETOKEN_TYPE::DEVACTION);
+        $statId = $_POST["stat"];
+        $name = $_POST["name"];
+        $type = intval($_POST["type"]);
+
+        $stat = Stat::getById($statId);
+        $stat->name = $name;
+        $stat->type = ESTAT_TYPE::from($type);
+        $stat->save();
+
+        echo json_encode(["status" => 200, "message" => "Estadística editada"]);
+        exit();
+    }
+
+    public static function apiDeleteStat($gameId, $id)
+    {
+        FormHelper::ValidateToken($_GET["tript_token"] ?? "", "tript_token", ETOKEN_TYPE::DEVACTION);
+        $stat = Stat::getById($id);
+        if ($stat && $stat->game_id == $gameId) {
+            $stat->delete();
+        }
+        echo json_encode(["status" => 200, "message" => "Estadística eliminada"]);
         exit();
     }
 }

@@ -1,0 +1,75 @@
+{% extends 'layouts/admin.twig' %}
+
+{% set is_dev_panel = true %}
+{% set title = 'Editar Tabla de Clasificación | ' ~ game.title %}
+{% set panel_title = title %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto animate__animated animate__fadeIn">
+    <div class="mb-8 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-alt">Editar Tabla de Clasificación</h1>
+        <a href="/dev/panel/games/{{ game.id }}/community/leaderboards" class="text-gray-400 hover:text-alt transition">Volver</a>
+    </div>
+
+    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+        <form id="leaderboard-form" class="space-y-6">
+            {{ csrf_token('DEVACTION', { userID: user.id, gameID: game.id }) }}
+            <input type="hidden" name="leaderboard" value="{{ leaderboard.id }}">
+            <input type="hidden" name="game" value="{{ game.id }}">
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="concept" class="block text-sm font-medium text-gray-300 mb-1">Concepto de la Tabla</label>
+                    <select id="concept" name="concept" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" required>
+                        <option value="0" {{ leaderboard.concept == 0 ? 'selected' : '' }}>Puntuación más alta (Máximo)</option>
+                        <option value="1" {{ leaderboard.concept == 1 ? 'selected' : '' }}>Puntuación más baja (Mínimo)</option>
+                        <option value="2" {{ leaderboard.concept == 2 ? 'selected' : '' }}>Puntuación acumulada (Total)</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label for="stat" class="block text-sm font-medium text-gray-300 mb-1">Estadística Base</label>
+                    <select id="stat" name="stat" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" required>
+                        <option value="">Selecciona una estadística...</option>
+                        {% for stat in stats %}
+                            <option value="{{ stat.id }}" {{ leaderboard.stat_id == stat.id ? 'selected' : '' }}>{{ stat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-branddark-500 flex justify-end">
+                <button type="submit" class="bg-alt text-branddark-900 font-bold px-8 py-3 rounded-lg hover:scale-105 transition-transform shadow-lg">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('leaderboard-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('/api/dev/leaderboard-edit', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        
+        if (data.status === 200) {
+            Orion.showToast('success', 'Tabla actualizada correctamente');
+            setTimeout(() => window.location.href = '/dev/panel/games/{{ game.id }}/community/leaderboards', 1500);
+        } else {
+            Orion.showToast('error', data.message || 'Error al actualizar tabla');
+        }
+    } catch (error) {
+        Orion.showToast('error', 'Error de red');
+    }
+});
+</script>
+{% endblock %}

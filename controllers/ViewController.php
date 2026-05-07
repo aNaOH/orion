@@ -35,9 +35,9 @@ class ViewController
                 return 'https://cdn.orion.moonnastd.com/' . $type . '/' . $id;
             }));
 
-            // profile_pic(user) → user->getProfilePicURL()
-            self::$twig->addFunction(new \Twig\TwigFunction('profile_pic', function ($user): string {
-                return $user->getProfilePicURL();
+            // profile_pic(entity) → entity->getProfilePicURL()
+            self::$twig->addFunction(new \Twig\TwigFunction('profile_pic', function ($entity): string {
+                return method_exists($entity, 'getProfilePicURL') ? $entity->getProfilePicURL() : 'https://cdn.orion.moonnastd.com/user/profile_pic/default.png';
             }));
 
             // snapshot_pic(report) → snapshot URL
@@ -73,7 +73,7 @@ class ViewController
                         $token = UserActionToken::createToken();
                         break;
                     case 'DEVACTION':
-                        $token = DevActionToken::createToken($params["userID"], $params["gameID"]);
+                        $token = DevActionToken::createToken($params["userID"] ?? 0, $params["gameID"] ?? null);
                         break;
                 }
                 return '<input type="hidden" name="tript_token" id="tript_token" value="' . $token . '">';
@@ -86,7 +86,7 @@ class ViewController
                     case 'COMMON': $token = Token::createToken(); break;
                     case 'AUTHFORM': $token = AuthFormToken::createToken(); break;
                     case 'USERACTION': $token = UserActionToken::createToken(); break;
-                    case 'DEVACTION': $token = DevActionToken::createToken($params["userID"], $params["gameID"]); break;
+                    case 'DEVACTION': $token = DevActionToken::createToken($params["userID"] ?? 0, $params["gameID"] ?? null); break;
                 }
                 return '<input type="hidden" name="tript_token" id="tript_token" value="' . $token . '">';
             }, ['is_safe' => ['html']]));
@@ -118,14 +118,19 @@ class ViewController
                       const token = document.getElementById('tript_token')?.value;
                       const separator = url.includes('?') ? '&' : '?';
                       fetch(url + separator + 'tript_token=' + token, { method: 'DELETE' })
-                        .then(response => {
-                          if (response.ok) {
-                            window.location.href = '{$redirectUrl}';
+                        .then(response => response.json())
+                        .then(data => {
+                          if (data.status === 200) {
+                            Orion.showToast('success', data.message || 'Eliminado correctamente');
+                            setTimeout(() => window.location.href = '{$redirectUrl}', 1500);
                           } else {
-                            console.error('Error al eliminar');
+                            Orion.showToast('error', data.message || 'Error al eliminar');
                           }
                         })
-                        .catch(error => console.error('Error al eliminar:', error));
+                        .catch(error => {
+                          console.error('Error al eliminar:', error);
+                          Orion.showToast('error', 'Error de red');
+                        });
                     }
                   });
                 </script>";

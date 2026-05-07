@@ -12,6 +12,7 @@
 {% set delete_title = '¿Eliminar logro?' %}
 
 {% block table %}
+  {{ csrf_token('DEVACTION', { userID: user.id, gameID: game.id }) }}
   {{ ui.table_header(['ID', 'Nombre', 'Descripción', 'Tipo', 'Estadística asociada', '¿Secreto?', 'Icono', 'Icono (bloqueado)', 'Acciones']) }}
   <tbody>
     {% for achievement in achievements %}
@@ -23,7 +24,7 @@
           {{ achievement.type == constant('EACHIEVEMENT_TYPE::TRIGGERED') ? 'Por activación' : 'Por estadística' }}
         </td>
         <td class="px-4 py-3">
-          {{ achievement.type == constant('EACHIEVEMENT_TYPE::STAT') and achievement.stat_id is not null ? achievement.stat_id : 'No' }}
+          {{ achievement.type == constant('EACHIEVEMENT_TYPE::STAT') and achievement.stat_id is not null ? achievement.getStat().name ~ ' (' ~ achievement.stat_value ~ ')' : 'No' }}
         </td>
         <td class="px-4 py-3">{{ achievement.secret ? 'Si' : 'No' }}</td>
         <td class="px-4 py-3">
@@ -33,10 +34,18 @@
           >
         </td>
         <td class="px-4 py-3">
-          <img
-            src="{{ cdn_url('game/achievement', achievement.locked_icon) }}"
-            alt="Ícono bloqueado para el logro de {{ game.title }} '{{ achievement.name }}'"
-          >
+          {% if achievement.locked_icon %}
+            <img
+              src="{{ cdn_url('game/achievement', achievement.locked_icon) }}"
+              alt="Ícono bloqueado para el logro de {{ game.title }} '{{ achievement.name }}'"
+            >
+          {% else %}
+            <img
+              src="{{ cdn_url('game/achievement', achievement.icon) }}"
+              alt="Ícono bloqueado para el logro de {{ game.title }} '{{ achievement.name }}'"
+              style="filter: grayscale(100%); opacity: 0.7;"
+            >
+          {% endif %}
         </td>
         {{ ui.action_buttons('/dev/panel/games/' ~ game.id ~ '/community/achievements/' ~ achievement.id ~ '/edit/', achievement.id, achievement.name) }}
       </tr>

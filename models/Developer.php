@@ -97,4 +97,10 @@ class Developer {
 
         return $count[0];
     }
+
+    public function getProfilePicURL(): string
+    {
+        return "https://cdn.orion.moonnastd.com/user/profile_pic/" .
+            ($this->profile_pic ?? "default.png");
+    }
 }

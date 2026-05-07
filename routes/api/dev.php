@@ -15,8 +15,16 @@ $router->mount("/dev", function () use ($router) {
     $router->post("/achievement", 'DevController::apiCreateAchievement');
     $router->post("/achievement-edit", 'DevController::apiEditAchievement');
     $router->delete("/achievement/{game}/{id}/delete/", 'DevController::apiDeleteAchievement');
+    $router->post("/leaderboard", 'DevController::apiCreateLeaderboard');
+    $router->post("/leaderboard-edit", 'DevController::apiEditLeaderboard');
+    $router->delete("/leaderboard/{game}/{id}/delete/", 'DevController::apiDeleteLeaderboard');
+    $router->post("/stat", 'DevController::apiCreateStat');
+    $router->post("/stat-edit", 'DevController::apiEditStat');
+    $router->delete("/stat/{game}/{id}/delete/", 'DevController::apiDeleteStat');
+    $router->post("/settings", 'DevController::apiUpdateSettings');
     $router->post("/news", 'DevController::apiCreateNews');
     $router->post("/news-edit", 'DevController::apiEditNews');
-    $router->delete("/news/{id}/delete/", 'DevController::apiDeleteNews');
+    $router->delete("/news/{game}/{id}/delete/", 'DevController::apiDeleteNews');
+    $router->delete("/game/{id}/delete/", 'DevController::apiDeleteGame');
 });
 

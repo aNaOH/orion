@@ -60,4 +60,11 @@ enum EUSER_RELATIONSHIP: int
     case BLOCKED = 2;
 }
 
+enum ELEADERBOARD_CONCEPT: int
+{
+    case HIGHEST_STAT = 0;
+    case LOWEST_STAT = 1;
+    case TOTAL_STAT = 2;
+}
+
 ?>

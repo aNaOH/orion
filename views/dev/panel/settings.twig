@@ -1,0 +1,88 @@
+{% extends 'layouts/admin.twig' %}
+
+{% set is_dev_panel = true %}
+{% set title = 'Configuración del Perfil de Desarrollador | Orion Dev Panel' %}
+{% set panel_title = title %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto animate__animated animate__fadeIn">
+    <div class="mb-8 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-alt">Configuración del Perfil</h1>
+        <a href="/dev/panel" class="text-gray-400 hover:text-alt transition">Volver al Inicio</a>
+    </div>
+
+    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+        <form id="settings-form" class="space-y-6">
+            {{ csrf_token('DEVACTION', { userID: user.id }) }}
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Avatar Upload -->
+                <div class="flex flex-col items-center space-y-4">
+                    <div class="relative group">
+                        <img id="avatar-preview" src="{{ profile_pic(developer) }}" alt="Profile Pic" class="w-32 h-32 rounded-full border-2 border-alt object-cover shadow-lg">
+                        <label for="profile_pic" class="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                            <i class="bi bi-camera-fill text-2xl text-white"></i>
+                        </label>
+                        <input type="file" id="profile_pic" name="profile_pic" class="hidden" accept="image/*">
+                    </div>
+                    <p class="text-xs text-gray-400">Recomendado: 512x512px</p>
+                </div>
+
+                <!-- Form Fields -->
+                <div class="md:col-span-2 space-y-4">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Nombre de Desarrollador</label>
+                        <input type="text" id="name" name="name" value="{{ developer.name }}" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" required>
+                    </div>
+
+                    <div>
+                        <label for="motd" class="block text-sm font-medium text-gray-300 mb-1">MOTD (Mensaje del día)</label>
+                        <textarea id="motd" name="motd" rows="3" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors">{{ developer.motd }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-branddark-500 flex justify-end">
+                <button type="submit" class="bg-alt text-branddark-900 font-bold px-8 py-3 rounded-lg hover:scale-105 transition-transform shadow-lg">
+                    Guardar Cambios
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('profile_pic').addEventListener('change', function(e) {
+    if (e.target.files && e.target.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('avatar-preview').src = e.target.result;
+        };
+        reader.readAsDataURL(e.target.files[0]);
+    }
+});
+
+document.getElementById('settings-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('/api/dev/settings', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        
+        if (data.status === 200) {
+            Orion.showToast('success', 'Perfil actualizado correctamente');
+        } else {
+            Orion.showToast('error', data.message || 'Error al actualizar perfil');
+        }
+    } catch (error) {
+        Orion.showToast('error', 'Error de red');
+    }
+});
+</script>
+{% endblock %}

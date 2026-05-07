@@ -32,7 +32,9 @@ class ViewHelpers
             if ($user) {
                 $data['user'] = $user;
                 $data['is_admin'] = ($user->role == EUSER_TYPE::ADMIN);
-                $data['is_developer'] = !is_null($user->getDeveloperInfo());
+                $devInfo = $user->getDeveloperInfo();
+                $data['is_developer'] = !is_null($devInfo);
+                $data['developer'] = $devInfo;
 
                 // Cart data
                 if (OrderHelper::getOrder()) {

@@ -46,7 +46,7 @@
   {% if developer %}
   <div class="border-t border-branddark-500 p-4 flex items-center justify-between">
     <div class="flex items-center gap-3">
-      <img src="{{ developer.profile_pic }}" alt="{{ developer.name }} icon" class="w-10 h-10 rounded-full border border-branddark-400">
+      <img src="{{ profile_pic(developer) }}" alt="{{ developer.name }} icon" class="w-10 h-10 rounded-full border border-branddark-400">
       <div class="menu-text">
         <p class="text-sm font-semibold">{{ developer.name }}</p>
       </div>

@@ -1,0 +1,68 @@
+{% extends 'layouts/admin.twig' %}
+
+{% set is_dev_panel = true %}
+{% set title = 'Nueva Estadística | ' ~ game.title %}
+{% set panel_title = title %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto animate__animated animate__fadeIn">
+    <div class="mb-8 flex items-center justify-between">
+        <h1 class="text-2xl font-bold text-alt">Nueva Estadística</h1>
+        <a href="/dev/panel/games/{{ game.id }}/community/stats" class="text-gray-400 hover:text-alt transition">Volver</a>
+    </div>
+
+    <div class="bg-branddark-700/50 backdrop-blur-md border border-branddark-500 rounded-2xl p-8 shadow-xl">
+        <form id="stat-form" class="space-y-6">
+            {{ csrf_token('DEVACTION', { userID: user.id, gameID: game.id }) }}
+            <input type="hidden" name="game" value="{{ game.id }}">
+            
+            <div class="space-y-4">
+                <div>
+                    <label for="name" class="block text-sm font-medium text-gray-300 mb-1">Nombre de la Estadística</label>
+                    <input type="text" id="name" name="name" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" placeholder="Ej: Enemigos derrotados" required>
+                </div>
+
+                <div>
+                    <label for="type" class="block text-sm font-medium text-gray-300 mb-1">Tipo de Comportamiento</label>
+                    <select id="type" name="type" class="w-full bg-branddark-800 border border-branddark-500 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-alt transition-colors" required>
+                        <option value="0">Incremental (Se suma al valor existente)</option>
+                        <option value="1">Mejor valor (Solo se actualiza si el nuevo es mayor)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="pt-6 border-t border-branddark-500 flex justify-end">
+                <button type="submit" class="bg-alt text-branddark-900 font-bold px-8 py-3 rounded-lg hover:scale-105 transition-transform shadow-lg">
+                    Crear Estadística
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('stat-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    try {
+        const response = await fetch('/api/dev/stat', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await response.json();
+        
+        if (data.status === 201) {
+            Orion.showToast('success', 'Estadística creada correctamente');
+            setTimeout(() => window.location.href = '/dev/panel/games/{{ game.id }}/community/stats', 1500);
+        } else {
+            Orion.showToast('error', data.message || 'Error al crear estadística');
+        }
+    } catch (error) {
+        Orion.showToast('error', 'Error de red');
+    }
+});
+</script>
+{% endblock %}

@@ -5,6 +5,7 @@
 
 {% block styles %}
     <link rel="stylesheet" href="{{ asset('vendor/simplemde/simplemde.orion.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/components/markdown-editor.css') }}">
 {% endblock %}
 
 {% block content %}
@@ -62,17 +63,11 @@
       <div class="invalid-feedback text-red-400 mt-1 text-sm" id="categoryError"></div>
     </div>
 
-    <!-- Cuerpo -->
-    <div class="relative">
-      <label for="body" class="block mb-2 text-gray-300 font-medium">Cuerpo</label>
-      <textarea
-        id="body"
-        name="body"
-        class="w-full bg-[#0f172a] border border-gray-600 text-gray-200 rounded-lg px-4 pt-6 pb-2
-               focus:ring-2 focus:ring-alt focus:border-alt outline-none"
-        rows="10"
-        required
-      >{{ new.body }}</textarea>
+    <div class="space-y-2">
+      <label for="body" class="block mb-2 text-gray-300 font-medium ml-1">Cuerpo</label>
+      <div class="editor-wrapper rounded-2xl overflow-hidden">
+        <textarea id="body" name="body" required>{{ new.body }}</textarea>
+      </div>
       <div class="invalid-feedback text-red-400 mt-1 text-sm" id="bodyError"></div>
     </div>
 
@@ -112,16 +107,24 @@
         submitButton.disabled = true;
 
         const formData = new FormData(form);
-        const response = await fetch("/api/dev/news-edit", {
-          method: "POST",
-          body: formData
-        });
-        const data = await response.json();
+        formData.set("body", simplemde.value());
 
-        if (data.status === 201) {
-          window.location.href = "/dev/panel/games/{{ game.id }}/community/news";
-        } else {
-          bodyError.textContent = data.error || "Ocurrió un error al actualizar la noticia.";
+        try {
+            const response = await fetch("/api/dev/news-edit", {
+              method: "POST",
+              body: formData
+            });
+            const data = await response.json();
+
+            if (data.status === 201 || data.status === 200) {
+              Orion.showToast('success', 'Noticia actualizada correctamente');
+              setTimeout(() => window.location.href = "/dev/panel/games/{{ game.id }}/community/news", 1500);
+            } else {
+              Orion.showToast('error', data.error || 'Error al actualizar noticia');
+              bodyError.textContent = data.error || "Ocurrió un error al actualizar la noticia.";
+            }
+        } catch (error) {
+            Orion.showToast('error', 'Error de red');
         }
 
         spinner.classList.add("hidden");

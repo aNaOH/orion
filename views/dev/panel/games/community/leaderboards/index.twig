@@ -1,0 +1,39 @@
+{% extends 'layouts/admin_index_layout.twig' %}
+{% import 'macros/admin_components.twig' as ui %}
+
+{% set is_dev_panel = true %}
+{% set panel_title = 'Tablas de clasificación para ' ~ game.title ~ ' | Orion Dev Panel' %}
+{% set title = 'Tablas de clasificación para ' ~ game.title %}
+{% set back_url = '/dev/panel/games/' ~ game.id ~ '/community/' %}
+{% set new_url = '/dev/panel/games/' ~ game.id ~ '/community/leaderboards/new' %}
+{% set new_label = 'Nueva tabla' %}
+{% set api_delete_url = '/api/dev/leaderboard/' ~ game.id ~ '/{id}/delete/' %}
+{% set redirect_after_delete = '/dev/panel/games/' ~ game.id ~ '/community/leaderboards/' %}
+{% set delete_title = '¿Eliminar tabla de clasificación?' %}
+
+{% block table %}
+    {{ csrf_token('DEVACTION', { userID: user.id, gameID: game.id }) }}
+    {{ ui.table_header(['ID', 'Concepto', 'Estadística base', 'Acciones']) }}
+    <tbody>
+      {% for leaderboard in leaderboards %}
+      <tr class="border-t border-gray-700 hover:bg-[#1f2937] transition">
+        <td class="px-4 py-3 text-gray-400">#{{ leaderboard.id }}</td>
+        <td class="px-4 py-3">
+            {% if leaderboard.concept == 0 %}
+                Puntuación más alta (Máximo)
+            {% elseif leaderboard.concept == 1 %}
+                Puntuación más baja (Mínimo)
+            {% elseif leaderboard.concept == 2 %}
+                Puntuación acumulada (Total)
+            {% else %}
+                Desconocido
+            {% endif %}
+        </td>
+        <td class="px-4 py-3">
+            {{ leaderboard.getStat() ? leaderboard.getStat().name : 'N/A' }}
+        </td>
+        {{ ui.action_buttons('/dev/panel/games/' ~ game.id ~ '/community/leaderboards/' ~ leaderboard.id ~ '/edit/', leaderboard.id, 'Tabla #' ~ leaderboard.id) }}
+      </tr>
+      {% endfor %}
+    </tbody>
+{% endblock %}

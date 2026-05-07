@@ -7,7 +7,7 @@
 {% set back_url = '/dev/panel/games/' ~ game.id ~ '/community/' %}
 {% set new_url = '/dev/panel/games/' ~ game.id ~ '/community/news/new' %}
 {% set new_label = 'Nueva noticia' %}
-{% set api_delete_url = '/api/dev/news/{id}/delete/' %}
+{% set api_delete_url = '/api/dev/news/' ~ game.id ~ '/{id}/delete/' %}
 {% set redirect_after_delete = '/dev/panel/games/' ~ game.id ~ '/community/news/' %}
 {% set delete_title = '¿Eliminar noticia?' %}
 

@@ -1,6 +1,10 @@
 (function (global) {
   function setupMarkdownEditor(opts = {}) {
-    const { selector = "#description", uniqueId = "Orion_MDEditor" } = opts;
+    const {
+      selector = "#description",
+      uniqueId = "Orion_MDEditor",
+      placeholder = "Escribe aquí el contenido..."
+    } = opts;
 
     return new SimpleMDE({
       element: document.querySelector(selector),
@@ -9,81 +13,74 @@
         uniqueId: uniqueId,
         delay: 1000,
       },
-      insertTexts: {
-        horizontalRule: ["", "\n\n-----\n\n"],
-        link: ["[", "](http://)"],
-        table: [
-          "",
-          "\n\n| Column 1 | Column 2 | Column 3 |\n| -------- | -------- | -------- |\n| Text     | Text      | Text     |\n\n",
-        ],
-      },
-      placeholder: "Type here...",
+      placeholder: placeholder,
+      spellChecker: false,
+      status: ["lines", "words"],
       toolbar: [
         {
           name: "bold",
           action: SimpleMDE.toggleBold,
-          className: "fa fa-bold !text-alt",
-          title: "Bold",
+          className: "bi bi-type-bold",
+          title: "Negrita",
         },
         {
           name: "italic",
           action: SimpleMDE.toggleItalic,
-          className: "fa fa-italic !text-alt",
-          title: "Italic",
+          className: "bi bi-type-italic",
+          title: "Cursiva",
         },
         {
-          name: "underline",
-          action: SimpleMDE.toggleUnderline,
-          className: "fa fa-underline !text-alt",
-          title: "Underline",
+          name: "strikethrough",
+          action: SimpleMDE.toggleStrikethrough,
+          className: "bi bi-type-strikethrough",
+          title: "Tachado",
         },
         {
           name: "heading",
           action: SimpleMDE.toggleHeadingSmaller,
-          className: "fa fa-header !text-alt",
-          title: "Heading",
+          className: "bi bi-type-h1",
+          title: "Encabezado",
+        },
+        "|",
+        {
+          name: "unordered-list",
+          action: SimpleMDE.toggleUnorderedList,
+          className: "bi bi-list-ul",
+          title: "Lista",
+        },
+        {
+          name: "ordered-list",
+          action: SimpleMDE.toggleOrderedList,
+          className: "bi bi-list-ol",
+          title: "Lista numerada",
         },
         "|",
         {
           name: "link",
-          action: SimpleMDE.toggleLink,
-          className: "fa fa-link !text-alt",
-          title: "Link",
+          action: SimpleMDE.drawLink,
+          className: "bi bi-link-45deg",
+          title: "Enlace",
+        },
+        {
+          name: "image",
+          action: SimpleMDE.drawImage,
+          className: "bi bi-image",
+          title: "Imagen",
         },
         {
           name: "table",
-          action: SimpleMDE.drawTable, // toggleTable no existe en SimpleMDE
-          className: "fa fa-table !text-alt",
-          title: "Table",
+          action: SimpleMDE.drawTable,
+          className: "bi bi-table",
+          title: "Tabla",
         },
         "|",
         {
           name: "preview",
           action: SimpleMDE.togglePreview,
-          className: "fa fa-eye !text-alt no-disable",
-          title: "Preview",
+          className: "bi bi-eye no-disable",
+          title: "Vista previa",
         },
       ],
-      previewRender: function (plainText) {
-        const html = SimpleMDE.prototype.markdown(plainText);
-        const temp = document.createElement("div");
-        temp.innerHTML = html;
-
-        const applyClass = (sel, cls) =>
-          temp.querySelectorAll(sel).forEach((el) => (el.className = cls));
-
-        applyClass("h1", "text-4xl font-bold my-4");
-        applyClass("h2", "text-2xl font-bold my-4");
-        applyClass("h3", "text-xl font-bold my-4");
-        applyClass("h4", "text-lg font-bold my-4");
-        applyClass("p", "text-base leading-relaxed my-2");
-        applyClass("ul", "list-disc pl-5 my-2");
-        applyClass("ol", "list-decimal pl-5 my-2");
-        applyClass("a", "text-blue-500 hover:underline");
-        applyClass("img", "max-w-full h-auto rounded");
-
-        return temp.innerHTML;
-      },
     });
   }
 

@@ -30,17 +30,20 @@ formAchievement.onsubmit = (e) => {
   resetField("description");
   resetField("type");
   resetField("stat");
+  resetField("stat_value");
   resetField("icon");
   resetField("lockedIcon");
 
   let formData = new FormData();
 
+  formData.append("tript_token", fields["tript_token"].value);
   formData.append("achievement", fields["achievement"].value);
   formData.append("game", fields["game"].value);
   formData.append("name", fields["name"].value);
   formData.append("description", fields["description"].value);
   formData.append("type", fields["type"].value);
   formData.append("stat", fields["stat"].value);
+  formData.append("stat_value", fields["stat_value"].value);
 
   if (document.getElementById("icon").getFileInput()) {
     formData.append("icon", document.getElementById("icon").getFileInput()[0]);
@@ -62,13 +65,17 @@ formAchievement.onsubmit = (e) => {
     processData: false,
     contentType: false,
     success: function () {
-      location.href =
-        "/dev/panel/games/" + fields["game"].value + "/community/achievements";
+      Orion.showToast('success', 'Logro actualizado correctamente');
+      setTimeout(() => {
+        location.href =
+          "/dev/panel/games/" + fields["game"].value + "/community/achievements";
+      }, 1500);
     },
     error: function (xhr) {
       const info = xhr.responseJSON;
       console.log(info);
-      showError(info);
+      Orion.showToast('error', info?.message || 'Error al actualizar logro');
+      if (typeof showError === 'function') showError(info);
       toggleSpinner("submitButton", "spinnerAchievement", false);
       submitAchievement.classList.remove("disabled");
     },

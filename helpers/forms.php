@@ -133,6 +133,14 @@ class FormHelper {
                 $validated = AuthFormToken::validateToken($field);
                 break;
 
+            case ETOKEN_TYPE::DEVACTION:
+                $validated = DevActionToken::validateToken($field);
+                break;
+
+            case ETOKEN_TYPE::USERLIBRARY:
+                $validated = UserLibraryToken::validateToken($field);
+                break;
+
             default:
                 $validated = Token::validateToken($field);
                 break;

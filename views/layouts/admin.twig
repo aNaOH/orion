@@ -1,34 +1,164 @@
-{% include 'layouts/panel/header.twig' %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{{ title|default('Orion | Admin Panel') }}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-{% if is_dev_panel %}
-    {% include 'layouts/panel/dev_sidebar.twig' %}
-{% else %}
-    {% include 'layouts/panel/admin_sidebar.twig' %}
-{% endif %}
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Gabarito:wght@400..900&family=Lexend:wght@100..900&display=swap" rel="stylesheet">
 
-<!-- CONTENIDO -->
-<div id="main-content" class="flex-1 flex flex-col bg-branddark-800 overflow-hidden">
-  <!-- HEADER -->
-  <header
-    class="flex items-center justify-between px-6 py-4 border-b border-branddark-600 bg-branddark-700 shadow-sm flex-shrink-0">
-    <div class="flex items-center gap-3">
-      <button id="sidebarToggle" class="text-gray-400 hover:text-alt-400 transition md:block hidden">
-        <i class="bi bi-list text-2xl"></i>
-      </button>
-      <h2 class="text-xl font-lg">{{ panel_title|default(is_dev_panel ? 'Panel de Desarrollador' : 'Panel de Administración') }}</h2>
+    <!-- Tailwind -->
+    <script src="{{ asset('vendor/tailwind-3.4.15.js') }}"></script>
+    <script src="{{ asset('js/tailwindConfig.js') }}"></script>
+
+    <!-- JQuery -->
+    <script src="{{ asset('vendor/jquery/jquery-3.7.1.min.js') }}"></script>
+
+    <!-- Orion CSS -->
+    <link rel="stylesheet" href="{{ asset('css/main.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/orion-panel.css') }}">
+
+    <!-- Vendor CSS -->
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/bootstrap-icons.min.css') }}">
+    
+    <!-- Vendor JS -->
+    <script src="{{ asset('vendor/moment/moment.min.js') }}"></script>
+    
+    {% block styles %}{% endblock %}
+</head>
+<body class="bg-brand-900 text-gray-100 font-base h-screen overflow-hidden">
+    <div class="flex h-full w-full overflow-hidden">
+
+        {% if is_dev_panel %}
+            {% include 'layouts/panel/dev_sidebar.twig' %}
+        {% else %}
+            {% include 'layouts/panel/admin_sidebar.twig' %}
+        {% endif %}
+
+        <!-- CONTENIDO -->
+        <div id="main-content" class="flex-1 flex flex-col bg-branddark-800 overflow-hidden">
+        <!-- HEADER -->
+        <header
+            class="flex items-center justify-between px-6 py-4 border-b border-branddark-600 bg-branddark-700 shadow-sm flex-shrink-0">
+            <div class="flex items-center gap-3">
+            <button id="sidebarToggle" class="text-gray-400 hover:text-alt-400 transition md:block hidden">
+                <i class="bi bi-list text-2xl"></i>
+            </button>
+            <h2 class="text-xl font-lg">{{ panel_title|default(is_dev_panel ? 'Panel de Desarrollador' : 'Panel de Administración') }}</h2>
+            </div>
+            <div class="flex items-center gap-5">
+            <button class="hover:text-alt-400 transition">
+                <i class="bi bi-bell text-xl"></i>
+            </button>
+            </div>
+        </header>
+
+        <!-- MAIN -->
+        <main class="flex-1 p-8 overflow-y-auto">
+            {% block content %}{% endblock %}
+        </main>
+        </div>
+
     </div>
-    <div class="flex items-center gap-5">
-      <button class="hover:text-alt-400 transition">
-        <i class="bi bi-bell text-xl"></i>
-      </button>
-    </div>
-  </header>
 
-  <!-- MAIN -->
-  <main class="flex-1 p-8 overflow-y-auto">
-    {% block content %}{% endblock %}
-  </main>
-</div>
+    <!-- TOOLTIP -->
+    <div id="tooltip" class="fixed bg-gray-800 text-gray-100 text-xs px-2 py-1 rounded-md shadow-lg opacity-0 pointer-events-none transition-all duration-200 z-50"></div>
 
-{% include 'layouts/panel/footer.twig' %}
-{% block scripts %}{% endblock %}
+    <script>
+        const sidebar = $("#sidebar");
+        const body = $("body");
+        const tooltip = $("#tooltip");
+
+        // Toggle sidebar
+        $("#sidebarToggle").on("click", function () {
+            body.toggleClass("sidebar-collapsed");
+        });
+
+        // Toggle móvil
+        $("#sidebarToggleMobile").on("click", function () {
+            sidebar.removeClass("mobile-active");
+        });
+
+        $(document).on("click", function (e) {
+            if (sidebar.hasClass("mobile-active") && !$(e.target).closest("#sidebar, #sidebarToggle").length) {
+                sidebar.removeClass("mobile-active");
+            }
+        });
+
+        // Tooltip
+        $(".menu-item").hover(function (e) {
+            if ($("body").hasClass("sidebar-collapsed")) {
+                const text = $(this).data("tooltip");
+                if (text) {
+                    tooltip.text(text);
+                    const rect = this.getBoundingClientRect();
+                    tooltip.css({
+                        top: rect.top + rect.height / 2 - 10,
+                        left: rect.right + 10,
+                        opacity: 1
+                    });
+                }
+            }
+        }, function () {
+            tooltip.css("opacity", 0);
+        });
+
+        // Orion Global Helper
+        window.Orion = {
+            showToast: function(type, message) {
+                const toastContainer = document.getElementById('toast-container') || this.createToastContainer();
+                const toast = document.createElement('div');
+                
+                const bgColor = type === 'success' ? 'bg-green-500/20' : 'bg-red-500/20';
+                const borderColor = type === 'success' ? 'border-green-500/50' : 'border-red-500/50';
+                const icon = type === 'success' ? 'bi-check-circle-fill' : 'bi-exclamation-triangle-fill';
+                const iconColor = type === 'success' ? 'text-green-400' : 'text-red-400';
+
+                toast.className = `flex items-center gap-3 px-6 py-4 rounded-xl border ${bgColor} ${borderColor} backdrop-blur-md shadow-2xl animate__animated animate__fadeInRight mb-3 min-w-[300px]`;
+                toast.innerHTML = `
+                    <i class="bi ${icon} ${iconColor} text-xl"></i>
+                    <p class="text-white font-medium">${message}</p>
+                `;
+
+                toastContainer.appendChild(toast);
+
+                setTimeout(() => {
+                    toast.classList.replace('animate__fadeInRight', 'animate__fadeOutRight');
+                    setTimeout(() => toast.remove(), 500);
+                }, 4000);
+            },
+            createToastContainer: function() {
+                const container = document.createElement('div');
+                container.id = 'toast-container';
+                container.className = 'fixed bottom-8 right-8 z-[9999] flex flex-col items-end';
+                document.body.appendChild(container);
+                return container;
+            }
+        };
+
+        // Timezone conversion
+        $(document).ready(function() {
+          if (typeof moment !== 'undefined') {
+            $('.local-date').each(function() {
+              const timestamp = $(this).attr('data-timestamp');
+              if (timestamp) {
+                const m = moment(timestamp);
+                if (m.isValid()) {
+                  const localDate = m.local().format('DD/MM/YYYY HH:mm');
+                  $(this).text(localDate);
+                } else {
+                  console.warn('Invalid timestamp for .local-date:', timestamp);
+                }
+              }
+            });
+          }
+        });
+    </script>
+    
+    {% block scripts %}{% endblock %}
+
+</body>
+</html>
