@@ -1,0 +1,137 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Comunidad | Orion{% endblock %}
+
+{% block content %}
+    <script src="{{ asset('js/components/gradientChip.js') }}"></script>
+
+    <!-- Hero Section -->
+    <section id="hero" class="py-24 -mt-8 mb-12 relative overflow-hidden">
+        <div class="container mx-auto text-center px-6 relative z-10">
+            <h2 class="text-5xl md:text-6xl font-bold animate__animated animate__fadeInDown mb-6">Comunidad</h2>
+            <p class="text-xl md:text-2xl mt-4 text-white/80 max-w-2xl mx-auto">Conecta con jugadores de todo el mundo, comparte tus mejores momentos y descubre nuevas experiencias.</p>
+            
+            <form id="searchForm" action="/communities" method="GET" class="flex items-center space-x-2 p-2 mt-12 rounded-full bg-branddark bg-opacity-75 backdrop-blur-md shadow-2xl w-full max-w-2xl mx-auto border border-white/10 focus-within:border-alt transition-all">
+                <div class="relative flex-grow">
+                    <input
+                        type="text"
+                        name="search"
+                        id="search"
+                        placeholder="Buscar comunidades..."
+                        class="w-full bg-transparent text-gray-200 placeholder-text-gray-200/50 px-8 py-4 rounded-full border-none focus:outline-none text-lg"
+                    >
+                    <div class="absolute inset-y-0 right-6 flex items-center pointer-events-none text-white/50">
+                        <i class="bi bi-search text-2xl"></i>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <div class="container mx-auto px-6 space-y-24 pb-24">
+        <!-- Recommendations Section -->
+        <section>
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-alt/20">
+                        <i class="bi bi-stars text-alt text-2xl"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-3xl font-bold text-white mb-1">
+                            {% if session.user %}Para ti{% else %}Te sugerimos estas comunidades{% endif %}
+                        </h2>
+                        <p class="text-gray-400">
+                            {% if session.user %}
+                                Basado en tus juegos y preferencias
+                            {% else %}
+                                <a href="/login" class="text-alt hover:underline">Inicia sesión</a> para recibir recomendaciones personalizadas
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 justify-items-center">
+                {% for game in recommendations %}
+                    {% include 'partials/game_card.twig' with {'game': game} %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Trending Communities -->
+        <section>
+            <div class="flex items-center justify-between mb-10">
+                <div>
+                    <h2 class="text-3xl font-bold text-white mb-2">Comunidades Destacadas</h2>
+                    <p class="text-gray-400">Las comunidades más activas del momento</p>
+                </div>
+                <a href="/communities?explore=true" class="hidden sm:flex items-center gap-2 text-alt font-bold hover:underline group">
+                    Explorar todas
+                    <i class="bi bi-arrow-right transition-transform group-hover:translate-x-1"></i>
+                </a>
+            </div>
+
+            <div class="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-10 justify-items-center">
+                {% for game in trendingCommunities %}
+                    {% include 'partials/game_card.twig' with {'game': game} %}
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- Recent Activity Feed -->
+        <section class="max-w-4xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-white mb-4">Actividad Reciente</h2>
+                <div class="h-1 w-20 bg-alt mx-auto rounded-full"></div>
+            </div>
+
+            <div class="space-y-6">
+                {% for post in recentPosts %}
+                    {% set author = post.getAuthor() %}
+                    {% set game = post.game_id ? post.getGame() : null %}
+                    <div class="bg-branddark/40 backdrop-blur-sm p-6 rounded-3xl border border-white/5 hover:border-white/10 transition-all">
+                        <div class="flex items-start gap-4">
+                            <img src="https://cdn.orion.moonnastd.com/user/profile_pic/{{ author.id }}" class="w-12 h-12 rounded-full border-2 border-alt/30" alt="{{ author.username }}">
+                            <div class="flex-grow">
+                                <div class="flex items-center justify-between mb-1">
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-bold text-white">{{ author.username }}</span>
+                                        <span class="text-gray-500 text-sm">• {{ post.created_at|date('d M') }}</span>
+                                    </div>
+                                    {% if game %}
+                                        <a href="/communities/{{ game.id }}" class="text-xs font-bold text-alt hover:underline">
+                                            en {{ game.title }}
+                                        </a>
+                                    {% endif %}
+                                </div>
+                                <h3 class="text-lg font-bold text-white mb-2">{{ post.title }}</h3>
+                                <p class="text-gray-400 text-sm line-clamp-3 mb-4">{{ post.body|striptags }}</p>
+                                
+                                <div class="flex items-center gap-6 text-gray-500 text-sm">
+                                    <span class="flex items-center gap-2"><i class="bi bi-chat"></i> {{ post.getComments()|length }}</span>
+                                    <span class="flex items-center gap-2"><i class="bi bi-heart"></i> {{ post.getValue()|default(0) }}</span>
+                                    
+                                    {% set typeName = '' %}
+                                    {% if post.type.value == 1 %}{% set typeName = 'Galería' %}
+                                    {% elseif post.type.value == 2 %}{% set typeName = 'Guía' %}
+                                    {% elseif post.type.value == 3 %}{% set typeName = 'Noticia' %}
+                                    {% else %}{% set typeName = 'Post' %}{% endif %}
+                                    
+                                    <span class="ml-auto px-2 py-0.5 rounded bg-white/5 text-[10px] uppercase tracking-wider">{{ typeName }}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <div class="mt-12 text-center">
+                <p class="text-gray-400 mb-6">¿Quieres compartir algo con la comunidad?</p>
+                <div class="flex flex-wrap justify-center gap-4">
+                    <a href="/login" class="px-8 py-3 bg-alt text-white font-bold rounded-xl shadow-lg shadow-alt/20 hover:scale-105 transition-transform">Crear Publicación</a>
+                    <a href="/communities" class="px-8 py-3 bg-white/5 text-white font-bold rounded-xl border border-white/10 hover:bg-white/10 transition-all">Explorar Grupos</a>
+                </div>
+            </div>
+        </section>
+    </div>
+{% endblock %}

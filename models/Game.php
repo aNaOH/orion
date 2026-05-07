@@ -408,4 +408,36 @@ class Game
     {
         return strval($this->discount * 100) . "%";
     }
+
+    public static function getPopularCommunities(int $limit = 6): array
+    {
+        $sql = "SELECT g.*, COUNT(p.id) as post_count 
+                FROM game g 
+                LEFT JOIN posts p ON g.id = p.game_id 
+                WHERE g.is_public = 1 
+                GROUP BY g.id 
+                ORDER BY post_count DESC, g.title ASC 
+                LIMIT " . (int)$limit;
+
+        $results = Connection::customQuery(ORION_DB, $sql)->fetchAll(PDO::FETCH_ASSOC);
+        
+        $games = [];
+        foreach ($results as $game) {
+            $games[] = new Game(
+                $game["title"],
+                $game["short_description"],
+                $game["description"],
+                $game["launch_date"],
+                (float) $game["base_price"],
+                (float) $game["discount"],
+                $game["as_editor"] == 1,
+                $game["is_public"] == 1,
+                $game["developer_name"],
+                $game["developer_id"],
+                $game["genre_id"],
+                $game["id"],
+            );
+        }
+        return $games;
+    }
 }

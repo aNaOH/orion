@@ -201,13 +201,47 @@ class Post
         return $comments;
     }
 
-    public function delete(): ?bool
+    public function getValue(): int
     {
-        if (!isset($this->id)) {
+        if (is_null($this->id)) {
+            return 0;
+        }
+        $sql = "SELECT SUM(modifier) FROM votes WHERE post_id = ?";
+        $valueDB = Connection::customQuery(ORION_DB, $sql, [$this->id])->fetchAll();
+        return intval($valueDB[0][0] ?? "0");
+    }
+
+    public function getGame(): ?Game
+    {
+        if (is_null($this->game_id)) {
             return null;
         }
-        return (bool) Connection::doDelete(ORION_DB, self::$table, [
-            "id" => $this->id,
-        ]);
+        return Game::getById($this->game_id);
+    }
+
+    public static function getLatest(int $limit = 8): array
+    {
+        $sql = "SELECT * FROM " . self::$table . " WHERE is_public = 1 ORDER BY created_at DESC LIMIT " . (int)$limit;
+        $results = Connection::customQuery(ORION_DB, $sql)->fetchAll(PDO::FETCH_ASSOC);
+        
+        $posts = [];
+        foreach ($results as $post) {
+            $postObj = new Post(
+                $post["title"],
+                $post["body"],
+                (bool) $post["is_public"],
+                $post["type"],
+                $post["game_id"],
+                $post["author_id"],
+                $post["id"],
+            );
+
+            $postObj->created_at = new DateTime($post["created_at"]);
+            $postObj->last_updated_at = new DateTime($post["last_updated_at"]);
+
+            $posts[] = $postObj;
+        }
+
+        return $posts;
     }
 }

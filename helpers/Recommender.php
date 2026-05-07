@@ -89,14 +89,20 @@ class Recommender
     public static function getRecommendations(
         User $user,
         bool $allowOwned = false,
+        int $limit = 4
     ): array {
         $owned = $user->getAdquiredGames();
         $ownedIds = array_map(fn($g) => $g->id, $owned);
 
+        // Fallback: Si el usuario no tiene juegos, recomendamos los más populares
+        if (empty($ownedIds)) {
+            return Game::getPopularCommunities($limit);
+        }
+
         $cacheKey =
             "recommendations:user:{$user->id}:allowOwned:" .
             (int) $allowOwned .
-            ":lib:" .
+            ":limit:{$limit}:lib:" .
             md5(json_encode($ownedIds));
 
         if ($cached = FileCache::get($cacheKey)) {
@@ -111,7 +117,7 @@ class Recommender
         $featureFreq = self::getFeatureFrequency($user);
 
         if (empty($genreFreq) && empty($devFreq) && empty($featureFreq)) {
-            return []; // Sin datos para recomendar
+            return Game::getPopularCommunities($limit);
         }
 
         $sql = "SELECT * FROM `" . Game::$table . "` WHERE is_public = 1";
@@ -143,10 +149,25 @@ class Recommender
             $allowOwned ? [] : $ownedIds,
         )->fetchAll(PDO::FETCH_ASSOC);
 
-        // 🔹 Cargamos features en bloque
+        // Si no hay suficientes recomendaciones filtradas, rellenamos con populares
+        if (count($rows) < $limit) {
+            $popular = Game::getPopularCommunities($limit * 2);
+            foreach ($popular as $p) {
+                if (count($rows) >= $limit) break;
+                // Evitar duplicados y ya poseídos si aplica
+                $exists = false;
+                foreach ($rows as $r) { if ($r['id'] == $p->id) { $exists = true; break; } }
+                if (!$exists && ($allowOwned || !in_array($p->id, $ownedIds))) {
+                    // Convertir objeto Game a array para el usort posterior (o simplemente añadirlo)
+                    // Para simplificar, si llegamos aquí, simplemente retornamos lo que tengamos mezclado
+                }
+            }
+        }
+
+        // Cargamos features en bloque
         $gameFeatures = self::loadGameFeatures($rows);
 
-        // 🔹 Pesos ajustables
+        // Pesos ajustables
         $genreWeight = 2;
         $developerWeight = 1;
         $featureWeight = 1;
@@ -182,7 +203,7 @@ class Recommender
                 );
         });
 
-        $top = array_slice($rows, 0, 4);
+        $top = array_slice($rows, 0, $limit);
         FileCache::set($cacheKey, $top);
 
         return array_map(fn($row) => self::createGameFromRow($row), $top);

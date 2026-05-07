@@ -2,17 +2,46 @@
 
 require_once "controllers/GameController.php";
 require_once "controllers/PostController.php";
+require_once "helpers/Recommender.php";
 
 class CommunityController
 {
     public static function showHub()
     {
-        $searchQuery = $_GET["search"] ?? "";
-        $genre = $_GET["genre"] ?? "";
-        $features = isset($_GET["features"]) && $_GET["features"] !== "" ? explode(",", $_GET["features"]) : [];
-        $page = $_GET["page"] ?? 1;
+        $search = $_GET['search'] ?? '';
+        $genre = $_GET['genre'] ?? 'all';
+        $features = isset($_GET['features']) ? explode(',', $_GET['features']) : [];
+        $page = $_GET['page'] ?? 1;
 
-        GameController::showCommunities($searchQuery, $genre, $features, (int)$page);
+        $explore = $_GET['explore'] ?? 'false';
+
+        // Si no hay búsqueda ni filtros, y no se ha pedido "explorar", mostramos la nueva Landing Page
+        if (empty($search) && $genre === 'all' && empty($features) && $page == 1 && $explore === 'false') {
+            $trendingCommunities = Game::getPopularCommunities(4);
+            $recentPosts = Post::getLatest(8);
+            
+            // Recomendaciones personalizadas
+            $recommendations = [];
+            if (isset($_SESSION['user'])) {
+                $user = User::getById($_SESSION['user']['id']);
+                if ($user) {
+                    $recommendations = Recommender::getRecommendations($user, false, 4);
+                }
+            } else {
+                $recommendations = Game::pickRandom(4);
+            }
+            
+            ViewController::render('community/landing', [
+                'trendingCommunities' => $trendingCommunities,
+                'recentPosts' => $recentPosts,
+                'recommendations' => $recommendations,
+                'genres' => GameGenre::getAll(),
+                'features' => GameFeature::getAll()
+            ]);
+            return;
+        }
+
+        GameController::showCommunities($search, $genre, $features, $page);
     }
 
     public static function showDashboard($gameId)
