@@ -75,10 +75,30 @@ class GameController
         exit();
     }
 
-    public static function showCommunities()
-    {
+    public static function showCommunities(
+        string $query = "",
+        string $genre = "",
+        array $features = [],
+        int $page = 1,
+    ) {
+        $totalPages = 0;
+        $games = Game::search(
+            $query,
+            $genre,
+            $features,
+            $page,
+            $totalPages,
+        );
+
         ViewController::render('community/hub', [
-            'games' => Game::all()
+            'searchQuery' => $query,
+            'games' => $games,
+            'totalPages' => $totalPages,
+            'page' => $page,
+            'filteredGender' => $genre,
+            'filteredFeatures' => $features,
+            'genres' => GameGenre::getAll(),
+            'features' => GameFeature::getAll()
         ]);
     }
 
@@ -98,7 +118,10 @@ class GameController
             'genres' => $genres,
             'features' => $features,
             'randomGames' => $randomGames,
-            'recommended' => $recommended
+            'recommended' => $recommended,
+            'searchQuery' => '',
+            'filteredGender' => 'all',
+            'filteredFeatures' => []
         ]);
     }
 

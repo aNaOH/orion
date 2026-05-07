@@ -11,6 +11,7 @@ class GradientChipElement extends HTMLElement {
       "use-tailwind",
       "border-radius",
       "text",
+      "full-width",
     ];
   }
 
@@ -34,16 +35,24 @@ class GradientChipElement extends HTMLElement {
     style.textContent = `
       :host {
         display: inline-block;
+        vertical-align: middle;
+        min-width: 0;
+      }
+      :host([full-width]), :host([full-width="true"]) {
+        display: block;
+        width: 100%;
       }
       .wrapper {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        padding: 8px 12px;
-        gap: 8px;
-        overflow: hidden;
+        padding: 6px 12px;
+        gap: 10px;
         position: relative;
         transition: background 0.3s ease, color 0.3s ease;
+        min-height: 36px;
+        width: 100%;
+        box-sizing: border-box;
       }
       .icon-container {
         display: flex;
@@ -53,12 +62,14 @@ class GradientChipElement extends HTMLElement {
         flex-shrink: 0;
       }
       .text-container {
-        font-size: 14px;
+        font-size: 13px;
         font-weight: 500;
-        line-height: 1;
-        white-space: nowrap;
-        text-overflow: ellipsis;
+        line-height: 1.25;
+        white-space: normal;
+        word-break: break-word;
         flex-grow: 1;
+        min-width: 0;
+        padding: 2px 0;
       }
       svg {
         width: 100%;
@@ -98,10 +109,10 @@ class GradientChipElement extends HTMLElement {
 
     if (useTailwind) {
       this.wrapper.className =
-        "wrapper flex items-center cursor-pointer overflow-hidden";
+        "wrapper flex items-center cursor-pointer";
       this.iconContainer.className =
         "icon-container flex items-center justify-center";
-      this.textContainer.className = "text-container text-sm font-medium";
+      this.textContainer.className = "text-container text-sm font-medium whitespace-normal";
     } else {
       this.wrapper.className = "wrapper";
       this.iconContainer.className = "icon-container";

@@ -7,7 +7,12 @@ class CommunityController
 {
     public static function showHub()
     {
-        GameController::showCommunities();
+        $searchQuery = $_GET["search"] ?? "";
+        $genre = $_GET["genre"] ?? "";
+        $features = isset($_GET["features"]) && $_GET["features"] !== "" ? explode(",", $_GET["features"]) : [];
+        $page = $_GET["page"] ?? 1;
+
+        GameController::showCommunities($searchQuery, $genre, $features, (int)$page);
     }
 
     public static function showDashboard($gameId)

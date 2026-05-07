@@ -29,10 +29,33 @@
     </section>
 
     <div class="container mx-auto px-6">
-        <div class="flex flex-col lg:flex-row gap-10">
-            <!-- Sidebar Filters -->
-            <aside class="lg:w-64 flex-shrink-0">
-                <form id="filterForm" action="/store/games" method="GET" class="sticky top-24 bg-branddark/50 p-6 rounded-2xl border border-white/5 shadow-xl">
+        <!-- Mobile Filter Button -->
+        <div class="lg:hidden mb-6">
+            <button id="openMobileFilters" class="w-full flex items-center justify-center gap-3 bg-branddark/80 hover:bg-branddark text-white font-bold py-4 px-6 rounded-2xl border border-white/10 shadow-lg transition-all active:scale-95">
+                <i class="bi bi-funnel text-alt"></i>
+                Filtrar y Buscar
+                {% if filteredGender != 'all' or filteredFeatures|length > 0 or searchQuery != '' %}
+                    <span class="w-2 h-2 bg-alt rounded-full"></span>
+                {% endif %}
+            </button>
+        </div>
+
+        <div class="flex flex-col lg:flex-row gap-10 relative">
+            <!-- Sidebar Filters (Drawer on Mobile) -->
+            <aside id="sidebarFilters" class="fixed inset-0 z-50 lg:relative lg:inset-auto lg:z-0 lg:w-64 flex-shrink-0 invisible lg:visible opacity-0 lg:opacity-100 transition-all duration-300">
+                <!-- Mobile Overlay Backdrop -->
+                <div id="mobileFiltersBackdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm lg:hidden"></div>
+                
+                <form id="filterForm" action="/store/games" method="GET" class="relative w-4/5 max-w-sm h-full lg:h-auto lg:w-full bg-branddark lg:bg-branddark/50 p-8 lg:p-6 lg:rounded-2xl border-r lg:border border-white/10 lg:border-white/5 shadow-2xl lg:shadow-xl overflow-y-auto lg:overflow-visible transition-transform -translate-x-full lg:translate-x-0">
+                    <div class="flex items-center justify-between lg:hidden mb-8">
+                        <h3 class="text-xl font-bold text-white">Filtros</h3>
+                        <button type="button" id="closeMobileFilters" class="text-2xl text-gray-400 hover:text-white">
+                            <i class="bi bi-x-lg"></i>
+                        </button>
+                    </div>
+
+                    <input type="hidden" name="search" value="{{ searchQuery }}">
+                    
                     <div class="space-y-8">
                         <div>
                             <h3 class="text-lg font-bold text-white mb-4 flex items-center gap-2">
@@ -41,7 +64,7 @@
                             <select name="genre" class="w-full rounded-xl bg-branddark text-gray-200 px-4 py-2.5 border border-white/10 focus:border-alt focus:ring-0 transition-all cursor-pointer">
                                 <option value="all">Todos los géneros</option>
                                 {% for genre in genres %}
-                                    <option value="{{ genre.id }}">{{ genre.name }}</option>
+                                    <option value="{{ genre.id }}" {{ genre.id == filteredGender ? 'selected' : '' }}>{{ genre.name }}</option>
                                 {% endfor %}
                             </select>
                         </div>
@@ -52,11 +75,11 @@
                             </h3>
                             <div class="space-y-3">
                                 {% for feature in features %}
-                                    <label class="flex items-center group cursor-pointer">
-                                        <div class="relative flex items-center">
-                                            <input type="checkbox" name="features[]" value="{{ feature.id }}" class="peer hidden">
-                                            <div class="w-5 h-5 border-2 border-white/20 rounded peer-checked:bg-alt peer-checked:border-alt transition-all"></div>
-                                            <i class="bi bi-check absolute text-white opacity-0 peer-checked:opacity-100 left-0.5 top-0 transition-opacity"></i>
+                                    <label class="flex items-center group cursor-pointer w-full gap-3">
+                                        <div class="relative flex items-center justify-center w-5 h-5 flex-shrink-0">
+                                            <input type="checkbox" name="features[]" value="{{ feature.id }}" class="peer hidden" {{ feature.id in filteredFeatures ? 'checked' : '' }}>
+                                            <div class="absolute inset-0 border-2 border-white/20 rounded peer-checked:bg-alt peer-checked:border-alt transition-all"></div>
+                                            <i class="bi bi-check relative text-white opacity-0 peer-checked:opacity-100 transition-opacity text-xl leading-none"></i>
                                         </div>
                                         <gradient-chip
                                             base-color="{{ feature.tint }}"
@@ -64,7 +87,8 @@
                                             icon-path="https://cdn.orion.moonnastd.com/game/feature/{{ feature.icon }}"
                                             text="{{ feature.name }}"
                                             border-radius="8"
-                                            class="flex-1 ml-3 group-hover:scale-[1.02] transition-transform"
+                                            full-width="true"
+                                            class="flex-1 group-hover:scale-[1.01] transition-transform min-w-0"
                                         ></gradient-chip>
                                     </label>
                                 {% endfor %}
@@ -72,8 +96,13 @@
                         </div>
                     </div>
                     <button type="submit" class="w-full bg-alt hover:bg-alt-600 text-white font-bold py-3 px-6 rounded-xl mt-10 shadow-lg shadow-alt/20 transition-all active:scale-95">
-                        Aplicar Filtros
+                        Filtrar
                     </button>
+                    {% if filteredGender != 'all' or filteredFeatures|length > 0 or searchQuery != '' %}
+                        <a href="/store" class="block w-full text-center text-gray-400 hover:text-white text-sm mt-4 transition-colors">
+                            Limpiar filtros
+                        </a>
+                    {% endif %}
                 </form>
             </aside>
 

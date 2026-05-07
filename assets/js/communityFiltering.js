@@ -30,21 +30,25 @@ function applyFilter(page = 1) {
   }
   const paramsString = params.toString();
   if (paramsString.trim().length > 0) {
-    window.location.href = `/store/games?${params.toString()}`;
+    window.location.href = `/communities?${params.toString()}`;
   } else {
-    window.location.href = `/store/games`;
+    window.location.href = `/communities`;
   }
 }
 
-searchForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  applyFilter();
-});
+if (searchForm) {
+  searchForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    applyFilter();
+  });
+}
 
-filterForm.addEventListener("submit", (event) => {
-  event.preventDefault();
-  applyFilter();
-});
+if (filterForm) {
+  filterForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    applyFilter();
+  });
+}
 
 const previousBtn = document.getElementById("prevPage");
 const nextBtn = document.getElementById("nextPage");
