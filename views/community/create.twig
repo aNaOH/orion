@@ -1,4 +1,4 @@
-{% extends 'layouts/base.twig' %}
+{% extends 'layouts/community_dashboard.twig' %}
 
 {% block title %}Crear {{ post_type_label }} - {{ game.title }} - Orion{% endblock %}
 
@@ -6,46 +6,149 @@
     {% if post_type != 'gallery' %}
         <link rel="stylesheet" href="{{ asset('vendor/simplemde/simplemde.orion.css') }}">
     {% endif %}
+    <style>
+        /* Unified Editor Styling */
+        .editor-wrapper {
+            border: 2px solid rgba(255, 255, 255, 0.08);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.02);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            cursor: text;
+        }
+
+        /* Custom Dark Scrollbar */
+        .CodeMirror-scroll {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+            overflow-x: hidden !important;
+        }
+        .CodeMirror-scroll::-webkit-scrollbar { width: 6px; }
+        .CodeMirror-scroll::-webkit-scrollbar-track { background: transparent; }
+        .CodeMirror-scroll::-webkit-scrollbar-thumb { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 10px;
+        }
+        .CodeMirror-scroll::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+
+        .editor-wrapper:focus-within {
+            border-color: var(--color-alt);
+            background: rgba(var(--color-alt-rgb), 0.04);
+            box-shadow: 0 0 40px -10px rgba(var(--color-alt-rgb), 0.2),
+                        0 0 0 4px rgba(var(--color-alt-rgb), 0.05);
+            transform: translateY(-2px);
+        }
+
+        .CodeMirror {
+            background: transparent !important;
+            border: none !important;
+            color: white !important;
+            font-family: 'Lexend', sans-serif !important;
+            padding: 0.75rem 1rem !important;
+            min-height: 300px !important;
+            font-size: 1rem !important;
+            line-height: 1.6 !important;
+        }
+
+        .CodeMirror-cursor { 
+            border-left: 2px solid var(--color-alt) !important;
+            border-right: none !important;
+            width: 0 !important;
+            display: block !important;
+            visibility: visible !important;
+            z-index: 10 !important;
+            opacity: 1 !important;
+        }
+
+        .editor-toolbar {
+            background: rgba(255, 255, 255, 0.03) !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08) !important;
+            padding: 0.75rem 1rem !important;
+            opacity: 0.6;
+            transition: all 0.3s ease;
+        }
+        
+        .editor-wrapper:focus-within .editor-toolbar {
+            opacity: 1;
+            background: rgba(255, 255, 255, 0.06) !important;
+            border-bottom-color: rgba(var(--color-alt-rgb), 0.2) !important;
+        }
+
+        .editor-toolbar a { 
+            color: rgba(255, 255, 255, 0.5) !important; 
+            border-radius: 0.75rem !important;
+            width: 32px !important;
+            height: 32px !important;
+            line-height: 32px !important;
+            margin-right: 2px !important;
+            transition: all 0.2s ease !important;
+        }
+        
+        .editor-toolbar a:hover, .editor-toolbar a.active { 
+            background: var(--color-alt) !important; 
+            color: white !important; 
+            transform: translateY(-1px);
+        }
+
+        .editor-statusbar { 
+            padding: 0.5rem 1rem !important;
+            color: rgba(255, 255, 255, 0.2) !important;
+            font-size: 10px !important;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            background: rgba(0,0,0,0.1);
+        }
+    </style>
 {% endblock %}
 
-{% block content %}
-<section id="hero" class="bg-brand-500 text-white py-20 -mt-8 mb-10">
-    <div class="container mx-auto text-center">
-        <h2 class="text-2xl md:text-4xl font-bold">Crear {{ post_type_label }} para {{ game.title }}</h2>
-    </div>
-</section>
+{% block community_content %}
+    <div class="max-w-3xl mx-auto">
+        <div class="mb-8">
+            <h2 class="text-3xl font-black text-white tracking-tight">Crear {{ post_type_label }}</h2>
+            <p class="text-gray-400 mt-2">Comparte algo increíble con la comunidad de {{ game.title }}</p>
+        </div>
 
-<section id="create-form" class="py-10">
-    <div class="container mx-auto max-w-2xl px-4">
-        <form id="communityCreateForm" novalidate class="bg-branddark shadow-lg rounded-lg p-8 space-y-6 border border-gray-700/50">
+        <form id="communityCreateForm" novalidate class="space-y-8">
             {{ csrf_token('USERACTION') }}
 
             <!-- Título -->
-            <div>
-                <label for="title" class="block text-sm font-medium text-gray-200 mb-2">Título</label>
-                <input class="form-control block w-full p-4 border border-gray-700 bg-branddark-600 text-gray-200 rounded-lg shadow-sm focus:border-alt focus:ring focus:ring-alt/20 transition-all outline-none"
-                    id="title" name="title" type="text" placeholder="Título del contenido" required />
+            <div class="space-y-2">
+                <label for="title" class="block text-sm font-bold text-gray-400 ml-1">Título del contenido</label>
+                <input class="w-full p-4 bg-white/5 border border-white/10 text-white rounded-2xl focus:border-alt/50 focus:ring-4 focus:ring-alt/5 outline-none transition-all placeholder:text-gray-600 font-medium"
+                    id="title" name="title" type="text" placeholder="¿De qué trata tu publicación?" required />
                 <div id="titleError" class="text-sm text-red-500 mt-2 hidden"></div>
             </div>
 
             {% if post_type == 'guides' %}
                 <!-- Tipo de Guía -->
-                <div>
-                    <label for="guideType" class="block text-sm font-medium text-gray-200 mb-2">Seleccionar tipo de guía</label>
-                    <div class="p-3 bg-branddark-600 rounded-lg shadow-inner flex flex-row gap-x-4 items-center transition-colors duration-300 border border-gray-700" 
-                         style="background-color: {{ guideTypes[0].tint|default('#1a1a1a') }};" id="guideContainer">
-                        <div class="shadow-2xl flex-shrink-0">
-                            <gradient-square id="guideIcon" size="55" 
-                                base-color="{{ guideTypes[0].tint|default('#1a1a1a') }}" 
-                                icon-path="{{ cdn_url('community/guide/type', guideTypes[0].icon|default('default.svg')) }}">
-                            </gradient-square>
+                <div class="space-y-3">
+                    <label for="guideType" class="block text-sm font-bold text-gray-400 ml-1">Categoría de la guía</label>
+                    <div class="relative group">
+                        <!-- Visual Container -->
+                        <div class="p-4 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-4 transition-all duration-300 group-focus-within:border-alt/50 group-focus-within:bg-white/10 group-hover:bg-white/10" id="guideContainer">
+                            <div class="flex-shrink-0">
+                                <gradient-square id="guideIcon" size="48" 
+                                    base-color="{{ guideTypes[0].tint|default('#1a1a1a') }}" 
+                                    icon-path="{{ cdn_url('community/guide/type', guideTypes[0].icon|default('default.svg')) }}">
+                                </gradient-square>
+                            </div>
+                            <div class="flex-grow">
+                                <p id="guideTypeText" class="text-white font-bold">{{ guideTypes[0].type }}</p>
+                            </div>
+                            <div class="text-gray-500 group-hover:text-alt transition-colors">
+                                <i class="bi bi-chevron-down text-lg"></i>
+                            </div>
                         </div>
-                        <select name="guideType" id="guideType" class="bg-transparent text-gray-100 font-semibold block w-full p-2 border-none focus:ring-0 outline-none cursor-pointer">
+                        
+                        <!-- Invisible but clickable select that covers the whole area -->
+                        <select name="guideType" id="guideType" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                             {% for gType in guideTypes %}
                                 <option value="{{ gType.id }}" 
                                         data-color="{{ gType.tint }}" 
-                                        data-icon="{{ cdn_url('guidetype', gType.icon) }}"
-                                        class="bg-branddark text-gray-200">
+                                        data-icon="{{ cdn_url('community/guide/type', gType.icon) }}"
+                                        class="bg-branddark text-white">
                                     {{ gType.type }}
                                 </option>
                             {% endfor %}
@@ -55,38 +158,45 @@
             {% endif %}
 
             <!-- Cuerpo / Media -->
-            <div>
-                <label for="body" class="block text-sm font-medium text-gray-200 mb-2">
-                    {% if post_type == 'gallery' %}Imagen o Video{% else %}Contenido{% endif %}
+            <div class="space-y-2">
+                <label for="body" class="block text-sm font-bold text-gray-400 ml-1">
+                    {% if post_type == 'gallery' %}Archivo multimedia{% else %}Contenido de la publicación{% endif %}
                 </label>
-                <div class="{% if post_type != 'gallery' %}p-2 bg-white rounded-lg{% endif %}">
-                    {% if post_type == 'gallery' %}
+                
+                {% if post_type == 'gallery' %}
+                    <div class="p-1 bg-white/5 rounded-2xl border border-white/10">
                         <file-upload id="body" accept-video="true" max-video-size="15MB"></file-upload>
-                    {% else %}
-                        <textarea name="body" id="body" class="w-full p-4 border border-gray-300 rounded-lg text-brand" rows="8" required></textarea>
-                    {% endif %}
-                </div>
+                    </div>
+                {% else %}
+                    <div class="editor-wrapper rounded-2xl overflow-hidden">
+                        <textarea name="body" id="body" required></textarea>
+                    </div>
+                {% endif %}
             </div>
 
             <!-- Botón Publicar -->
-            <div class="flex justify-end pt-4">
-                <button class="px-8 py-3 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg shadow-lg transition-all transform hover:scale-105" id="submitButton" type="submit">
-                    Publicar {{ post_type_label }}
+            <div class="flex items-center justify-between pt-6 border-t border-white/5">
+                <p class="text-xs text-gray-500 max-w-[400px]">
+                    Asegúrate de seguir las <a href="/legal/community-guidelines" target="_blank" rel="noopener noreferrer" class="text-alt hover:text-alt-600 transition-colors">normas de la comunidad</a> antes de publicar.
+                </p>
+                <button class="px-10 py-4 bg-alt hover:bg-alt-600 text-white font-black rounded-2xl shadow-xl shadow-alt/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2" id="submitButton" type="submit">
+                    <i class="bi bi-rocket-takeoff-fill"></i>
+                    Publicar ahora
                 </button>
             </div>
         </form>
     </div>
-</section>
 {% endblock %}
 
 {% block scripts %}
     <script src="{{ asset('js/helpers/colorHelper.js') }}"></script>
-    <script src="{{ asset('js/forms/community-create.js') }}"></script>
+    
     
     {% if post_type == 'gallery' %}
         <script src="{{ asset('js/components/fileUpload.js') }}"></script>
         <script src="{{ asset('js/forms/gallery-create.js') }}"></script>
     {% else %}
+        <script src="{{ asset('js/forms/community-create.js') }}"></script>
         <script src="{{ asset('vendor/simplemde/simplemde.min.js') }}"></script>
         <script>
             var simplemde = new SimpleMDE({

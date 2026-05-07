@@ -161,6 +161,17 @@ class PostController
                 $label = "guía";
                 $guideTypes = GuideType::getAll();
                 break;
+            case "news":
+                // Solo el desarrollador del juego puede crear noticias
+                $developer = $game->getDeveloper();
+                if (!$developer || $developer->owner_id !== $_SESSION['user']['id']) {
+                    header("Location: /communities/" . $game->id);
+                    exit();
+                }
+                //Redirigimos al dev panel si es el desarrollador
+                header("Location: /dev/panel/games/" . $game->id . "/community/news/new");
+                exit();
+                break;
         }
 
         ViewController::render('community/create', [
@@ -192,6 +203,15 @@ class PostController
                 break;
             case "guides":
                 $postType = EPOST_TYPE::GUIDE;
+                break;
+            case "news":
+                $postType = EPOST_TYPE::GAME_NEWS;
+                $game = Game::getById($gameId);
+                $developer = $game ? $game->getDeveloper() : null;
+                if (!$developer || $developer->owner_id !== $_SESSION['user']['id']) {
+                    $router->trigger404();
+                    exit();
+                }
                 break;
         }
 

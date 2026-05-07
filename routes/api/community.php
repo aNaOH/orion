@@ -7,9 +7,9 @@ $router->mount("/communities", function () use ($router) {
         PostController::create(
             intval($gameId),
             $type,
-            $_POST["title"],
-            $_POST["body"],
-            $_POST["token"] ?? $_POST["tript_token"],
+            $_POST["title"] ?? "",
+            $_POST["body"] ?? "",
+            $_POST["token"] ?? $_POST["tript_token"] ?? "",
             $_POST["guideType"] ?? null
         );
     });

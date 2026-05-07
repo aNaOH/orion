@@ -1,60 +1,53 @@
-{% extends 'layouts/base.twig' %}
+{% extends 'layouts/community_dashboard.twig' %}
 
 {% block title %}{{ title }} - Orion{% endblock %}
 
-{% block content %}
-<!-- Hero Section -->
-<section id="hero" class="bg-brand-500 text-white py-20 -mt-8 mb-10">
-    <div class="container mx-auto text-center px-4">
-        <h2 class="text-4xl md:text-5xl font-bold transition-all">{{ title }}</h2>
-        {% if session_user %}
-            <div class="mt-6">
-                <a href="/communities/{{ game.id }}/{{ post_type }}/create" class="px-6 py-3 bg-alt hover:bg-alt-400 text-white font-semibold rounded-lg shadow-md transition-all">
-                    Nuevo {% if post_type == 'gallery' %}post{% elseif post_type == 'guides' %}guía{% else %}post{% endif %}
-                </a>
+{% block community_content %}
+    <div class="space-y-8">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-3xl font-black text-white tracking-tight">{{ title }}</h2>
+                <p class="text-gray-400 mt-1">Explora las últimas aportaciones de la comunidad</p>
             </div>
-        {% endif %}
-    </div>
-</section>
+            
+            {% set is_dev = game.getDeveloper().owner_id == session_user.id %}
+            {% if session_user %}
+                {% if post_type == 'news' and is_dev %}
+                    <a href="/dev/panel/games/{{ game.id }}/community/news" class="flex items-center gap-2 px-6 py-3 bg-branddark-600 hover:bg-branddark-500 text-white font-bold rounded-xl border border-white/10 shadow-lg transition-all hover:scale-105">
+                        <i class="bi bi-gear-fill text-alt"></i>
+                        Gestionar noticias
+                    </a>
+                {% elseif post_type != 'news' or is_dev %}
+                    <a href="/communities/{{ game.id }}/{{ post_type }}/create" class="flex items-center gap-2 px-6 py-3 bg-alt hover:bg-alt-600 text-white font-bold rounded-xl shadow-lg transition-all hover:scale-105">
+                        <i class="bi bi-plus-lg"></i>
+                        Nuevo {% if post_type == 'gallery' %}post{% elseif post_type == 'guides' %}guía{% elseif post_type == 'news' %}noticia{% else %}post{% endif %}
+                    </a>
+                {% endif %}
+            {% endif %}
+        </div>
 
-<!-- Content Section -->
-<section id="content" class="py-10">
-    <div class="container mx-auto px-4">
-        <div class="space-y-6 max-w-4xl mx-auto">
+        <div class="space-y-6">
             {% if posts is empty %}
-                <div class="text-center py-10 bg-branddark-600 rounded-xl border border-gray-700/50">
-                    <p class="text-gray-400">No hay contenido aún en esta categoría.</p>
+                <div class="py-20 text-center bg-branddark/20 rounded-3xl border border-dashed border-white/10">
+                    <i class="bi bi-chat-dots text-4xl text-gray-600 mb-4 block"></i>
+                    <p class="text-gray-500">No hay contenido aún en esta categoría.<br>¡Sé el primero en publicar algo!</p>
                 </div>
             {% else %}
                 {% for post in posts %}
                     {% if post.is_public %}
                         {% if post_type == 'gallery' %}
-                            {# The 'gallery_card' needs the user vote if logged in #}
                             {% include 'partials/gallery_card.twig' with {'post': post, 'user_vote_value': post.user_vote_value|default(0)} %}
                         {% else %}
-                            <!-- Standard Post Item -->
-                            <a href="/communities/{{ game.id }}/{{ post_type }}/{{ post.id }}" class="block bg-branddark shadow-lg rounded-lg p-6 hover:bg-branddark-600 transition-all border border-gray-700/50">
-                                <div class="flex justify-between items-center whitespace-nowrap overflow-hidden">
-                                    <div class="overflow-hidden">
-                                        <h6 class="text-lg font-semibold text-gray-200 mb-1 truncate">{{ post.title }}</h6>
-                                        <p class="text-sm text-gray-400">de <span class="text-alt font-medium">{{ post.getAuthor().username }}</span></p>
-                                    </div>
-                                    <small class="text-gray-500 text-sm ml-4" data-createdate="{{ post.created_at|date('Y-m-d H:i:s') }}">
-                                        {{ post.created_at|date('d/m/Y') }}
-                                    </small>
-                                </div>
-                            </a>
+                            {% include 'partials/post_card.twig' with {'post': post, 'post_type': post_type} %}
                         {% endif %}
                     {% endif %}
                 {% endfor %}
             {% endif %}
         </div>
     </div>
-</section>
 {% endblock %}
 
 {% block scripts %}
-    {# Generic community JS helpers #}
     <script src="{{ asset('js/addDatesCommunity.js') }}"></script>
     {% if post_type == 'gallery' %}
         <script src="{{ asset('js/components/galleryvote.js') }}"></script>

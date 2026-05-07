@@ -1,97 +1,110 @@
-let urlSplitted = document.URL.split("/");
-let game = urlSplitted[urlSplitted.length - 2];
-
-mediaContainers = $('*[data-galleryslot="media"]');
+const CDN_URL = "https://cdn.orion.moonnastd.com/community/gallery/";
 
 async function loadMedia(mediaContainer, uuid) {
+  if (!uuid) return;
+  
   try {
-    // Aquí la URL del archivo se construye a partir del UUID
-    const mediaUrl =
-      `https://cdn.orion.moonnastd.com/community/gallery/` + uuid;
+    const mediaUrl = CDN_URL + uuid;
+    mediaContainer.innerHTML = ""; // Limpiar spinner
 
-    if (uuid.endsWith("image")) {
-      // Si es una imagen
-      const img = document.createElement("img");
-      img.src = mediaUrl;
-      img.alt = "Media content";
-      img.classList.add("w-full", "h-auto", "rounded-lg");
-      mediaContainer.appendChild(img);
-    } else if (uuid.endsWith("video")) {
-      // Si es un video
+    // Detección mejorada
+    const isVideo = uuid.toLowerCase().includes("video") || uuid.toLowerCase().endsWith(".mp4") || uuid.toLowerCase().endsWith(".webm");
+    
+    if (isVideo) {
       const video = document.createElement("video");
       video.src = mediaUrl;
       video.controls = true;
-      video.classList.add("w-full", "h-auto", "rounded-lg");
+      video.classList.add("w-full", "h-auto", "max-h-[70vh]", "bg-black");
       mediaContainer.appendChild(video);
     } else {
-      mediaContainer.innerHTML = "<p>Tipo de archivo no soportado</p>";
+      const img = document.createElement("img");
+      img.src = mediaUrl;
+      img.alt = "Gallery content";
+      img.classList.add("w-full", "h-auto", "object-contain");
+      // Manejar error de carga (por si era video sin tag en uuid)
+      img.onerror = async () => {
+          if (!mediaContainer.dataset.retry) {
+              mediaContainer.dataset.retry = "true";
+              const response = await fetch(mediaUrl, { method: "HEAD" });
+              const contentType = response.headers.get("Content-Type");
+              if (contentType && contentType.includes("video")) {
+                  mediaContainer.innerHTML = "";
+                  const video = document.createElement("video");
+                  video.src = mediaUrl;
+                  video.controls = true;
+                  video.classList.add("w-full", "h-auto", "max-h-[70vh]");
+                  mediaContainer.appendChild(video);
+              }
+          }
+      };
+      mediaContainer.appendChild(img);
     }
   } catch (error) {
     console.error("Error al cargar el contenido multimedia:", error);
+    mediaContainer.innerHTML = "<p class='text-gray-500 text-xs'>Error al cargar medios</p>";
   }
 }
 
-for (const media of mediaContainers) {
-  loadMedia(media, media.dataset.uuid);
-}
+// Inicialización de tarjetas
+const galleryCards = document.querySelectorAll('[data-gameid]');
 
-shareBtns = $('*[data-galleryslot="shareBtn"]');
-shareLinks = $('*[data-galleryslot="shareLink"]');
-linkInputs = $('*[data-galleryslot="linkInput"]');
-values = $('*[data-galleryslot="value"]');
-galleryVotes = $("gallery-vote");
+galleryCards.forEach((card, index) => {
+    const mediaContainer = card.querySelector('[data-galleryslot="media"]');
+    const shareBtn = card.querySelector('[data-galleryslot="shareBtn"]');
+    const shareLinkBox = card.querySelector('[data-galleryslot="shareLink"]');
+    const linkInput = card.querySelector('[data-galleryslot="linkInput"]');
+    const voteValue = card.querySelector('[data-galleryslot="value"]');
+    const galleryVote = card.querySelector('gallery-vote');
+    const gameId = card.dataset.gameid;
+    const postId = shareBtn ? shareBtn.dataset.postid : null;
 
-function onShareBtnClick(index, postId) {
-  var linkBox = shareLinks[index];
-  var linkInput = linkInputs[index];
+    if (mediaContainer) {
+        loadMedia(mediaContainer, mediaContainer.dataset.uuid);
+    }
 
-  // Muestra la caja de texto
-  linkBox.classList.toggle("hidden"); // Alterna la visibilidad de la caja
+    if (shareBtn && shareLinkBox && linkInput) {
+        shareBtn.addEventListener("click", () => {
+            shareLinkBox.classList.toggle("hidden");
+            
+            var hostname = window.location.origin;
+            linkInput.value = hostname + "/communities/" + gameId + "/gallery/" + postId;
+            linkInput.select();
+            
+            // Copiar al portapapeles opcionalmente
+            try {
+                navigator.clipboard.writeText(linkInput.value);
+            } catch(e) {}
+        });
+    }
 
-  // Asegúrate de que el contenedor padre tenga la clase 'relative'
-  linkBox.parentElement.classList.toggle("relative");
+    if (galleryVote && postId) {
+        galleryVote.addEventListener("valueChange", (event) => {
+            const newValue = event.detail.value;
+            const previousValue = event.detail.previousValue;
+            const tokenElement = document.getElementById("tript_token");
+            
+            if (!tokenElement) {
+                console.error("Token CSRF no encontrado");
+                return;
+            }
 
-  // Posiciona linkBox a la derecha
-  linkBox.classList.toggle("absolute"); // Se posiciona a la derecha del contenedor
-  linkBox.classList.toggle("left-10");
-  linkBox.classList.toggle("translate-y-[-25%]");
-
-  // Si el enlace es dinámico, cambia el valor del input aquí (opcional)
-  var hostname = window.location.hostname;
-  if (hostname != "localhost") hostname = "www." + hostname;
-  linkInput.value = hostname + "/communities/" + game + "/gallery/" + postId; // Cambia a tu enlace dinámico
-  linkInput.select();
-}
-
-for (let index = 0; index < shareBtns.length; index++) {
-  const shareBtn = shareBtns[index];
-  shareBtn.addEventListener("click", function () {
-    onShareBtnClick(index, shareBtn.dataset.postid);
-  });
-
-  galleryVotes[index].addEventListener("valueChange", function (event) {
-    const postId = shareBtn.dataset.postid;
-    const newValue = event.detail.value;
-    const previousValue = event.detail.previousValue;
-
-    const token = document.getElementById("tript_token").value;
-
-    $.ajax({
-      url: "/api/communities/vote/" + postId, // The URL to which the request is sent
-      type: "POST", // The HTTP method to use for the request (GET, POST, etc.)
-      data: {
-        previousValue,
-        newValue,
-        token,
-      }, // Data to be sent to the server
-      success: function (response) {
-        values[index].innerHTML = response.new_value;
-      },
-      error: function (xhr, status, error) {
-        const info = xhr.responseJSON;
-        console.log(info);
-        galleryVotes.setAttribute("value", previousValue);
-      },
-    });
-  });
-}
+            $.ajax({
+                url: "/api/communities/vote/" + postId,
+                type: "POST",
+                data: {
+                    previousValue,
+                    newValue,
+                    token: tokenElement.value,
+                },
+                success: function (response) {
+                    if (voteValue) voteValue.innerHTML = response.new_value;
+                },
+                error: function (xhr) {
+                    console.error("Error en la votación:", xhr.responseJSON);
+                    galleryVote.setAttribute("value", previousValue);
+                    alert("No se pudo registrar tu voto. Por favor, intenta de nuevo.");
+                },
+            });
+        });
+    }
+});

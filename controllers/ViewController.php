@@ -136,6 +136,19 @@ class ViewController
                 $parsedown = new TailwindParsedown();
                 return $parsedown->text($content);
             }, ['is_safe' => ['html']]));
+
+            // time_ago filter: <span data-timestamp="...">...</span>
+            self::$twig->addFilter(new \Twig\TwigFilter('time_ago', function ($date): string {
+                if ($date instanceof DateTime) {
+                    $timestamp = $date->format('Y-m-d\TH:i:s\Z');
+                    $display = $date->format('d/m/Y');
+                } else {
+                    $ts = is_numeric($date) ? $date : strtotime($date . ' UTC');
+                    $timestamp = gmdate('Y-m-d\TH:i:s\Z', $ts);
+                    $display = date('d/m/Y', $ts);
+                }
+                return '<span class="time-ago" data-timestamp="' . $timestamp . '" title="' . $timestamp . '">' . $display . '</span>';
+            }, ['is_safe' => ['html']]));
         }
 
         return self::$twig;

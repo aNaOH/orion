@@ -155,15 +155,16 @@ class GameController
     public static function openCommunity($gameId)
     {
         $game = Game::getById($gameId);
-
-        if (is_null($game)) {
+        if (!$game) {
             return false;
         }
 
         ViewController::render('community/dashboard', [
-            'game' => $game
+            'game' => $game,
+            'recentActivity' => Post::getLatestByGame($gameId, 10),
+            'genres' => GameGenre::getAll(),
+            'features' => GameFeature::getAll()
         ]);
-
         return true;
     }
 

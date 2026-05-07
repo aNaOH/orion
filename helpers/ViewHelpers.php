@@ -23,6 +23,7 @@ class ViewHelpers
             'cart_total' => 0,
             'server_time' => date('c'),
             'server_timezone' => date('T'),
+            'request_uri' => $_SERVER['REQUEST_URI'],
         ];
 
         // If user is logged in, fetch full user object and role flags

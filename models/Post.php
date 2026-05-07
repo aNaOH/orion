@@ -244,4 +244,30 @@ class Post
 
         return $posts;
     }
+
+    public static function getLatestByGame(int $gameId, int $limit = 5): array
+    {
+        $sql = "SELECT * FROM " . self::$table . " WHERE game_id = ? AND is_public = 1 ORDER BY created_at DESC LIMIT " . (int)$limit;
+        $results = Connection::customQuery(ORION_DB, $sql, [$gameId])->fetchAll(PDO::FETCH_ASSOC);
+        
+        $posts = [];
+        foreach ($results as $post) {
+            $postObj = new Post(
+                $post["title"],
+                $post["body"],
+                (bool) $post["is_public"],
+                $post["type"],
+                $post["game_id"],
+                $post["author_id"],
+                $post["id"],
+            );
+
+            $postObj->created_at = new DateTime($post["created_at"]);
+            $postObj->last_updated_at = new DateTime($post["last_updated_at"]);
+
+            $posts[] = $postObj;
+        }
+
+        return $posts;
+    }
 }

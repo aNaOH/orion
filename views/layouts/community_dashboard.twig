@@ -1,0 +1,110 @@
+{% extends 'layouts/base.twig' %}
+
+{% block title %}Comunidad de {{ game.title }} - Orion{% endblock %}
+
+{% block body %}
+    {{ csrf_token('USERACTION') }}
+    <script src="{{ asset('js/components/gradientChip.js') }}"></script>
+    <main>
+        <!-- Hero Header (Full Width) -->
+        <div class="relative h-[450px] overflow-hidden group border-b border-white/5">
+            <!-- Blurred Background Cover -->
+            <img src="https://cdn.orion.moonnastd.com/game/cover/{{ game.id }}" class="absolute inset-0 w-full h-full object-cover scale-105 blur-md brightness-[0.3]" alt="background">
+            <div class="absolute inset-0 bg-gradient-to-t from-branddark via-branddark/60 to-transparent"></div>
+            
+            <div class="container mx-auto px-6 h-full flex flex-col justify-end pb-12 relative z-10">
+                <div class="flex flex-col md:flex-row items-center md:items-end gap-8">
+                    <!-- Game Icon -->
+                    <div class="relative">
+                        <div class="absolute -inset-1 bg-alt rounded-3xl blur opacity-30"></div>
+                        <img src="https://cdn.orion.moonnastd.com/game/icon/{{ game.id }}" class="relative w-32 h-32 md:w-40 md:h-40 rounded-3xl border-4 border-branddark shadow-2xl" alt="{{ game.title }} icon">
+                    </div>
+                    
+                    <!-- Game Info -->
+                    <div class="flex-grow text-center md:text-left mb-2">
+                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-3 mb-4">
+                            {% set genre = game.getGenre() %}
+                            {% if genre %}
+                                <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider border" 
+                                      style="background-color: {{ genre.tint }}20; border-color: {{ genre.tint }}40; color: {{ genre.tint }};">
+                                    {{ genre.name }}
+                                </span>
+                            {% endif %}
+                        </div>
+                        <h1 class="text-4xl md:text-6xl font-black text-white mb-4 tracking-tight">{{ game.title }}</h1>
+                        <p class="text-white/60 text-lg max-w-2xl line-clamp-2 md:line-clamp-none">
+                            {{ game.short_description }}
+                        </p>
+                    </div>
+
+                    <!-- Action Button -->
+                    <div class="pb-2">
+                        <a href="/login" class="flex items-center gap-2 px-8 py-4 bg-alt hover:bg-alt-600 text-white font-bold rounded-2xl shadow-xl shadow-alt/20 transition-all hover:scale-105 active:scale-95">
+                            <i class="bi bi-plus-lg"></i>
+                            Unirse a la comunidad
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Community Navigation (Full Width) -->
+        <div class="bg-branddark/80 backdrop-blur-xl border-b border-white/5 shadow-lg">
+            <div class="container mx-auto px-6">
+                <div class="flex items-center gap-8 overflow-x-auto no-scrollbar py-1">
+                    {% set current_path = request_uri|default('') %}
+                    {% set is_posts = '/posts' in current_path %}
+                    {% set is_gallery = '/gallery' in current_path %}
+                    {% set is_guides = '/guides' in current_path %}
+                    {% set is_news = '/news' in current_path %}
+                    {% set is_home = not (is_posts or is_gallery or is_guides or is_news) %}
+
+                    <a href="/communities/{{ game.id }}" class="py-5 {% if is_home %}text-alt border-b-2 border-alt font-bold{% else %}text-gray-400 hover:text-white font-medium border-b-2 border-transparent hover:border-white/20{% endif %} whitespace-nowrap transition-all">Inicio</a>
+                    <a href="/communities/{{ game.id }}/posts" class="py-5 {% if is_posts %}text-alt border-b-2 border-alt font-bold{% else %}text-gray-400 hover:text-white font-medium border-b-2 border-transparent hover:border-white/20{% endif %} whitespace-nowrap transition-all">Posts</a>
+                    <a href="/communities/{{ game.id }}/gallery" class="py-5 {% if is_gallery %}text-alt border-b-2 border-alt font-bold{% else %}text-gray-400 hover:text-white font-medium border-b-2 border-transparent hover:border-white/20{% endif %} whitespace-nowrap transition-all">Galería</a>
+                    <a href="/communities/{{ game.id }}/guides" class="py-5 {% if is_guides %}text-alt border-b-2 border-alt font-bold{% else %}text-gray-400 hover:text-white font-medium border-b-2 border-transparent hover:border-white/20{% endif %} whitespace-nowrap transition-all">Guías</a>
+                    <a href="/communities/{{ game.id }}/news" class="py-5 {% if is_news %}text-alt border-b-2 border-alt font-bold{% else %}text-gray-400 hover:text-white font-medium border-b-2 border-transparent hover:border-white/20{% endif %} whitespace-nowrap transition-all">Noticias</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Content (Contained) -->
+        <div class="container mx-auto px-6 py-12">
+            <div class="flex flex-col lg:flex-row gap-10">
+                <!-- Main Content -->
+                <div class="flex-grow">
+                    {% block community_content %}{% endblock %}
+                </div>
+
+                <!-- Sidebar -->
+                <aside class="lg:w-80 space-y-8 flex-shrink-0">
+                    {% block community_sidebar %}
+                        <!-- Community Rules -->
+                        <div class="bg-gradient-to-br from-branddark/50 to-branddark/20 p-6 rounded-3xl border border-white/5">
+                            <h3 class="text-lg font-bold text-white mb-4">Reglas de la casa</h3>
+                            <ul class="space-y-3 text-sm text-gray-400">
+                                <li class="flex gap-2"><span class="text-alt font-bold">1.</span> Mantén el respeto</li>
+                                <li class="flex gap-2"><span class="text-alt font-bold">2.</span> Nada de spoilers sin aviso</li>
+                                <li class="flex gap-2"><span class="text-alt font-bold">3.</span> Contenido original</li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Game Info Mini Card -->
+                        <div class="relative group rounded-3xl overflow-hidden shadow-2xl">
+                            <img src="https://cdn.orion.moonnastd.com/game/cover/{{ game.id }}" class="w-full h-auto" alt="cover">
+                            <div class="absolute inset-0 bg-gradient-to-t from-black to-transparent p-6 flex flex-col justify-end">
+                                <span class="text-xs font-bold text-alt mb-1">Disponible ahora</span>
+                                <h4 class="text-white font-bold text-lg mb-4">{{ game.title }}</h4>
+                                <a href="/store/{{ game.id }}" class="w-full py-2 bg-white text-black text-center text-sm font-bold rounded-xl hover:bg-alt hover:text-white transition-all">Ver en tienda</a>
+                            </div>
+                        </div>
+                    {% endblock %}
+                </aside>
+            </div>
+        </div>
+    </main>
+{% endblock %}
+
+{% block scripts %}
+    {{ parent() }}
+{% endblock %}

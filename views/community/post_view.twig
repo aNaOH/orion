@@ -1,87 +1,143 @@
-{% extends 'layouts/base.twig' %}
+{% extends 'layouts/community_dashboard.twig' %}
 
 {% block title %}Post '{{ post.title }}' - {{ game.title }} - Orion{% endblock %}
 
-{% block content %}
-<!-- Content Section -->
-<div class="max-w-4xl mx-auto py-10 px-4">
-    
-    {% if post_type == 'gallery' %}
-        {# Gallery items use the same card component as the list for consistency #}
-        <div class="mb-10">
-            {% include 'partials/gallery_card.twig' with {'post': post, 'user_vote_value': user_vote_value|default(0)} %}
-        </div>
-    {% else %}
-        <!-- Standard Post Header -->
-        <header class="mb-10 text-center">
-            <h1 class="text-4xl md:text-5xl font-bold text-gray-100 mb-4">{{ post.title }}</h1>
-            <p class="text-lg text-gray-400">
-                Escrito por 
-                <a href="/profile/{{ post.getAuthor().id }}" class="font-semibold text-alt hover:underline">
-                    {{ post.getAuthor().username }}
-                </a>
-                {#- Rendered as inline to avoid space before date #}
-                <span class="mx-2">•</span>
-                <span data-createdate="{{ post.created_at|date('Y-m-d H:i:s') }}">{{ post.created_at|date('d/m/Y') }}</span>
-            </p>
-        </header>
-
-        <!-- Post Body -->
-        <article class="prose prose-invert prose-lg max-w-none bg-branddark p-8 rounded-xl border border-gray-700/50 shadow-lg mb-10">
-            {{ post.body|markdown }}
-        </article>
-    {% endif %}
-
-    <!-- Comments Section -->
-    <section id="comments" class="bg-branddark rounded-xl border border-gray-700/50 shadow-lg overflow-hidden">
-        <div class="p-6 border-b border-gray-700/50">
-            <h2 class="text-2xl font-bold text-gray-100 flex items-center">
-                <i class="bi bi-chat-left-text-fill mr-3 text-alt"></i>
-                Comentarios
-            </h2>
-        </div>
-
-        <div class="p-6 space-y-6">
-            {% if session_user %}
-                <!-- Comment Form -->
-                <form id="commentForm" method="post" action="/api/communities/comment/{{ post.id }}" class="mb-10">
-                    {{ csrf_token('USERACTION') }}
-                    <div class="bg-branddark-600 flex flex-col md:flex-row p-4 gap-5 rounded-xl border border-alt-500/30">
-                        <div class="w-16 h-16 rounded-full overflow-hidden border-4 border-alt-500 flex-shrink-0 hidden md:block">
-                            <img src="{{ profile_pic(user) }}" alt="Tu foto de perfil" class="w-full h-full object-cover">
+{% block community_content %}
+    <div class="space-y-10">
+        {% if post_type == 'gallery' %}
+            {# Immersive Gallery View #}
+            <div data-gameid="{{ game.id }}" class="bg-branddark/40 rounded-[2rem] border border-white/5 overflow-hidden shadow-2xl">
+                <!-- Media Header / Navigation -->
+                <div class="p-6 flex items-center justify-between border-b border-white/5 bg-white/5">
+                    <div class="flex items-center gap-4">
+                        {% set author = post.getAuthor() %}
+                        <img src="{{ profile_pic(author) }}" class="w-12 h-12 rounded-full border-2 border-alt/30" alt="{{ author.username }}">
+                        <div>
+                            <p class="text-white font-bold leading-tight">{{ author.username }}</p>
+                            <p class="text-gray-500 text-xs">Publicado {{ post.created_at|time_ago }}</p>
                         </div>
-                        <div class="flex flex-col gap-3 w-full">
-                            <p class="font-semibold text-gray-200">Comentando como <span class="text-alt">{{ session_user.username }}</span></p>
-                            <textarea name="comment" id="comment" rows="3" required placeholder="Escribe aquí tu comentario" 
-                                class="p-3 rounded-xl text-gray-200 w-full bg-branddark border border-gray-700 focus:border-alt focus:ring-1 focus:ring-alt outline-none transition-all resize-none"></textarea>
-                            <div class="flex justify-end">
-                                <button class="px-6 py-2 bg-alt hover:bg-alt-400 text-white font-bold rounded-lg shadow-lg transition-all" id="submitButton" type="submit">
-                                    Comentar
-                                </button>
+                    </div>
+
+                    <div class="flex items-center gap-3 relative">
+                        <div data-galleryslot="shareBtn" data-postid="{{ post.id }}" class="w-10 h-10 rounded-2xl bg-white/5 hover:bg-alt text-gray-400 hover:text-white cursor-pointer flex items-center justify-center transition-all">
+                            <i class="bi bi-share"></i>
+                        </div>
+                        <div data-galleryslot="shareLink" class="hidden absolute right-0 top-full mt-3 z-50 p-4 bg-branddark border border-white/10 rounded-2xl shadow-2xl w-72">
+                            <p class="text-[10px] text-gray-500 uppercase font-black mb-2 tracking-widest">Enlace de publicación</p>
+                            <input data-galleryslot="linkInput" type="text" class="w-full p-3 text-xs border-none rounded-xl bg-white/5 text-alt font-bold" readonly>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Large Media Section -->
+                <div data-galleryslot="media" data-uuid="{{ post.getPostInfo().media }}" class="bg-black/40 min-h-[400px] flex items-center justify-center relative">
+                    <div class="animate-pulse flex flex-col items-center gap-4">
+                        <i class="bi bi-image text-white/10 text-6xl"></i>
+                        <span class="text-white/20 text-xs font-bold tracking-widest uppercase">Cargando obra maestra...</span>
+                    </div>
+                </div>
+
+                <!-- Info & Interaction Bar -->
+                <div class="p-8 md:p-10 flex flex-col md:flex-row md:items-center justify-between gap-8 bg-gradient-to-b from-transparent to-black/20">
+                    <div class="flex-grow">
+                        <h1 class="text-3xl md:text-4xl font-black text-white mb-4 tracking-tight leading-tight">{{ post.title }}</h1>
+                        <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-2 px-4 py-2 bg-alt/10 border border-alt/20 rounded-full">
+                                <i class="bi bi-star-fill text-alt text-sm"></i>
+                                <span data-galleryslot="value" class="text-white font-black text-lg">{{ post.getPostInfo().getValue() }}</span>
+                            </div>
+                            <div class="text-gray-500 text-sm font-medium">
+                                Valoración de la comunidad
                             </div>
                         </div>
                     </div>
-                </form>
-            {% else %}
-                <div class="mb-10 p-4 bg-branddark-600 rounded-xl border border-dashed border-gray-600 text-center text-gray-400">
-                    <p>Debes <a href="/login" class="text-alt font-bold hover:underline">iniciar sesión</a> para comentar.</p>
-                </div>
-            {% endif %}
 
-            <!-- Comments List -->
-            <div class="space-y-4">
-                {% set comments = post.getComments() %}
-                {% if comments is empty %}
-                    <p class="text-center text-gray-500 py-4">Aún no hay comentarios. ¡Sé el primero en comentar!</p>
-                {% else %}
-                    {% for comment in comments %}
-                        {% include 'partials/comment.twig' with {'comment': comment} %}
-                    {% endfor %}
-                {% endif %}
+                    <div class="flex flex-col items-center md:items-end gap-3">
+                        <p class="text-[10px] text-gray-500 uppercase font-black tracking-widest">Tu valoración</p>
+                        {% if session_user %}
+                            <gallery-vote value="{{ user_vote_value|default(0) }}"></gallery-vote>
+                        {% else %}
+                            <a href="/login" class="px-6 py-3 bg-white/5 hover:bg-white/10 text-white text-xs font-bold rounded-2xl border border-white/5 transition-all">
+                                Inicia sesión para votar
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
-        </div>
-    </section>
-</div>
+        {% else %}
+            <!-- Standard Post Content -->
+            <article class="bg-branddark/40 p-8 md:p-12 rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
+                <header class="mb-10">
+                    <div class="flex items-center gap-3 mb-6">
+                        {% set author = post.getAuthor() %}
+                        <img src="{{ profile_pic(author) }}" class="w-14 h-14 rounded-full border-2 border-alt/30" alt="{{ author.username }}">
+                        <div>
+                            <p class="text-white font-bold text-lg hover:text-alt transition-colors cursor-pointer">{{ author.username }}</p>
+                            <p class="text-gray-500 text-sm">Publicado {{ post.created_at|time_ago }}</p>
+                        </div>
+                    </div>
+                    <h1 class="text-4xl md:text-5xl font-black text-white mb-6 leading-tight tracking-tight">{{ post.title }}</h1>
+                    <div class="w-20 h-1.5 bg-alt rounded-full"></div>
+                </header>
+
+                <div class="prose prose-invert prose-lg max-w-none text-gray-300 leading-relaxed">
+                    {{ post.body|markdown }}
+                </div>
+            </article>
+        {% endif %}
+
+        <!-- Comments Section -->
+        <section id="comments" class="bg-branddark/40 rounded-3xl border border-white/5 shadow-2xl overflow-hidden">
+            <div class="p-8 border-b border-white/5 flex items-center justify-between">
+                <h2 class="text-2xl font-bold text-white flex items-center gap-3">
+                    <i class="bi bi-chat-left-text text-alt"></i>
+                    Comentarios
+                </h2>
+                <span class="px-3 py-1 bg-white/5 rounded-full text-xs font-bold text-gray-400">
+                    {{ post.getComments()|length }} aportaciones
+                </span>
+            </div>
+
+            <div class="p-8 space-y-10">
+                {% if session_user %}
+                    <!-- Comment Form -->
+                    <form id="commentForm" method="post" action="/api/communities/comment/{{ post.id }}" class="group">
+                        {{ csrf_token('USERACTION') }}
+                        <div class="relative flex flex-col gap-4">
+                            <textarea name="comment" id="comment" rows="3" required placeholder="Comparte tu opinión..." 
+                                class="p-6 rounded-2xl text-white w-full bg-white/5 border border-white/10 focus:border-alt/50 focus:ring-4 focus:ring-alt/5 outline-none transition-all resize-none placeholder:text-gray-600"></textarea>
+                            <div class="flex justify-end">
+                                <button class="px-8 py-3 bg-alt hover:bg-alt-600 text-white font-bold rounded-xl shadow-xl shadow-alt/10 transition-all hover:scale-105 active:scale-95 flex items-center gap-2" id="submitButton" type="submit">
+                                    <i class="bi bi-send-fill"></i>
+                                    Enviar comentario
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                {% else %}
+                    <div class="p-8 bg-white/5 rounded-3xl border border-dashed border-white/10 text-center text-gray-400">
+                        <i class="bi bi-lock text-3xl mb-4 block opacity-50"></i>
+                        <p>Debes <a href="/login" class="text-alt font-bold hover:underline">iniciar sesión</a> para participar en la conversación.</p>
+                    </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                <div class="space-y-6">
+                    {% set comments = post.getComments() %}
+                    {% if comments is empty %}
+                        <div class="text-center py-10 opacity-50">
+                            <i class="bi bi-chat-dots text-4xl mb-4 block"></i>
+                            <p>Aún no hay comentarios. ¡Sé el primero!</p>
+                        </div>
+                    {% else %}
+                        {% for comment in comments %}
+                            {% include 'partials/comment.twig' with {'comment': comment} %}
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            </div>
+        </section>
+    </div>
 {% endblock %}
 
 {% block scripts %}

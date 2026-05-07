@@ -7,6 +7,7 @@ class GradientChipElement extends HTMLElement {
     return [
       "base-color",
       "size",
+      "icon",
       "icon-path",
       "use-tailwind",
       "border-radius",
@@ -46,11 +47,11 @@ class GradientChipElement extends HTMLElement {
         display: flex;
         align-items: center;
         justify-content: flex-start;
-        padding: 6px 12px;
-        gap: 10px;
+        padding: 4px 12px;
+        gap: 8px;
         position: relative;
         transition: background 0.3s ease, color 0.3s ease;
-        min-height: 36px;
+        min-height: 28px;
         width: 100%;
         box-sizing: border-box;
       }
@@ -60,16 +61,23 @@ class GradientChipElement extends HTMLElement {
         justify-content: center;
         position: relative;
         flex-shrink: 0;
+        overflow: hidden;
+      }
+      .icon-container img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
       }
       .text-container {
-        font-size: 13px;
-        font-weight: 500;
+        font-size: 11px;
+        font-weight: 800;
         line-height: 1.25;
-        white-space: normal;
-        word-break: break-word;
+        white-space: nowrap;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
         flex-grow: 1;
         min-width: 0;
-        padding: 2px 0;
       }
       svg {
         width: 100%;
@@ -98,10 +106,10 @@ class GradientChipElement extends HTMLElement {
 
   updateStyles() {
     const baseColor = this.getAttribute("base-color") || "#000000";
-    const size = Math.max(10, parseInt(this.getAttribute("size") || "40", 10));
+    const size = Math.max(10, parseInt(this.getAttribute("size") || "16", 10));
     const borderRadius = Math.max(
       0,
-      parseInt(this.getAttribute("border-radius") || "16", 10),
+      parseInt(this.getAttribute("border-radius") || "8", 10),
     );
     const useTailwind = this.getAttribute("use-tailwind") !== "false";
 
@@ -112,7 +120,7 @@ class GradientChipElement extends HTMLElement {
         "wrapper flex items-center cursor-pointer";
       this.iconContainer.className =
         "icon-container flex items-center justify-center";
-      this.textContainer.className = "text-container text-sm font-medium whitespace-normal";
+      this.textContainer.className = "text-container text-[10px] font-black uppercase tracking-widest";
     } else {
       this.wrapper.className = "wrapper";
       this.iconContainer.className = "icon-container";
@@ -141,29 +149,46 @@ class GradientChipElement extends HTMLElement {
   }
 
   async updateIcon() {
+    const iconUrl = this.getAttribute("icon");
     const iconPath = this.getAttribute("icon-path");
-    if (!iconPath) {
+    const path = iconUrl || iconPath;
+
+    if (!path) {
       this.iconContainer.innerHTML = "";
-      this.updateStyles(); // Asegurar que se quite el espacio
+      this.updateStyles();
       return;
     }
 
-    try {
-      const response = await fetch(iconPath);
-      if (!response.ok) throw new Error("Failed to fetch icon");
-      const svgText = await response.text();
-      this.iconContainer.innerHTML = svgText;
+    // Comprobar si es una imagen (extensión) o si se ha pasado por el atributo 'icon'
+    const isImage = iconUrl || /\.(png|jpg|jpeg|webp|gif|svg)$/i.test(path);
+    
+    // Si es SVG pero por icon-path, intentamos fetch para inyectar y poder colorear
+    if (iconPath && path.toLowerCase().endsWith(".svg")) {
+      try {
+        const response = await fetch(path);
+        if (!response.ok) throw new Error("Failed to fetch icon");
+        const svgText = await response.text();
+        this.iconContainer.innerHTML = svgText;
 
-      const svg = this.iconContainer.querySelector("svg");
-      if (svg) {
-        svg.style.fill = "currentColor";
+        const svg = this.iconContainer.querySelector("svg");
+        if (svg) {
+          svg.style.fill = "currentColor";
+        }
+        this.updateStyles();
+        return;
+      } catch (error) {
+        console.error("Error loading SVG:", error);
       }
-    } catch (error) {
-      console.error("Error loading SVG:", error);
+    }
+
+    // Si no es un SVG para inyectar, o el fetch falló, lo tratamos como imagen normal
+    if (path) {
+      this.iconContainer.innerHTML = `<img src="${path}" alt="icon">`;
+    } else {
       this.iconContainer.innerHTML = "";
     }
 
-    this.updateStyles(); // Actualiza visualmente el espaciado según haya o no icono
+    this.updateStyles();
   }
 
   updateText() {
@@ -180,7 +205,7 @@ class GradientChipElement extends HTMLElement {
   attributeChangedCallback(name, oldValue, newValue) {
     if (oldValue === newValue) return;
 
-    if (name === "icon-path") {
+    if (name === "icon" || name === "icon-path") {
       this.updateIcon();
     } else if (name === "text") {
       this.updateText();

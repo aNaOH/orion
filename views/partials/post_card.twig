@@ -1,0 +1,56 @@
+{# Post Card Component (Horizontal Split Design) #}
+<a href="/communities/{{ game.id }}/{{ post_type }}/{{ post.id }}" class="group block bg-branddark/40 hover:bg-branddark/60 p-6 rounded-3xl border border-white/5 transition-all">
+    <div class="flex items-center justify-between gap-6">
+        {# Left Side: Title and Chips #}
+        <div class="flex-grow space-y-2">
+            <div class="flex items-center gap-3 flex-wrap">
+                <h3 class="text-xl font-black text-white group-hover:text-alt transition-colors leading-tight">
+                    {{ post.title }}
+                </h3>
+                
+                {# Tipo chip (Inline with title) #}
+                {% set typeLabel = '' %}
+                {% if post.type.value == 2 %}{% set typeLabel = 'Guía' %}
+                {% elseif post.type.value == 3 %}{% set typeLabel = 'Noticia' %}
+                {% else %}{% set typeLabel = 'Post' %}{% endif %}
+                
+                <span class="px-2 py-0.5 rounded bg-white/10 text-gray-400 text-[10px] font-black uppercase tracking-widest border border-white/5">
+                    {{ typeLabel }}
+                </span>
+            </div>
+            
+            {# Gradient chip (Below title) #}
+            <div class="flex items-center gap-3">
+                {% if post.type.value == 3 %}
+                    <gradient-chip text="Noticia Oficial" base-color="#00d2ff"></gradient-chip>
+                {% elseif post.type.value == 2 %}
+                    {% set info = post.getPostInfo() %}
+                    {% if info %}
+                        {% set gType = info.getType() %}
+                        <gradient-chip text="{{ gType.type }}" base-color="{{ gType.tint }}" icon="{{ cdn_url('community/guide/type', gType.icon) }}"></gradient-chip>
+                    {% endif %}
+                {% endif %}
+            </div>
+        </div>
+
+        {# Right Side: Author Info and Pic #}
+        <div class="flex items-center gap-4 text-right shrink-0">
+            <div class="hidden sm:block">
+                {% set author = post.getAuthor() %}
+                <p class="text-white font-bold group-hover:text-alt transition-colors">{{ author.username }}</p>
+                <p class="text-gray-500 text-xs">{{ post.created_at|time_ago }}</p>
+            </div>
+            <img src="{{ profile_pic(author) }}" class="w-12 h-12 rounded-full border-2 border-white/10 shadow-lg group-hover:border-alt/50 transition-all" alt="{{ author.username }}">
+        </div>
+    </div>
+
+    {# Bottom Stats #}
+    <div class="flex items-center gap-6 mt-6 pt-4 border-t border-white/5 text-gray-500 text-sm font-bold">
+        <div class="flex items-center gap-2">
+            <i class="bi bi-chat-text text-xs opacity-50"></i> 
+            {{ post.getComments()|length }}
+        </div>
+        
+        <i class="bi bi-arrow-right ml-auto text-gray-700 group-hover:text-alt group-hover:translate-x-1 transition-all"></i>
+    </div>
+</a>
